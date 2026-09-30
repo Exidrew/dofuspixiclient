@@ -1,5 +1,10 @@
 import type { Serializable } from "@shared/handoff/handoff.coordinator";
-import { Injectable, Logger, type OnModuleDestroy } from "@nestjs/common";
+import {
+  Inject,
+  Injectable,
+  Logger,
+  type OnModuleDestroy,
+} from "@nestjs/common";
 import { EventEmitter2 } from "@nestjs/event-emitter";
 import { HandoffPart } from "@shared/handoff/handoff-part.decorator";
 
@@ -26,7 +31,7 @@ export class SchedulerService
   private readonly jobs = new Map<string, ScheduledJob>();
   private readonly timers = new Map<string, ReturnType<typeof setTimeout>>();
 
-  constructor(private readonly events: EventEmitter2) {}
+  constructor(@Inject(EventEmitter2) private readonly events: EventEmitter2) {}
 
   schedule(job: ScheduledJob): void {
     this.cancel(job.id);

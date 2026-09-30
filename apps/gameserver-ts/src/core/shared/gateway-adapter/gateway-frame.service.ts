@@ -13,7 +13,12 @@ import {
   HandoffControlSchema,
 } from "@dofus/proto/gateway/v1/gateway_frame_pb";
 import { type FramedSocket, listen as udsListen } from "@dofus/uds-transport";
-import { Injectable, Logger, type OnModuleDestroy } from "@nestjs/common";
+import {
+  Inject,
+  Injectable,
+  Logger,
+  type OnModuleDestroy,
+} from "@nestjs/common";
 import { SessionRegistry } from "@shared/gateway-adapter/session-registry";
 import { WsRouter } from "@shared/gateway-adapter/ws-router";
 import { match } from "ts-pattern";
@@ -32,8 +37,8 @@ export class GatewayFrameService implements OnModuleDestroy {
   private handoffHandler: HandoffFrameHandler | null = null;
 
   constructor(
-    private readonly router: WsRouter,
-    private readonly sessions: SessionRegistry
+    @Inject(WsRouter) private readonly router: WsRouter,
+    @Inject(SessionRegistry) private readonly sessions: SessionRegistry
   ) {}
 
   setHandoffHandler(fn: HandoffFrameHandler) {

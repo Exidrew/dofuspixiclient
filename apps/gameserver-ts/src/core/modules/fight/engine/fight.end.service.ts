@@ -19,7 +19,7 @@ import { monsterGroupToSpriteEntry } from "@modules/monsters/map-monster.sprite-
 import { PlayerPresenceService } from "@modules/player-presence/player-presence.service";
 import { toSpriteEntry } from "@modules/player-presence/player-presence.sprite-entry";
 import { PlayersRepository } from "@modules/players/players.repository";
-import { Injectable, Logger } from "@nestjs/common";
+import { Inject, Injectable, Logger } from "@nestjs/common";
 import { GatewayFrameService } from "@shared/gateway-adapter/gateway-frame.service";
 
 @Injectable()
@@ -27,13 +27,17 @@ export class FightEndService {
   private readonly logger = new Logger(FightEndService.name);
 
   constructor(
+    @Inject(FightRegistryService)
     private readonly registry: FightRegistryService,
-    private readonly frames: GatewayFrameService,
+    @Inject(GatewayFrameService) private readonly frames: GatewayFrameService,
+    @Inject(FightHistoryRepository)
     private readonly historyRepo: FightHistoryRepository,
-    private readonly players: PlayersRepository,
+    @Inject(PlayersRepository) private readonly players: PlayersRepository,
+    @Inject(PlayerPresenceService)
     private readonly presence: PlayerPresenceService,
+    @Inject(MapTransitionService)
     private readonly transition: MapTransitionService,
-    private readonly mapMonsters: MapMonsterService
+    @Inject(MapMonsterService) private readonly mapMonsters: MapMonsterService
   ) {}
 
   async endFight(fight: Fight): Promise<void> {

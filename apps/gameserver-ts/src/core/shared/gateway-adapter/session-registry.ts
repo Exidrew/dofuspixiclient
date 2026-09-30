@@ -3,7 +3,7 @@
 // during handoff.
 
 import type { Serializable } from "@shared/handoff/handoff.coordinator";
-import { Injectable, Logger } from "@nestjs/common";
+import { Inject, Injectable, Logger } from "@nestjs/common";
 import { EventEmitter2 } from "@nestjs/event-emitter";
 import { HandoffPart } from "@shared/handoff/handoff-part.decorator";
 
@@ -24,7 +24,7 @@ export class SessionRegistry implements Serializable<SerializedSession[]> {
   private readonly logger = new Logger(SessionRegistry.name);
   private readonly sessions = new Map<string, Session>();
 
-  constructor(private readonly events: EventEmitter2) {}
+  constructor(@Inject(EventEmitter2) private readonly events: EventEmitter2) {}
 
   open(input: Omit<Session, "openedAt">) {
     const session: Session = { ...input, openedAt: Date.now() };
@@ -58,7 +58,10 @@ export class SessionRegistry implements Serializable<SerializedSession[]> {
     return session;
   }
 
-  waitForAuth(sessionId: string, timeoutMs = 5000): Promise<Session | undefined> {
+  waitForAuth(
+    sessionId: string,
+    timeoutMs = 5000
+  ): Promise<Session | undefined> {
     const session = this.sessions.get(sessionId);
     if (session?.accountId) {
       return Promise.resolve(session);

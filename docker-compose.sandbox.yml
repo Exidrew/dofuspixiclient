@@ -1,0 +1,38 @@
+# Stack locale : PostgreSQL + Redis pour le gameserver.
+#
+#       docker compose -f docker-compose.sandbox.yml up -d
+#       # -> postgres et redis joignables par nom de service (postgres:5432, redis:6379)
+#
+# Puis lance les cores et la gateway :
+#   just server
+#
+# Le client (PixiJS + Vello WASM + WebGPU) tourne dans TON navigateur : WebGPU
+# n'est pas expose dans Docker.
+#
+# `expose` seulement (pas de publication de ports host) : ce fichier est destine
+# au sandbox agent-lab, qui ne peut pas publier de ports. Pour un usage local
+# classique, prefere docker-compose.local.yml (qui publie 5432/6379/8080).
+services:
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: dofus
+      POSTGRES_PASSWORD: dofus
+      POSTGRES_DB: dofus
+    expose:
+      - "5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U dofus"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+
+  redis:
+    image: redis:7-alpine
+    expose:
+      - "6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 3s
+      timeout: 3s
+      retries: 20

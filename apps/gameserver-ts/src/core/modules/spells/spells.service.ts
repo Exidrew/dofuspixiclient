@@ -1,23 +1,23 @@
+import type { SpellData } from "@dofus/proto/common_pb";
 import type { SpellPort } from "@modules/fight/cast/fight.cast.types";
 import type {
   SpellEffect,
   SpellLevel,
 } from "@modules/fight/cast/fight.spell.types";
 import type { AreaKind } from "@modules/fight/fight.types";
+import { create } from "@bufbuild/protobuf";
+import { SpellDataSchema } from "@dofus/proto/common_pb";
 import { LangsService } from "@modules/langs/langs.service";
 import { SpellsRepository } from "@modules/spells/spells.repository";
-import type { SpellData } from "@dofus/proto/common_pb";
-import { SpellDataSchema } from "@dofus/proto/common_pb";
-import { create } from "@bufbuild/protobuf";
-import { Injectable, Logger } from "@nestjs/common";
+import { Inject, Injectable, Logger } from "@nestjs/common";
 
 @Injectable()
 export class SpellsService implements SpellPort {
   private readonly logger = new Logger(SpellsService.name);
 
   constructor(
-    private readonly repo: SpellsRepository,
-    private readonly langs: LangsService
+    @Inject(SpellsRepository) private readonly repo: SpellsRepository,
+    @Inject(LangsService) private readonly langs: LangsService
   ) {}
 
   async spellLevel(

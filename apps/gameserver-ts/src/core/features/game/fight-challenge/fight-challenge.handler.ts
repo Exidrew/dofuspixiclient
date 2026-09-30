@@ -11,7 +11,7 @@ import { FightRegistryService } from "@modules/fight/registry/fight.registry";
 import { MapCacheService } from "@modules/maps/maps.cache.service";
 import { MapsRepository } from "@modules/maps/maps.repository";
 import { PlayerPresenceService } from "@modules/player-presence/player-presence.service";
-import { Injectable, Logger } from "@nestjs/common";
+import { Inject, Injectable, Logger } from "@nestjs/common";
 import { GatewayFrameService } from "@shared/gateway-adapter/gateway-frame.service";
 import { MessageHandler } from "@shared/gateway-adapter/message-handler.decorator";
 import { SessionRegistry } from "@shared/gateway-adapter/session-registry";
@@ -31,13 +31,15 @@ export class FightChallengeHandler {
   private pending = new Map<string, PendingChallenge>();
 
   constructor(
-    private readonly sessions: SessionRegistry,
+    @Inject(SessionRegistry) private readonly sessions: SessionRegistry,
+    @Inject(PlayerPresenceService)
     private readonly presence: PlayerPresenceService,
-    private readonly frames: GatewayFrameService,
-    private readonly fightStart: FightStartService,
+    @Inject(GatewayFrameService) private readonly frames: GatewayFrameService,
+    @Inject(FightStartService) private readonly fightStart: FightStartService,
+    @Inject(FightRegistryService)
     private readonly fightRegistry: FightRegistryService,
-    private readonly maps: MapsRepository,
-    private readonly mapCache: MapCacheService
+    @Inject(MapsRepository) private readonly maps: MapsRepository,
+    @Inject(MapCacheService) private readonly mapCache: MapCacheService
   ) {}
 
   @MessageHandler(GameActionRequestSchema)

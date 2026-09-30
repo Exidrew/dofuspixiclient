@@ -1,0 +1,2 @@
+DELETE ME — scratch file created while the sandbox container was down.
+    rm -f .tmp-placeholder-check.txt

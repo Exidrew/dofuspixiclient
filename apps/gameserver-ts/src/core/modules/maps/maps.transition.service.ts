@@ -9,7 +9,7 @@ import { DofusMessageSchema } from "@dofus/proto/server_messages_pb";
 import { PlayerPresenceService } from "@modules/player-presence/player-presence.service";
 import { toSpriteEntry } from "@modules/player-presence/player-presence.sprite-entry";
 import { PlayersRepository } from "@modules/players/players.repository";
-import { Injectable, Logger } from "@nestjs/common";
+import { Inject, Injectable, Logger } from "@nestjs/common";
 import { GatewayFrameService } from "@shared/gateway-adapter/gateway-frame.service";
 
 // Moves a player to (targetMapId, targetCellId): pulls them from presence on
@@ -23,9 +23,10 @@ export class MapTransitionService {
   private readonly logger = new Logger(MapTransitionService.name);
 
   constructor(
-    private readonly players: PlayersRepository,
+    @Inject(PlayersRepository) private readonly players: PlayersRepository,
+    @Inject(PlayerPresenceService)
     private readonly presence: PlayerPresenceService,
-    private readonly frames: GatewayFrameService
+    @Inject(GatewayFrameService) private readonly frames: GatewayFrameService
   ) {}
 
   async teleport(

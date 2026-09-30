@@ -5,7 +5,7 @@ import type { DB } from "@shared/db/schema";
 import { create } from "@bufbuild/protobuf";
 import { GameActionSchema } from "@dofus/proto/game_pb";
 import { DofusMessageSchema } from "@dofus/proto/server_messages_pb";
-import { Injectable, Logger } from "@nestjs/common";
+import { Inject, Injectable, Logger } from "@nestjs/common";
 import { TransactionHost } from "@nestjs-cls/transactional";
 import { GatewayFrameService } from "@shared/gateway-adapter/gateway-frame.service";
 
@@ -23,8 +23,9 @@ export class FightChallengeService {
   }> | null = null;
 
   constructor(
+    @Inject(TransactionHost)
     private readonly txHost: TransactionHost<TransactionalAdapterKysely<DB>>,
-    private readonly frames: GatewayFrameService
+    @Inject(GatewayFrameService) private readonly frames: GatewayFrameService
   ) {}
 
   registerFactory(id: number, factory: () => FightChallenge): void {

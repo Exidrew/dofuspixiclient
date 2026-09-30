@@ -17,13 +17,45 @@ gateway (stable)    ◄──UDS──►    core (Nest, restartable)
 
 ## Running (dev)
 
-```
-bun run dev:gateway   # terminal 1 — does not watch
-bun run dev:core      # terminal 2 — watches, auto-restart
+The core runs in one of two modes (`MODE=game` or `MODE=auth`), each listening
+on its own Unix socket; the gateway proxies to both.
+
+```bash
+bun run dev:gamed     # terminal 1 — MODE=game, watches, /tmp/dofus-gamed.sock
+bun run dev:authd     # terminal 2 — MODE=auth, watches, /tmp/dofus-authd.sock
+bun run dev:gateway   # terminal 3 — :8080, proxies to both sockets
 ```
 
-Editing a slice in `core/` restarts core only. Gateway buffers client messages
-during the ~hundreds-of-ms gap, then flushes. WS clients never disconnect.
+All three read `DATABASE_URL` (required) and `REDIS_URL` (optional). From the
+repo root, `just server` starts these three processes for you.
+
+`bun run dev:core` (single core, no modes) is **not** a valid entrypoint: the
+env schema requires `MODE`, and `AppModule` selects `AuthModule` vs
+`GameModule`/`LangsModule` from it.
+
+Editing a slice in `core/` restarts that core only. Gateway buffers client
+messages during the ~hundreds-of-ms gap, then flushes. WS clients never
+disconnect.
+
+## Dev account / character seed
+
+A fresh database has no account, no game server and no character, so the first
+connection fails at `select-character` with `not found id=… account=…`. The
+seed script creates (or repairs) the whole chain expected by the login flow:
+
+```bash
+DATABASE_URL=postgres://dofus:dofus@localhost:5432/dofus \
+  node tools/seed-dev-account.mjs
+# defaults: --username admin --password admin --server-id 1 --character-name Admin
+```
+
+It provisions `accounts` → `game_servers` (state ONLINE) → `account_servers`
+→ `players` (+ `player_stats`, + `player_colors`, + starter spells when
+`class_starter_spells` is seeded). It is idempotent and *repairs* a character
+whose `account_id`/`server_id` don't match, or that is soft-deleted — the
+classic cause of `success: false` on character selection. Password verification
+is disabled in dev, so any password works. `--server-id` must equal the core's
+`GAME_SERVER_ID` (default 1).
 
 ## Deploy (prod, zero-downtime)
 
@@ -36,13 +68,3 @@ during the ~hundreds-of-ms gap, then flushes. WS clients never disconnect.
 
 See `src/core/handoff/handoff.coordinator.ts` for the snapshot/restore flow and
 `src/gateway/core-router.ts` for the gateway orchestration.
-
-## Notes
-
-- Frame codec is length-prefixed JSON for the scaffold. Replace with proto
-  (`proto/gateway_frame.proto`) once codegen is wired.
-- One example slice is implemented end-to-end: `CastSpell` — shows the full
-  path from WS message → gateway → core router → slice handler → fight actor
-  → domain resolution → domain event → saga.
-- `@nestjs/event-emitter` is used as the in-process bus. `DomainEventBus`
-  wraps it with cluster-scope routing (stub for future NATS integration).

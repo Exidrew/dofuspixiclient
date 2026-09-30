@@ -453,7 +453,7 @@ export class Spell1054 extends RuntimeSpell {
     // sprite21. The _parent references sprite21. We replicate: sprite20 onLoad
     // and onEnterFrame operate on sprite20 clip; _parent = sprite21 clip.
 
-    const sprite20Sym: SymbolDefinition = {
+    const sprite20InnerSym: SymbolDefinition = {
       name: "sprite20",
       totalFrames: 1,
       frames: textures.getFrames("lib_sprite20"),
@@ -512,13 +512,13 @@ export class Spell1054 extends RuntimeSpell {
 
     // Rebuild without dummy field — TypeScript spread workaround
     const sprite20SymClean: SymbolDefinition = {
-      name: sprite20Sym.name,
-      totalFrames: sprite20Sym.totalFrames,
-      frames: sprite20Sym.frames,
-      anchorX: sprite20Sym.anchorX,
-      anchorY: sprite20Sym.anchorY,
-      onLoad: sprite20Sym.onLoad,
-      onEnterFrame: sprite20Sym.onEnterFrame,
+      name: sprite20InnerSym.name,
+      totalFrames: sprite20InnerSym.totalFrames,
+      frames: sprite20InnerSym.frames,
+      anchorX: sprite20InnerSym.anchorX,
+      anchorY: sprite20InnerSym.anchorY,
+      onLoad: sprite20InnerSym.onLoad,
+      onEnterFrame: sprite20InnerSym.onEnterFrame,
     };
 
     // ---- sprite21 — outer orb wrapper  -------------------------

@@ -8,7 +8,7 @@ import {
 import { ChatChannel } from "@dofus/proto/common_pb";
 import { DofusMessageSchema } from "@dofus/proto/server_messages_pb";
 import { PlayerPresenceService } from "@modules/player-presence/player-presence.service";
-import { Injectable } from "@nestjs/common";
+import { Inject, Injectable } from "@nestjs/common";
 import { GatewayFrameService } from "@shared/gateway-adapter/gateway-frame.service";
 import { MessageHandler } from "@shared/gateway-adapter/message-handler.decorator";
 import { SessionRegistry } from "@shared/gateway-adapter/session-registry";
@@ -17,9 +17,10 @@ import { match } from "ts-pattern";
 @Injectable()
 export class ChatHandler {
   constructor(
-    private readonly sessions: SessionRegistry,
+    @Inject(SessionRegistry) private readonly sessions: SessionRegistry,
+    @Inject(PlayerPresenceService)
     private readonly presence: PlayerPresenceService,
-    private readonly frames: GatewayFrameService
+    @Inject(GatewayFrameService) private readonly frames: GatewayFrameService
   ) {}
 
   @MessageHandler(ChatSendMessageSchema)

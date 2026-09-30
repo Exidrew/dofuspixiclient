@@ -5,7 +5,7 @@ import {
 } from "@dofus/proto/account_pb";
 import { PlayersRepository } from "@modules/players/players.repository";
 import { StatsService } from "@modules/stats/stats.service";
-import { Injectable } from "@nestjs/common";
+import { Inject, Injectable } from "@nestjs/common";
 import { MessageHandler } from "@shared/gateway-adapter/message-handler.decorator";
 import { SessionRegistry } from "@shared/gateway-adapter/session-registry";
 import { match } from "ts-pattern";
@@ -13,9 +13,9 @@ import { match } from "ts-pattern";
 @Injectable()
 export class StatBoostHandler {
   constructor(
-    private readonly sessions: SessionRegistry,
-    private readonly players: PlayersRepository,
-    private readonly stats: StatsService
+    @Inject(SessionRegistry) private readonly sessions: SessionRegistry,
+    @Inject(PlayersRepository) private readonly players: PlayersRepository,
+    @Inject(StatsService) private readonly stats: StatsService
   ) {}
 
   @MessageHandler(AccountUseBoostSchema)

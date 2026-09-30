@@ -8,7 +8,7 @@ import {
 import { DofusMessageSchema } from "@dofus/proto/server_messages_pb";
 import { StateName } from "@modules/fight/fight.types";
 import { FightRegistryService } from "@modules/fight/registry/fight.registry";
-import { Injectable, Logger } from "@nestjs/common";
+import { Inject, Injectable, Logger } from "@nestjs/common";
 import { GatewayFrameService } from "@shared/gateway-adapter/gateway-frame.service";
 import { MessageHandler } from "@shared/gateway-adapter/message-handler.decorator";
 import { SessionRegistry } from "@shared/gateway-adapter/session-registry";
@@ -18,9 +18,10 @@ export class FightLeaveHandler {
   private readonly logger = new Logger(FightLeaveHandler.name);
 
   constructor(
-    readonly _sessions: SessionRegistry,
+    @Inject(SessionRegistry) readonly _sessions: SessionRegistry,
+    @Inject(FightRegistryService)
     private readonly fightRegistry: FightRegistryService,
-    private readonly frames: GatewayFrameService
+    @Inject(GatewayFrameService) private readonly frames: GatewayFrameService
   ) {}
 
   @MessageHandler(GameLeaveRequestSchema)

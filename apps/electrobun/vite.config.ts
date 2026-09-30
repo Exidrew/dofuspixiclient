@@ -492,7 +492,7 @@ export default defineConfig({
   resolve: {
     alias: {
       "@": resolve(__dirname, "./src"),
-      "vello-wasm": resolve(__dirname, "../../../dofus-vello-custom-format/packages/vello-wasm/pkg"),
+      "vello-wasm": resolve(__dirname, "../../../vello-dofasset-format/packages/vello-wasm/pkg"),
     },
   },
   build: {
@@ -504,10 +504,15 @@ export default defineConfig({
     port: 5173,
     strictPort: true,
     fs: {
-      // Allow serving files from the vello-wasm pkg directory (outside project root)
+      // Allow serving files from the vello-wasm pkg directory (outside project root).
+      // NOTE: Vite compares REAL paths (realpath), so we must list the real
+      // directory `vello-dofasset-format` — NOT the `dofus-vello-custom-format`
+      // symlink, whose realpath resolves to `vello-dofasset-format` and would
+      // otherwise be rejected ("outside of Vite serving allow list") which
+      // makes the WASM fetch fail and leaves the game canvas black.
       allow: [
         resolve(__dirname, "../.."),
-        resolve(__dirname, "../../../dofus-vello-custom-format/packages/vello-wasm/pkg"),
+        resolve(__dirname, "../../../vello-dofasset-format/packages/vello-wasm/pkg"),
       ],
     },
   },

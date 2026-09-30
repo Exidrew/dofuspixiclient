@@ -16,7 +16,13 @@ import { StatStealEffectHandler } from "@modules/fight/effects/handlers/stat-ste
 import { StateEffectHandler } from "@modules/fight/effects/handlers/state.handler";
 import { SummonEffectHandler } from "@modules/fight/effects/handlers/summon.handler";
 import { TrapGlyphEffectHandler } from "@modules/fight/effects/handlers/trap-glyph.handler";
-import { Injectable, Logger, Module, type OnModuleInit } from "@nestjs/common";
+import {
+  Inject,
+  Injectable,
+  Logger,
+  Module,
+  type OnModuleInit,
+} from "@nestjs/common";
 import {
   DiscoveryModule,
   DiscoveryService,
@@ -45,10 +51,10 @@ class EffectHandlerDiscovery implements OnModuleInit {
   private readonly logger = new Logger(EffectHandlerDiscovery.name);
 
   constructor(
-    private readonly discovery: DiscoveryService,
-    private readonly scanner: MetadataScanner,
-    private readonly reflector: Reflector,
-    private readonly registry: EffectRegistry
+    @Inject(DiscoveryService) private readonly discovery: DiscoveryService,
+    @Inject(MetadataScanner) private readonly scanner: MetadataScanner,
+    @Inject(Reflector) private readonly reflector: Reflector,
+    @Inject(EffectRegistry) private readonly registry: EffectRegistry
   ) {}
 
   onModuleInit(): void {

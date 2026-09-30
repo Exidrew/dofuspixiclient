@@ -104,7 +104,6 @@ export class Spell312 extends RuntimeSpell {
     textures: SpellTextureProvider,
     _context: SpellContext,
   ): void {
-    const anim1Anchor = calculateAnchor(ANIM1_BOUNDS);
     const sprite4Anchor = calculateAnchor(SPRITE4_BOUNDS);
     const sprite7Anchor = calculateAnchor(SPRITE7_BOUNDS);
     const sprite8Anchor = calculateAnchor(SPRITE8_BOUNDS);

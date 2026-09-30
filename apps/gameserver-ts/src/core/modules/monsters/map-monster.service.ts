@@ -2,7 +2,7 @@ import type { DecodedCell } from "@modules/maps/maps.cells-codec";
 import { MapCacheService } from "@modules/maps/maps.cache.service";
 import { MapsRepository } from "@modules/maps/maps.repository";
 import { MonstersRepository } from "@modules/monsters/monsters.repository";
-import { Injectable, Logger } from "@nestjs/common";
+import { Inject, Injectable, Logger } from "@nestjs/common";
 
 export interface LiveMonsterGroup {
   id: number;
@@ -63,9 +63,9 @@ export class MapMonsterService {
   private readonly maps = new Map<number, MapMonsterState>();
 
   constructor(
-    private readonly mapsRepo: MapsRepository,
-    private readonly mapCache: MapCacheService,
-    private readonly monsters: MonstersRepository
+    @Inject(MapsRepository) private readonly mapsRepo: MapsRepository,
+    @Inject(MapCacheService) private readonly mapCache: MapCacheService,
+    @Inject(MonstersRepository) private readonly monsters: MonstersRepository
   ) {}
 
   async ensureSpawned(mapId: number): Promise<LiveMonsterGroup[]> {

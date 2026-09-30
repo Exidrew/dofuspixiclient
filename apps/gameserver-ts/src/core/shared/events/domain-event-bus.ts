@@ -34,7 +34,7 @@ export class DomainEventBus {
   private readonly logger = new Logger(DomainEventBus.name);
 
   constructor(
-    private readonly local: EventEmitter2,
+    @Inject(EventEmitter2) private readonly local: EventEmitter2,
     @Inject(NODE_ID) private readonly nodeId: string,
     // When null, cluster emits are no-ops. Inject a real transport (NATS,
     // Redis pub/sub) in production. Left optional so the scaffold runs.

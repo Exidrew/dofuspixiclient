@@ -1,0 +1,27 @@
+# Stack de verification (sandbox agent-lab) : PostgreSQL + Redis pour le gameserver.
+# Le client (PixiJS + Vello WASM + WebGPU) tourne dans un navigateur, pas dans un conteneur.
+# POSTGRES_DB=dofus pour reproduire exactement le flux du justfile/README.
+services:
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: dofus
+      POSTGRES_PASSWORD: dofus
+      POSTGRES_DB: dofus
+    expose:
+      - "5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U dofus"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+
+  redis:
+    image: redis:7-alpine
+    expose:
+      - "6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 3s
+      timeout: 3s
+      retries: 20

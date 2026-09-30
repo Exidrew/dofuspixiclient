@@ -49,7 +49,13 @@ import { UntouchableChallenge } from "@modules/fight/challenges/types/untouchabl
 import { UnwillingVolunteerChallenge } from "@modules/fight/challenges/types/unwilling-volunteer.challenge";
 import { VersatileChallenge } from "@modules/fight/challenges/types/versatile.challenge";
 import { ZombieChallenge } from "@modules/fight/challenges/types/zombie.challenge";
-import { Injectable, Logger, Module, type OnModuleInit } from "@nestjs/common";
+import {
+  Inject,
+  Injectable,
+  Logger,
+  Module,
+  type OnModuleInit,
+} from "@nestjs/common";
 import { DiscoveryModule, DiscoveryService, Reflector } from "@nestjs/core";
 
 const CHALLENGE_PROVIDERS = [
@@ -105,8 +111,9 @@ class ChallengeDiscovery implements OnModuleInit {
   private readonly logger = new Logger(ChallengeDiscovery.name);
 
   constructor(
-    private readonly discovery: DiscoveryService,
-    private readonly reflector: Reflector,
+    @Inject(DiscoveryService) private readonly discovery: DiscoveryService,
+    @Inject(Reflector) private readonly reflector: Reflector,
+    @Inject(FightChallengeService)
     private readonly service: FightChallengeService
   ) {}
 

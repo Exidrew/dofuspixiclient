@@ -16,12 +16,14 @@ import {
   GameZoneDataSchema,
 } from "@dofus/proto/game_pb";
 import { DofusMessageSchema } from "@dofus/proto/server_messages_pb";
-import { Injectable } from "@nestjs/common";
+import { Inject, Injectable } from "@nestjs/common";
 import { GatewayFrameService } from "@shared/gateway-adapter/gateway-frame.service";
 
 @Injectable()
 export class FightFrameEmitter implements Emitter {
-  constructor(private readonly frames: GatewayFrameService) {}
+  constructor(
+    @Inject(GatewayFrameService) private readonly frames: GatewayFrameService
+  ) {}
 
   private targets(fight: Fight): string[] {
     return fight.allSessions();

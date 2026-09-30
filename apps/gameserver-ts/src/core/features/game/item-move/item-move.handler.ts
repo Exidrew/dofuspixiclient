@@ -8,7 +8,7 @@ import {
 import { DofusMessageSchema } from "@dofus/proto/server_messages_pb";
 import { InventoryRepository } from "@modules/inventory/inventory.repository";
 import { StatsService } from "@modules/stats/stats.service";
-import { Injectable } from "@nestjs/common";
+import { Inject, Injectable } from "@nestjs/common";
 import { GatewayFrameService } from "@shared/gateway-adapter/gateway-frame.service";
 import { MessageHandler } from "@shared/gateway-adapter/message-handler.decorator";
 import { SessionRegistry } from "@shared/gateway-adapter/session-registry";
@@ -16,10 +16,11 @@ import { SessionRegistry } from "@shared/gateway-adapter/session-registry";
 @Injectable()
 export class ItemMoveHandler {
   constructor(
-    private readonly sessions: SessionRegistry,
+    @Inject(SessionRegistry) private readonly sessions: SessionRegistry,
+    @Inject(InventoryRepository)
     private readonly inventory: InventoryRepository,
-    private readonly stats: StatsService,
-    private readonly frames: GatewayFrameService
+    @Inject(StatsService) private readonly stats: StatsService,
+    @Inject(GatewayFrameService) private readonly frames: GatewayFrameService
   ) {}
 
   @MessageHandler(ItemMoveRequestSchema)

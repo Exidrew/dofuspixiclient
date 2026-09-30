@@ -7,8 +7,8 @@ import {
 import { DofusMessageSchema } from "@dofus/proto/server_messages_pb";
 import { PlayerPresenceService } from "@modules/player-presence/player-presence.service";
 import { toSpriteEntry } from "@modules/player-presence/player-presence.sprite-entry";
-import { Injectable, Logger } from "@nestjs/common";
-import { OnEvent } from "@nestjs/event-emitter";
+import { Inject, Injectable, Logger, type OnModuleInit } from "@nestjs/common";
+import { EventEmitter2 } from "@nestjs/event-emitter";
 import { GatewayFrameService } from "@shared/gateway-adapter/gateway-frame.service";
 
 type SessionClosedPayload = {
@@ -17,15 +17,26 @@ type SessionClosedPayload = {
 };
 
 @Injectable()
-export class SessionLeaveSaga {
+export class SessionLeaveSaga implements OnModuleInit {
   private readonly logger = new Logger(SessionLeaveSaga.name);
 
   constructor(
+    @Inject(PlayerPresenceService)
     private readonly presence: PlayerPresenceService,
-    private readonly frames: GatewayFrameService
+    @Inject(GatewayFrameService) private readonly frames: GatewayFrameService,
+    @Inject(EventEmitter2) private readonly events: EventEmitter2
   ) {}
 
-  @OnEvent("session.closed")
+  // Imperative subscription instead of NestJS' legacy `@OnEvent` decorator:
+  // that decorator reads `descriptor.value` and breaks under Bun's Stage-3 /
+  // ES decorator transpilation (TypeError at module load). See login.handshake.ts
+  // for the full explanation.
+  onModuleInit(): void {
+    this.events.on("session.closed", (payload: SessionClosedPayload) =>
+      this.onSessionClosed(payload)
+    );
+  }
+
   onSessionClosed({ session, reason }: SessionClosedPayload) {
     const player = this.presence.leaveBySession(session.sessionId);
 

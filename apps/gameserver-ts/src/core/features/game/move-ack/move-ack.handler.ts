@@ -16,7 +16,7 @@ import { PendingMovesService } from "@modules/player-presence/player-presence.pe
 import { PlayerPresenceService } from "@modules/player-presence/player-presence.service";
 import { PlayersRepository } from "@modules/players/players.repository";
 import { ScriptedCellsService } from "@modules/scripted-cells/scripted-cells.service";
-import { Injectable, Logger } from "@nestjs/common";
+import { Inject, Injectable, Logger } from "@nestjs/common";
 import { GatewayFrameService } from "@shared/gateway-adapter/gateway-frame.service";
 import { MessageHandler } from "@shared/gateway-adapter/message-handler.decorator";
 
@@ -25,16 +25,19 @@ export class MoveAckHandler {
   private readonly logger = new Logger(MoveAckHandler.name);
 
   constructor(
-    private readonly players: PlayersRepository,
-    private readonly pending: PendingMovesService,
+    @Inject(PlayersRepository) private readonly players: PlayersRepository,
+    @Inject(PendingMovesService) private readonly pending: PendingMovesService,
+    @Inject(PlayerPresenceService)
     private readonly presence: PlayerPresenceService,
-    private readonly maps: MapsRepository,
-    private readonly mapCache: MapCacheService,
+    @Inject(MapsRepository) private readonly maps: MapsRepository,
+    @Inject(MapCacheService) private readonly mapCache: MapCacheService,
+    @Inject(ScriptedCellsService)
     private readonly scripts: ScriptedCellsService,
+    @Inject(MapTransitionService)
     private readonly transition: MapTransitionService,
-    private readonly frames: GatewayFrameService,
-    private readonly mapMonsters: MapMonsterService,
-    private readonly fightStart: FightStartService
+    @Inject(GatewayFrameService) private readonly frames: GatewayFrameService,
+    @Inject(MapMonsterService) private readonly mapMonsters: MapMonsterService,
+    @Inject(FightStartService) private readonly fightStart: FightStartService
   ) {}
 
   @MessageHandler(GameActionAckSchema)

@@ -5,7 +5,7 @@ import { DofusMessageSchema } from "@dofus/proto/server_messages_pb";
 import { InventoryRepository } from "@modules/inventory/inventory.repository";
 import { ItemTemplateCacheService } from "@modules/inventory/item-template.cache";
 import { PlayersRepository } from "@modules/players/players.repository";
-import { Injectable } from "@nestjs/common";
+import { Inject, Injectable } from "@nestjs/common";
 import { GatewayFrameService } from "@shared/gateway-adapter/gateway-frame.service";
 
 export interface ComputedStats {
@@ -113,10 +113,12 @@ function applyItemEffect(
 @Injectable()
 export class StatsService {
   constructor(
+    @Inject(ItemTemplateCacheService)
     private readonly templateCache: ItemTemplateCacheService,
+    @Inject(InventoryRepository)
     private readonly inventory: InventoryRepository,
-    private readonly players: PlayersRepository,
-    private readonly frames: GatewayFrameService
+    @Inject(PlayersRepository) private readonly players: PlayersRepository,
+    @Inject(GatewayFrameService) private readonly frames: GatewayFrameService
   ) {}
 
   async computeEquipmentStats(playerId: string): Promise<ComputedStats> {

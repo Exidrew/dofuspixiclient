@@ -18,7 +18,7 @@ import { FightFrameEmitter } from "@modules/fight/engine/fight.frame-emitter";
 import { Runner } from "@modules/fight/engine/fight.runner";
 import { FightRegistryService } from "@modules/fight/registry/fight.registry";
 import { SpellsService } from "@modules/spells/spells.service";
-import { Injectable, Logger } from "@nestjs/common";
+import { Inject, Injectable, Logger } from "@nestjs/common";
 import { GatewayFrameService } from "@shared/gateway-adapter/gateway-frame.service";
 import { match } from "ts-pattern";
 
@@ -27,12 +27,13 @@ export class FightLifecycleService {
   private readonly logger = new Logger(FightLifecycleService.name);
 
   constructor(
+    @Inject(FightRegistryService)
     private readonly fightRegistry: FightRegistryService,
-    private readonly fightEnd: FightEndService,
-    private readonly spells: SpellsService,
-    private readonly effectRegistry: EffectRegistry,
-    private readonly frameEmitter: FightFrameEmitter,
-    private readonly frames: GatewayFrameService
+    @Inject(FightEndService) private readonly fightEnd: FightEndService,
+    @Inject(SpellsService) private readonly spells: SpellsService,
+    @Inject(EffectRegistry) private readonly effectRegistry: EffectRegistry,
+    @Inject(FightFrameEmitter) private readonly frameEmitter: FightFrameEmitter,
+    @Inject(GatewayFrameService) private readonly frames: GatewayFrameService
   ) {}
 
   startFight(fight: Fight): void {

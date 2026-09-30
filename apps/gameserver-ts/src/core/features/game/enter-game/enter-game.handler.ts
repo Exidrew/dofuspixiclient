@@ -20,7 +20,7 @@ import { toSpriteEntry } from "@modules/player-presence/player-presence.sprite-e
 import { PlayersRepository } from "@modules/players/players.repository";
 import { SpellsService } from "@modules/spells/spells.service";
 import { StatsService } from "@modules/stats/stats.service";
-import { Injectable, Logger } from "@nestjs/common";
+import { Inject, Injectable, Logger } from "@nestjs/common";
 import { GatewayFrameService } from "@shared/gateway-adapter/gateway-frame.service";
 import { MessageHandler } from "@shared/gateway-adapter/message-handler.decorator";
 import { SessionRegistry } from "@shared/gateway-adapter/session-registry";
@@ -32,15 +32,16 @@ export class EnterGameHandler {
   private readonly logger = new Logger(EnterGameHandler.name);
 
   constructor(
-    private readonly players: PlayersRepository,
-    private readonly maps: MapsRepository,
-    private readonly mapMonsters: MapMonsterService,
+    @Inject(PlayersRepository) private readonly players: PlayersRepository,
+    @Inject(MapsRepository) private readonly maps: MapsRepository,
+    @Inject(MapMonsterService) private readonly mapMonsters: MapMonsterService,
+    @Inject(PlayerPresenceService)
     private readonly presence: PlayerPresenceService,
-    private readonly sessions: SessionRegistry,
-    private readonly frames: GatewayFrameService,
-    private readonly stats: StatsService,
-    private readonly spells: SpellsService,
-    private readonly accessories: AccessoriesService
+    @Inject(SessionRegistry) private readonly sessions: SessionRegistry,
+    @Inject(GatewayFrameService) private readonly frames: GatewayFrameService,
+    @Inject(StatsService) private readonly stats: StatsService,
+    @Inject(SpellsService) private readonly spells: SpellsService,
+    @Inject(AccessoriesService) private readonly accessories: AccessoriesService
   ) {}
 
   @MessageHandler(GameCreateRequestSchema)

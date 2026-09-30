@@ -1,4 +1,3 @@
-import type { GameEnv } from "@shared/config/env.schema";
 import type { HandlerContext } from "@shared/gateway-adapter/ws-router";
 import { create } from "@bufbuild/protobuf";
 import {
@@ -12,8 +11,8 @@ import {
   MAX_CHARACTERS_PER_ACCOUNT,
 } from "@features/game/character-list/character-list.constants";
 import { CharacterListRepository } from "@features/game/character-list/character-list.repository";
-import { Injectable, Logger } from "@nestjs/common";
-import { ConfigService } from "@nestjs/config";
+import { Inject, Injectable, Logger } from "@nestjs/common";
+import { GameRuntimeConfig } from "@shared/config/game-runtime";
 import { GatewayFrameService } from "@shared/gateway-adapter/gateway-frame.service";
 import { MessageHandler } from "@shared/gateway-adapter/message-handler.decorator";
 import { SessionRegistry } from "@shared/gateway-adapter/session-registry";
@@ -26,12 +25,13 @@ export class CharacterListHandler {
   private readonly gameServerId: number;
 
   constructor(
-    config: ConfigService<GameEnv, true>,
+    @Inject(GameRuntimeConfig) private readonly runtime: GameRuntimeConfig,
+    @Inject(CharacterListRepository)
     private readonly repo: CharacterListRepository,
-    private readonly sessions: SessionRegistry,
-    private readonly frames: GatewayFrameService
+    @Inject(SessionRegistry) private readonly sessions: SessionRegistry,
+    @Inject(GatewayFrameService) private readonly frames: GatewayFrameService
   ) {
-    this.gameServerId = config.get("GAME_SERVER_ID", { infer: true });
+    this.gameServerId = runtime.serverId;
   }
 
   @MessageHandler(AccountGetCharactersListSchema)

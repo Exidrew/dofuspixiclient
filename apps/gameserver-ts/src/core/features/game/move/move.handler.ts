@@ -24,7 +24,7 @@ import {
 } from "@modules/maps/maps.validate-path";
 import { PendingMovesService } from "@modules/player-presence/player-presence.pending-moves.service";
 import { PlayerPresenceService } from "@modules/player-presence/player-presence.service";
-import { Injectable, Logger } from "@nestjs/common";
+import { Inject, Injectable, Logger } from "@nestjs/common";
 import { GatewayFrameService } from "@shared/gateway-adapter/gateway-frame.service";
 import { MessageHandler } from "@shared/gateway-adapter/message-handler.decorator";
 import { SessionRegistry } from "@shared/gateway-adapter/session-registry";
@@ -38,11 +38,12 @@ export class MoveHandler {
   private readonly logger = new Logger(MoveHandler.name);
 
   constructor(
-    private readonly mapCache: MapCacheService,
+    @Inject(MapCacheService) private readonly mapCache: MapCacheService,
+    @Inject(PlayerPresenceService)
     private readonly presence: PlayerPresenceService,
-    private readonly pending: PendingMovesService,
-    private readonly sessions: SessionRegistry,
-    private readonly frames: GatewayFrameService
+    @Inject(PendingMovesService) private readonly pending: PendingMovesService,
+    @Inject(SessionRegistry) private readonly sessions: SessionRegistry,
+    @Inject(GatewayFrameService) private readonly frames: GatewayFrameService
   ) {}
 
   @MessageHandler(GameActionRequestSchema)

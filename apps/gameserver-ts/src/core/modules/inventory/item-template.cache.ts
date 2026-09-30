@@ -1,6 +1,6 @@
 import type { TransactionalAdapterKysely } from "@nestjs-cls/transactional-adapter-kysely";
 import type { DB } from "@shared/db/schema";
-import { Injectable } from "@nestjs/common";
+import { Inject, Injectable } from "@nestjs/common";
 import { TransactionHost } from "@nestjs-cls/transactional";
 
 @Injectable()
@@ -11,6 +11,7 @@ export class ItemTemplateCacheService {
   >();
 
   constructor(
+    @Inject(TransactionHost)
     private readonly txHost: TransactionHost<TransactionalAdapterKysely<DB>>
   ) {}
 

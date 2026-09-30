@@ -118,6 +118,24 @@ export class Engine {
 
     await this.app.init(initOptions as Parameters<Application["init"]>[0]);
 
+    // Guard against a silent WebGL fallback. The render pipeline hands
+    // Vello-owned GPUTextures to Pixi via `ExternalSource`, which only works
+    // on the WebGPU renderer. If Pixi fell back to WebGL (e.g. WebGPU
+    // unavailable / adapter acquisition failed), every tile and character
+    // draw resolves to nothing and the user gets a black canvas behind the
+    // HUD. Fail loudly so the error is diagnosable.
+    const rendererType = (this.app.renderer as { type?: number } | null)?.type;
+    // RendererType.WEBGPU === 2 (pixi.js). Imported lazily to avoid a
+    // hard dependency on an internal enum path.
+    if (this.config.gpu && rendererType !== 2) {
+      throw new Error(
+        "PixiJS initialized without WebGPU (renderer=" +
+          `${this.app.renderer?.name ?? "unknown"}). The Vello texture-sharing ` +
+          "pipeline requires the WebGPU renderer; the map and characters " +
+          "cannot be drawn otherwise."
+      );
+    }
+
     if (this.app.canvas && this.container) {
       this.container.appendChild(this.app.canvas);
     }

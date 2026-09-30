@@ -14,7 +14,7 @@ import { StateName } from "@modules/fight/fight.types";
 import { FightRegistryService } from "@modules/fight/registry/fight.registry";
 import { PlayerPresenceService } from "@modules/player-presence/player-presence.service";
 import { PlayersRepository } from "@modules/players/players.repository";
-import { Injectable, Logger } from "@nestjs/common";
+import { Inject, Injectable, Logger } from "@nestjs/common";
 import { GatewayFrameService } from "@shared/gateway-adapter/gateway-frame.service";
 import { MessageHandler } from "@shared/gateway-adapter/message-handler.decorator";
 import { SessionRegistry } from "@shared/gateway-adapter/session-registry";
@@ -24,11 +24,13 @@ export class FightJoinHandler {
   private readonly logger = new Logger(FightJoinHandler.name);
 
   constructor(
-    private readonly sessions: SessionRegistry,
+    @Inject(SessionRegistry) private readonly sessions: SessionRegistry,
+    @Inject(PlayerPresenceService)
     private readonly presence: PlayerPresenceService,
-    private readonly frames: GatewayFrameService,
+    @Inject(GatewayFrameService) private readonly frames: GatewayFrameService,
+    @Inject(FightRegistryService)
     private readonly fightRegistry: FightRegistryService,
-    private readonly players: PlayersRepository
+    @Inject(PlayersRepository) private readonly players: PlayersRepository
   ) {}
 
   @MessageHandler(GameActionRequestSchema)

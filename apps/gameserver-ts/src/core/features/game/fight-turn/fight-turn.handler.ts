@@ -26,7 +26,7 @@ import { distance } from "@modules/fight/map/fight.area";
 import { FightRegistryService } from "@modules/fight/registry/fight.registry";
 import { decodePath } from "@modules/maps/maps.path-codec";
 import { SpellsService } from "@modules/spells/spells.service";
-import { Injectable, Logger } from "@nestjs/common";
+import { Inject, Injectable, Logger } from "@nestjs/common";
 import { GatewayFrameService } from "@shared/gateway-adapter/gateway-frame.service";
 import { MessageHandler } from "@shared/gateway-adapter/message-handler.decorator";
 import { SessionRegistry } from "@shared/gateway-adapter/session-registry";
@@ -37,13 +37,14 @@ export class FightTurnHandler {
   private castSpell: CastSpellUseCase;
 
   constructor(
-    readonly _sessions: SessionRegistry,
-    private readonly frames: GatewayFrameService,
+    @Inject(SessionRegistry) readonly _sessions: SessionRegistry,
+    @Inject(GatewayFrameService) private readonly frames: GatewayFrameService,
+    @Inject(FightRegistryService)
     private readonly fightRegistry: FightRegistryService,
-    private readonly fightEnd: FightEndService,
-    private readonly spells: SpellsService,
-    private readonly effectRegistry: EffectRegistry,
-    private readonly frameEmitter: FightFrameEmitter
+    @Inject(FightEndService) private readonly fightEnd: FightEndService,
+    @Inject(SpellsService) private readonly spells: SpellsService,
+    @Inject(EffectRegistry) private readonly effectRegistry: EffectRegistry,
+    @Inject(FightFrameEmitter) private readonly frameEmitter: FightFrameEmitter
   ) {
     this.castSpell = new CastSpellUseCase(
       {

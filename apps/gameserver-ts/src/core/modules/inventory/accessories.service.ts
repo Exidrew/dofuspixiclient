@@ -1,7 +1,7 @@
 import type { PlayerAccessoryPresence } from "@modules/player-presence/player-presence.service";
 import { InventoryRepository } from "@modules/inventory/inventory.repository";
 import { ItemTemplateCacheService } from "@modules/inventory/item-template.cache";
-import { Injectable } from "@nestjs/common";
+import { Inject, Injectable } from "@nestjs/common";
 import { match, P } from "ts-pattern";
 
 /**
@@ -30,7 +30,9 @@ function positionToOrdinal(position: number): number | null {
 @Injectable()
 export class AccessoriesService {
   constructor(
+    @Inject(InventoryRepository)
     private readonly inventory: InventoryRepository,
+    @Inject(ItemTemplateCacheService)
     private readonly templateCache: ItemTemplateCacheService
   ) {}
 

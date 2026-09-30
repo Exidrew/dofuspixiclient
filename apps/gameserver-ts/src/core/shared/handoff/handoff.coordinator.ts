@@ -2,7 +2,7 @@
 // enum for phase values.
 
 import { HandoffControl_Phase } from "@dofus/proto/gateway/v1/gateway_frame_pb";
-import { Injectable, Logger, type OnModuleInit } from "@nestjs/common";
+import { Inject, Injectable, Logger, type OnModuleInit } from "@nestjs/common";
 import { DiscoveryService, Reflector } from "@nestjs/core";
 import { GatewayFrameService } from "@shared/gateway-adapter/gateway-frame.service";
 import { HANDOFF_PART_METADATA } from "@shared/handoff/handoff-part.decorator";
@@ -26,9 +26,9 @@ export class HandoffCoordinator implements OnModuleInit {
   private readonly parts = new Map<string, Serializable>();
 
   constructor(
-    private readonly frames: GatewayFrameService,
-    private readonly discovery: DiscoveryService,
-    private readonly reflector: Reflector
+    @Inject(GatewayFrameService) private readonly frames: GatewayFrameService,
+    @Inject(DiscoveryService) private readonly discovery: DiscoveryService,
+    @Inject(Reflector) private readonly reflector: Reflector
   ) {}
 
   onModuleInit() {

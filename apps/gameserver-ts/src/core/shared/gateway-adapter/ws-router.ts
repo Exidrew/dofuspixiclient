@@ -1,6 +1,6 @@
 import type { Message } from "@bufbuild/protobuf";
 import type { InstanceWrapper } from "@nestjs/core/injector/instance-wrapper";
-import { Injectable, Logger, type OnModuleInit } from "@nestjs/common";
+import { Inject, Injectable, Logger, type OnModuleInit } from "@nestjs/common";
 import { DiscoveryService, MetadataScanner, Reflector } from "@nestjs/core";
 import {
   MESSAGE_HANDLER_METADATA,
@@ -25,9 +25,9 @@ export class WsRouter implements OnModuleInit {
   private readonly handlers = new Map<string, HandlerFn[]>();
 
   constructor(
-    private readonly discovery: DiscoveryService,
-    private readonly scanner: MetadataScanner,
-    private readonly reflector: Reflector
+    @Inject(DiscoveryService) private readonly discovery: DiscoveryService,
+    @Inject(MetadataScanner) private readonly scanner: MetadataScanner,
+    @Inject(Reflector) private readonly reflector: Reflector
   ) {}
 
   onModuleInit() {

@@ -5,7 +5,7 @@ import {
 } from "@modules/scripted-cells/scripted-cells.constants";
 import { ScriptedCellsRepository } from "@modules/scripted-cells/scripted-cells.repository";
 import { WaypointsService } from "@modules/waypoints/waypoints.service";
-import { Injectable, Logger } from "@nestjs/common";
+import { Inject, Injectable, Logger } from "@nestjs/common";
 
 // Dispatches scripted-cell verbs triggered by a player's arrival on a cell.
 // `onPlayerArrived` returns true when a verb fired, short-circuiting the
@@ -16,9 +16,11 @@ export class ScriptedCellsService {
   private readonly logger = new Logger(ScriptedCellsService.name);
 
   constructor(
+    @Inject(ScriptedCellsRepository)
     private readonly repo: ScriptedCellsRepository,
+    @Inject(MapTransitionService)
     private readonly transition: MapTransitionService,
-    private readonly waypoints: WaypointsService
+    @Inject(WaypointsService) private readonly waypoints: WaypointsService
   ) {}
 
   async onPlayerArrived(

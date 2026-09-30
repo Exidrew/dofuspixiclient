@@ -1,4 +1,4 @@
-import { readFile } from "node:fs/promises";
+import { access, readFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -9,13 +9,26 @@ import { defaultTargetMaskForEffect } from "../src/core/modules/fight/effects/fi
 import { parseTargetParam } from "../src/core/modules/fight/effects/fight.target-mask.ts";
 
 /**
- * Seeds spell_templates + spell_levels from the canonical lang JSON
- * (assets/dist/langs/fr/spells.json), the same file the lang-pipeline
- * extracts from spells_fr_1254.swf. The previous combat-exporter dump
- * (tools/combat-exporter/output/spells.json) preserved the raw `zones`
- * string as-is and dropped target masks entirely, leaving every effect
- * with areaKind=None / size=0 — so AOEs collapsed to a single cell and
- * no target filtering ever ran.
+ * Seeds spell_templates + spell_levels from the canonical lang JSON, the
+ * same file the lang-pipeline extracts from spells_fr_1254.swf. The previous
+ * combat-exporter dump (tools/combat-exporter/output/spells.json) preserved
+ * the raw `zones` string as-is and dropped target masks entirely, leaving
+ * every effect with areaKind=None / size=0 — so AOEs collapsed to a single
+ * cell and no target filtering ever ran.
+ *
+ * The bundle can live in two places depending on how the repo was populated:
+ *
+ *   1. `assets/dist/langs/<locale>/<namespace>.json` — the asset-pipeline's
+ *      build output (`assets/` is gitignored, so a clean checkout never has
+ *      it until `just pipeline-langs` has run).
+ *   2. `apps/electrobun/public/assets/langs/<locale>/<namespace>.json` — the
+ *      published, checked-in bundles the client fetches. `pipeline publish
+ *      langs` hardlinks (1) into this tree, so it is byte-identical and
+ *      always present in a checkout.
+ *
+ * We therefore try the dist path first and transparently fall back to the
+ * published one. That keeps `just setup` (which only runs `db migrate`)
+ * working on a fresh clone, without running the whole asset pipeline.
  *
  * lN array layout (positional, 21 slots):
  *   [0]  animationId      [11] freeCell (bool)
@@ -54,11 +67,36 @@ interface NormalizedEffect {
   param: string;
 }
 
-const LANG_RELATIVE = "../../../assets/dist/langs/fr/spells.json";
+/** Locale whose bundle seeds the tables. */
+const LANG_LOCALE = "fr";
 
-function langPath(): string {
+/**
+ * Candidate paths for the `spells` lang bundle, most-canonical first:
+ * the pipeline's `assets/dist` output, then the published client bundles
+ * (checked in, so available on a fresh clone).
+ */
+const LANG_CANDIDATES = [
+  `../../../assets/dist/langs/${LANG_LOCALE}/spells.json`,
+  `../../../apps/electrobun/public/assets/langs/${LANG_LOCALE}/spells.json`,
+];
+
+async function langPath(): Promise<string> {
   const here = dirname(fileURLToPath(import.meta.url));
-  return resolve(here, LANG_RELATIVE);
+  const tried: string[] = [];
+  for (const rel of LANG_CANDIDATES) {
+    const candidate = resolve(here, rel);
+    try {
+      await access(candidate);
+      return candidate;
+    } catch {
+      tried.push(candidate);
+    }
+  }
+  throw new Error(
+    `[0039] no spells lang bundle found. Looked in:\n  ${tried.join("\n  ")}\n` +
+      `Run \`just pipeline-langs\` (or \`just setup\`) to generate assets/dist/langs, ` +
+      `or make sure the published bundles under apps/electrobun/public/assets/langs exist.`
+  );
 }
 
 function asNumber(v: unknown, fallback = 0): number {
@@ -206,7 +244,7 @@ function buildLevel(
 }
 
 export async function up(db: Kysely<never>): Promise<void> {
-  const raw = await readFile(langPath(), "utf8");
+  const raw = await readFile(await langPath(), "utf8");
   const parsed = JSON.parse(raw) as { data?: { S?: Record<string, LangSpell> } };
   const spells = parsed.data?.S ?? {};
 

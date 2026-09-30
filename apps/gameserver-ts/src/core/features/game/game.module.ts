@@ -19,9 +19,11 @@ import { StatBoostModule } from "@features/game/stat-boost/stat-boost.module";
 import { WaypointUseModule } from "@features/game/waypoint-use/waypoint-use.module";
 import { FightModule } from "@modules/fight/fight.module";
 import { Module } from "@nestjs/common";
+import { GameRuntimeConfigModule } from "@shared/config/game-runtime";
 
 @Module({
   imports: [
+    GameRuntimeConfigModule,
     FightModule,
     ExchangeTicketModule,
     CharacterListModule,

@@ -8,7 +8,7 @@ import {
 import { ServerState } from "@dofus/proto/common_pb";
 import { DofusMessageSchema } from "@dofus/proto/server_messages_pb";
 import { ServerListRepository } from "@features/auth/server-list/server-list.repository";
-import { Injectable, Logger } from "@nestjs/common";
+import { Inject, Injectable, Logger } from "@nestjs/common";
 import { GatewayFrameService } from "@shared/gateway-adapter/gateway-frame.service";
 import { MessageHandler } from "@shared/gateway-adapter/message-handler.decorator";
 import { SessionRegistry } from "@shared/gateway-adapter/session-registry";
@@ -18,9 +18,9 @@ export class ServerListHandler {
   private readonly logger = new Logger(ServerListHandler.name);
 
   constructor(
-    private readonly repo: ServerListRepository,
-    private readonly sessions: SessionRegistry,
-    private readonly frames: GatewayFrameService
+    @Inject(ServerListRepository) private readonly repo: ServerListRepository,
+    @Inject(SessionRegistry) private readonly sessions: SessionRegistry,
+    @Inject(GatewayFrameService) private readonly frames: GatewayFrameService
   ) {}
 
   @MessageHandler(AccountGetServersListSchema)

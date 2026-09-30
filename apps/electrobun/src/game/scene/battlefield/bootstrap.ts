@@ -9,6 +9,10 @@ import { InteractionHandler } from "@/game/input/interaction-handler";
 import { AtlasLoader } from "@/game/render/atlas-loader";
 import { PickingSystem } from "@/game/render/picking-system";
 import { SpellVelloRenderer } from "@/game/render/spell-vello-renderer";
+import {
+  diagnoseWebGPU,
+  formatWebGPUDiagnostic,
+} from "@/game/render/webgpu-diagnostics";
 import { MapTransition } from "@/game/scene/map/transition";
 import { DebugOverlay } from "@/game/scene/overlays/debug";
 import { GridOverlay } from "@/game/scene/overlays/grid";
@@ -67,6 +71,28 @@ export interface BattlefieldBootstrapContext {
 export async function initEngineAndVello(
   ctx: BattlefieldBootstrapContext
 ): Promise<void> {
+  // The whole renderer pipeline is WebGPU-only: Vello allocates GPUTextures
+  // that Pixi consumes through `ExternalSource`. If `navigator.gpu` is
+  // missing (or no adapter can be acquired), Pixi would silently fall back
+  // to WebGL and every tile/sprite draw would resolve to nothing — the
+  // player sees the HUD over a black canvas with no error. Detect it up
+  // front and fail loudly instead, so MapRenderer's error overlay shows
+  // the real cause.
+  if (typeof navigator === "undefined" || !("gpu" in navigator)) {
+    // Probe the whole stack so the error message carries the exact failing
+    // link instead of a generic "WebGPU unavailable".
+    const report = await diagnoseWebGPU();
+    throw new Error(
+      "WebGPU is not available in this environment. The game renderer " +
+        "(Vello WASM + PixiJS) requires WebGPU. Use a WebGPU-capable browser " +
+        "(Chrome/Edge 113+) or enable it via chrome://flags/#enable-unsafe-webgpu. " +
+        "In the desktop (Electrobun/CEF) build, the GPU/WebGPU flags in " +
+        "electrobun.config.ts must be active.\n\n" +
+        "WebGPU diagnostics:\n" +
+        formatWebGPUDiagnostic(report)
+    );
+  }
+
   try {
     const { initVello } = await import("@/game/render/vello-loader");
     const { gpu } = await initVello();
@@ -74,10 +100,38 @@ export async function initEngineAndVello(
     log.info("Vello WASM renderer initialized (zero-copy GPU sharing)");
   } catch (e) {
     log.error("Vello WASM failed to initialize — rendering will not work:", e);
+    // Rethrow: continuing here produces a black canvas with a working HUD,
+    // which is indistinguishable from a dozen other bugs. Surface it, and
+    // append the raw WebGPU probe so a WASM-level failure (e.g. "Couldn't
+    // find suitable device") can be told apart from a missing adapter.
+    let probe = "";
+    try {
+      probe = `\n\nWebGPU diagnostics:\n${formatWebGPUDiagnostic(await diagnoseWebGPU())}`;
+    } catch {
+      // diagnostics are best-effort; never mask the original error.
+    }
+    throw new Error(
+      `Vello/WASM renderer failed to initialize: ${
+        e instanceof Error ? e.message : String(e)
+      }. The map and characters cannot be drawn without it.${probe}`
+    );
   }
 
   await ctx.engine.init();
   ctx.app = ctx.engine.getApp();
+
+  // Expose a one-call diagnostic usable from the browser devtools console
+  // (`await window.__webgpuDiagnostics()`). In the Chrome + `bun run hmr`
+  // workflow this is the fastest way to tell whether the black screen is a
+  // missing adapter, a WASM failure, or simply no map loaded yet.
+  if (typeof window !== "undefined") {
+    (
+      window as unknown as {
+        __webgpuDiagnostics: () => Promise<string>;
+      }
+    ).__webgpuDiagnostics = async () =>
+      formatWebGPUDiagnostic(await diagnoseWebGPU());
+  }
 
   ctx.mapContainer = new Container();
   // mapContainer holds the full battlefield stack — tiles, world-actors,

@@ -6,15 +6,15 @@ import {
   WaypointUseRequestSchema,
 } from "@dofus/proto/world_pb";
 import { WaypointsService } from "@modules/waypoints/waypoints.service";
-import { Injectable } from "@nestjs/common";
+import { Inject, Injectable } from "@nestjs/common";
 import { MessageHandler } from "@shared/gateway-adapter/message-handler.decorator";
 import { SessionRegistry } from "@shared/gateway-adapter/session-registry";
 
 @Injectable()
 export class WaypointUseHandler {
   constructor(
-    private readonly sessions: SessionRegistry,
-    private readonly waypoints: WaypointsService
+    @Inject(SessionRegistry) private readonly sessions: SessionRegistry,
+    @Inject(WaypointsService) private readonly waypoints: WaypointsService
   ) {}
 
   @MessageHandler(WaypointUseRequestSchema)

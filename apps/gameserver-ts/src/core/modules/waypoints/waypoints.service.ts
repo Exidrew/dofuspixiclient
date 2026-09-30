@@ -11,7 +11,7 @@ import { MapTransitionService } from "@modules/maps/maps.transition.service";
 import { PlayerPresenceService } from "@modules/player-presence/player-presence.service";
 import { PlayersRepository } from "@modules/players/players.repository";
 import { WaypointsRepository } from "@modules/waypoints/waypoints.repository";
-import { Injectable, Logger } from "@nestjs/common";
+import { Inject, Injectable, Logger } from "@nestjs/common";
 import { GatewayFrameService } from "@shared/gateway-adapter/gateway-frame.service";
 
 @Injectable()
@@ -19,12 +19,14 @@ export class WaypointsService {
   private readonly logger = new Logger(WaypointsService.name);
 
   constructor(
-    private readonly repo: WaypointsRepository,
-    private readonly maps: MapsRepository,
-    private readonly players: PlayersRepository,
+    @Inject(WaypointsRepository) private readonly repo: WaypointsRepository,
+    @Inject(MapsRepository) private readonly maps: MapsRepository,
+    @Inject(PlayersRepository) private readonly players: PlayersRepository,
+    @Inject(PlayerPresenceService)
     private readonly presence: PlayerPresenceService,
+    @Inject(MapTransitionService)
     private readonly transition: MapTransitionService,
-    private readonly frames: GatewayFrameService
+    @Inject(GatewayFrameService) private readonly frames: GatewayFrameService
   ) {}
 
   async openZaapMenu(sessionId: string, characterId: string): Promise<void> {

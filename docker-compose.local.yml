@@ -1,0 +1,130 @@
+# Stack locale : PostgreSQL + Redis + gameserver (cores game/auth + gateway WS).
+# Le client (PixiJS + Vello WASM + WebGPU) tourne dans TON navigateur/téléphone,
+# pas dans un conteneur : WebGPU n'est pas exposé dans Docker.
+#
+#   docker compose -f docker-compose.local.yml up -d --build
+#   # → postgres sur localhost:5432, gateway WS sur localhost:8080
+#
+# Puis lance le client :  bun install && just client-hmr
+#
+# Le gameserver est en deux parties : le core (game + auth) tient la logique et
+# écoute sur des sockets Unix PARTAGÉS (volume `sockets`), le gateway ne fait
+# que proxyfier le WebSocket vers ces sockets. Les deux cores et le gateway
+# doivent donc tourner dans des conteneurs partageant /tmp.
+
+services:
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: dofus
+      POSTGRES_PASSWORD: dofus
+      POSTGRES_DB: dofus
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U dofus"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+
+  # Migrations jouées une fois avant le démarrage des cores.
+  migrate:
+    image: oven/bun:1.3-slim
+    working_dir: /app
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment: &common_env
+      DATABASE_URL: postgres://dofus:dofus@postgres:5432/dofus
+      REDIS_URL: redis://redis:6379
+    volumes:
+      - .:/app
+    command: sh -c "bun install --frozen-lockfile && cd apps/gameserver-ts && bun run db:migrate"
+
+  # Seed dev : compte jouable admin/admin + serveur par défaut + personnage
+  # "Admin" + map de départ Incarnam (10300). Aucune migration n'insère la table
+  # `maps`, donc sans cette étape EnterGameHandler log "map not found id=10300"
+  # et rejette l'entrée en jeu. Les données des maps (géométrie + couches de
+  # cellules + background) sont FIGÉES dans le dépôt sous
+  # tools/data/incarnam-maps.json : le seed est autonome, sans source externe.
+  # Identifiants créés : admin / admin, serveur id=1, perso "Admin".
+  seed:
+    image: oven/bun:1.3-slim
+    working_dir: /app
+    depends_on:
+      postgres:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+    environment:
+      <<: *common_env
+    volumes:
+      - .:/app
+    command: sh -c "bun tools/seed-dev-account.mjs && \
+      bun tools/seed-maps-incarnam.mjs --map 10300"
+
+  # Core game : logique de jeu, écoute sur /tmp/dofus-gamed.sock.
+  core-game:
+    image: oven/bun:1.3-slim
+    working_dir: /app
+    depends_on:
+      postgres:
+        condition: service_healthy
+      seed:
+        condition: service_completed_successfully
+    environment:
+      <<: *common_env
+      MODE: game
+      CORE_SOCK: /tmp/dofus-gamed.sock
+    volumes:
+      - .:/app
+      - sockets:/tmp
+    command: sh -c "cd apps/gameserver-ts && bun run src/core/main.ts"
+
+  # Core auth : liste des serveurs / login, écoute sur /tmp/dofus-authd.sock.
+  core-auth:
+    image: oven/bun:1.3-slim
+    working_dir: /app
+    depends_on:
+      postgres:
+        condition: service_healthy
+      seed:
+        condition: service_completed_successfully
+    environment:
+      <<: *common_env
+      MODE: auth
+      AUTH_SOCK: /tmp/dofus-authd.sock
+    volumes:
+      - .:/app
+      - sockets:/tmp
+    command: sh -c "cd apps/gameserver-ts && bun run src/core/main.ts"
+
+  # Gateway WS : expose :8080, proxyfie vers les deux sockets ci-dessus.
+  gameserver:
+    image: oven/bun:1.3-slim
+    working_dir: /app
+    depends_on:
+      - core-game
+      - core-auth
+    environment:
+      <<: *common_env
+      GATEWAY_PORT: "8080"
+      CORE_SOCK: /tmp/dofus-gamed.sock
+      AUTH_SOCK: /tmp/dofus-authd.sock
+    ports:
+      - "8080:8080"
+    volumes:
+      - .:/app
+      - sockets:/tmp
+    command: sh -c "cd apps/gameserver-ts && bun run src/gateway/main.ts"
+
+volumes:
+  pgdata:
+  sockets:

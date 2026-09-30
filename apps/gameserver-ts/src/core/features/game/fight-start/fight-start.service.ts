@@ -21,7 +21,7 @@ import { PlayerPresenceService } from "@modules/player-presence/player-presence.
 import { PlayersRepository } from "@modules/players/players.repository";
 import { SpellsRepository } from "@modules/spells/spells.repository";
 import { StatsService } from "@modules/stats/stats.service";
-import { Injectable, Logger } from "@nestjs/common";
+import { Inject, Injectable, Logger } from "@nestjs/common";
 import { GatewayFrameService } from "@shared/gateway-adapter/gateway-frame.service";
 
 import {
@@ -65,14 +65,17 @@ export class FightStartService {
   private nextMonsterFighterId = -1_000_000;
 
   constructor(
+    @Inject(FightRegistryService)
     private readonly registry: FightRegistryService,
-    private readonly frames: GatewayFrameService,
-    private readonly players: PlayersRepository,
-    private readonly spells: SpellsRepository,
+    @Inject(GatewayFrameService) private readonly frames: GatewayFrameService,
+    @Inject(PlayersRepository) private readonly players: PlayersRepository,
+    @Inject(SpellsRepository) private readonly spells: SpellsRepository,
+    @Inject(FightChallengeService)
     private readonly challenges: FightChallengeService,
+    @Inject(PlayerPresenceService)
     private readonly presence: PlayerPresenceService,
-    private readonly stats: StatsService,
-    private readonly mapMonsters: MapMonsterService
+    @Inject(StatsService) private readonly stats: StatsService,
+    @Inject(MapMonsterService) private readonly mapMonsters: MapMonsterService
   ) {}
 
   async startPvM(
@@ -276,8 +279,7 @@ export class FightStartService {
     // the cap — a player walking into the fight at 200/1050 would
     // otherwise spawn as 200/200 (lpMax=lp=200) and cap at the wrong
     // ceiling for the rest of the fight.
-    const totalVit =
-      (playerStats?.vitality ?? 0) + (equipStats.vitality ?? 0);
+    const totalVit = (playerStats?.vitality ?? 0) + (equipStats.vitality ?? 0);
     const lifeMax = 50 + 5 * playerData.level + totalVit;
 
     const fighter = Fighter.fromPlayer(sessionId, {

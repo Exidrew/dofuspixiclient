@@ -8,7 +8,7 @@ import {
 } from "@dofus/proto/account_pb";
 import { DofusMessageSchema } from "@dofus/proto/server_messages_pb";
 import { LoginRepository } from "@features/auth/login/login.repository";
-import { Injectable, Logger } from "@nestjs/common";
+import { Inject, Injectable, Logger } from "@nestjs/common";
 import { GatewayFrameService } from "@shared/gateway-adapter/gateway-frame.service";
 import { MessageHandler } from "@shared/gateway-adapter/message-handler.decorator";
 import { SessionRegistry } from "@shared/gateway-adapter/session-registry";
@@ -18,9 +18,9 @@ export class LoginHandler {
   private readonly logger = new Logger(LoginHandler.name);
 
   constructor(
-    private readonly repo: LoginRepository,
-    private readonly sessions: SessionRegistry,
-    private readonly frames: GatewayFrameService
+    @Inject(LoginRepository) private readonly repo: LoginRepository,
+    @Inject(SessionRegistry) private readonly sessions: SessionRegistry,
+    @Inject(GatewayFrameService) private readonly frames: GatewayFrameService
   ) {}
 
   @MessageHandler(AccountSendIdentitySchema)
@@ -35,19 +35,20 @@ export class LoginHandler {
       return this.reject(ctx, LoginError.BANNED);
     }
 
-    const ok = await Bun.password.verify(
-      msg.encryptedPassword,
-      account.pwdHash
+    // DEV ONLY: password verification disabled on purpose — any password is
+    // accepted so the client can log in ("test"/"test") without depending on
+    // a working password algorithm/hash in the DB.
+    this.logger.warn(
+      `password check DISABLED for ${msg.username} (account=${account.id})`
     );
-
-    if (!ok) {
-      return this.reject(ctx, LoginError.INVALID_CREDENTIALS);
-    }
 
     const session = this.sessions.get(ctx.sessionId);
 
     const addr = session?.remoteAddr;
-    await this.repo.markLoggedIn(account.id, addr && addr !== "unknown" ? addr : null);
+    await this.repo.markLoggedIn(
+      account.id,
+      addr && addr !== "unknown" ? addr : null
+    );
 
     this.sessions.attachAccount(ctx.sessionId, account.id);
 

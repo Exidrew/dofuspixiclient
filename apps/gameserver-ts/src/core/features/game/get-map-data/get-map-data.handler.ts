@@ -8,7 +8,7 @@ import { DofusMessageSchema } from "@dofus/proto/server_messages_pb";
 import { buildMapData } from "@modules/maps/maps.build-data";
 import { MapsRepository } from "@modules/maps/maps.repository";
 import { PlayersRepository } from "@modules/players/players.repository";
-import { Injectable, Logger } from "@nestjs/common";
+import { Inject, Injectable, Logger } from "@nestjs/common";
 import { GatewayFrameService } from "@shared/gateway-adapter/gateway-frame.service";
 import { MessageHandler } from "@shared/gateway-adapter/message-handler.decorator";
 import { SessionRegistry } from "@shared/gateway-adapter/session-registry";
@@ -18,10 +18,10 @@ export class GetMapDataHandler {
   private readonly logger = new Logger(GetMapDataHandler.name);
 
   constructor(
-    private readonly players: PlayersRepository,
-    private readonly maps: MapsRepository,
-    private readonly sessions: SessionRegistry,
-    private readonly frames: GatewayFrameService
+    @Inject(PlayersRepository) private readonly players: PlayersRepository,
+    @Inject(MapsRepository) private readonly maps: MapsRepository,
+    @Inject(SessionRegistry) private readonly sessions: SessionRegistry,
+    @Inject(GatewayFrameService) private readonly frames: GatewayFrameService
   ) {}
 
   @MessageHandler(GameGetMapDataSchema)

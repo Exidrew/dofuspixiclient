@@ -10,7 +10,7 @@ import { ServerState } from "@dofus/proto/common_pb";
 import { DofusMessageSchema } from "@dofus/proto/server_messages_pb";
 import { TICKET_TTL_MS } from "@features/auth/select-server/select-server.constants";
 import { SelectServerRepository } from "@features/auth/select-server/select-server.repository";
-import { Injectable, Logger } from "@nestjs/common";
+import { Inject, Injectable, Logger } from "@nestjs/common";
 import { GatewayFrameService } from "@shared/gateway-adapter/gateway-frame.service";
 import { MessageHandler } from "@shared/gateway-adapter/message-handler.decorator";
 import { SessionRegistry } from "@shared/gateway-adapter/session-registry";
@@ -20,9 +20,10 @@ export class SelectServerHandler {
   private readonly logger = new Logger(SelectServerHandler.name);
 
   constructor(
+    @Inject(SelectServerRepository)
     private readonly repo: SelectServerRepository,
-    private readonly sessions: SessionRegistry,
-    private readonly frames: GatewayFrameService
+    @Inject(SessionRegistry) private readonly sessions: SessionRegistry,
+    @Inject(GatewayFrameService) private readonly frames: GatewayFrameService
   ) {}
 
   @MessageHandler(AccountSelectServerRequestSchema)

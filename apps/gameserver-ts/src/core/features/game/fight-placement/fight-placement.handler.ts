@@ -13,12 +13,12 @@ import {
   SpriteMovementEntrySchema,
 } from "@dofus/proto/game_pb";
 import { DofusMessageSchema } from "@dofus/proto/server_messages_pb";
+import { fighterColors } from "@features/game/fight-start/fight-start.shared";
 import { PlacementState } from "@modules/fight/core/fight.states";
 import { FightLifecycleService } from "@modules/fight/engine/fight.lifecycle.service";
 import { FighterKind, StateName } from "@modules/fight/fight.types";
 import { FightRegistryService } from "@modules/fight/registry/fight.registry";
-import { fighterColors } from "@features/game/fight-start/fight-start.shared";
-import { Injectable } from "@nestjs/common";
+import { Inject, Injectable } from "@nestjs/common";
 import { GatewayFrameService } from "@shared/gateway-adapter/gateway-frame.service";
 import { MessageHandler } from "@shared/gateway-adapter/message-handler.decorator";
 import { SessionRegistry } from "@shared/gateway-adapter/session-registry";
@@ -26,9 +26,11 @@ import { SessionRegistry } from "@shared/gateway-adapter/session-registry";
 @Injectable()
 export class FightPlacementHandler {
   constructor(
-    readonly _sessions: SessionRegistry,
-    private readonly frames: GatewayFrameService,
+    @Inject(SessionRegistry) readonly _sessions: SessionRegistry,
+    @Inject(GatewayFrameService) private readonly frames: GatewayFrameService,
+    @Inject(FightRegistryService)
     private readonly fightRegistry: FightRegistryService,
+    @Inject(FightLifecycleService)
     private readonly lifecycle: FightLifecycleService
   ) {}
 

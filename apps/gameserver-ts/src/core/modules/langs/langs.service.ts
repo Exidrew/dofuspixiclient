@@ -1,14 +1,13 @@
-import type { GameEnv } from "@shared/config/env.schema";
 import {
   DofusLang,
-  MemoryStorage,
   type Locale,
+  MemoryStorage,
   type ServerNamespace,
   type Spell,
   type SpellsBundle,
 } from "@dofus/dofus-lang";
-import { Injectable, Logger, type OnModuleInit } from "@nestjs/common";
-import { ConfigService } from "@nestjs/config";
+import { Inject, Injectable, Logger, type OnModuleInit } from "@nestjs/common";
+import { GameRuntimeConfig } from "@shared/config/game-runtime";
 
 /**
  * Namespaces the gameserver needs resolved for message-building. Keep this
@@ -41,12 +40,12 @@ export class LangsService implements OnModuleInit {
   private spellsBundle: SpellsBundle | null = null;
 
   constructor(
-    private readonly config: ConfigService<GameEnv, true>
+    @Inject(GameRuntimeConfig) private readonly runtime: GameRuntimeConfig
   ) {}
 
   async onModuleInit(): Promise<void> {
-    const dir = this.config.get("LANGS_DIR", { infer: true });
-    const locale = this.config.get("DEFAULT_LOCALE", { infer: true }) as Locale;
+    const dir = this.runtime.langsDir;
+    const locale = this.runtime.defaultLocale as Locale;
 
     // `file://` URLs need a trailing slash on the directory to resolve
     // `fetch(new URL("foo.json", base))` correctly. Normalize here.

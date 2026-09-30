@@ -1,4 +1,3 @@
-import type { GameEnv } from "@shared/config/env.schema";
 import type { HandlerContext } from "@shared/gateway-adapter/ws-router";
 import { create } from "@bufbuild/protobuf";
 import {
@@ -8,8 +7,8 @@ import {
 } from "@dofus/proto/account_pb";
 import { DofusMessageSchema } from "@dofus/proto/server_messages_pb";
 import { ExchangeTicketRepository } from "@features/game/exchange-ticket/exchange-ticket.repository";
-import { Injectable, Logger } from "@nestjs/common";
-import { ConfigService } from "@nestjs/config";
+import { Inject, Injectable, Logger } from "@nestjs/common";
+import { GameRuntimeConfig } from "@shared/config/game-runtime";
 import { GatewayFrameService } from "@shared/gateway-adapter/gateway-frame.service";
 import { MessageHandler } from "@shared/gateway-adapter/message-handler.decorator";
 import { SessionRegistry } from "@shared/gateway-adapter/session-registry";
@@ -20,12 +19,13 @@ export class ExchangeTicketHandler {
   private readonly gameServerId: number;
 
   constructor(
-    config: ConfigService<GameEnv, true>,
+    @Inject(GameRuntimeConfig) private readonly runtime: GameRuntimeConfig,
+    @Inject(ExchangeTicketRepository)
     private readonly repo: ExchangeTicketRepository,
-    private readonly sessions: SessionRegistry,
-    private readonly frames: GatewayFrameService
+    @Inject(SessionRegistry) private readonly sessions: SessionRegistry,
+    @Inject(GatewayFrameService) private readonly frames: GatewayFrameService
   ) {
-    this.gameServerId = config.get("GAME_SERVER_ID", { infer: true });
+    this.gameServerId = runtime.serverId;
   }
 
   @MessageHandler(AccountSendTicketSchema)

@@ -49,9 +49,11 @@ services:
     command: sh -c "bun install --frozen-lockfile && cd apps/gameserver-ts && bun run db:migrate"
 
   # Seed dev : compte jouable admin/admin + serveur par défaut + personnage
-  # "Admin" + map de départ Incarnam (10300). Aucune migration n'insère la table
-  # `maps`, donc sans cette étape EnterGameHandler log "map not found id=10300"
-  # et rejette l'entrée en jeu. Les données des maps (géométrie + couches de
+  # "Admin" + maps de départ Incarnam (10300 = -4,3 et 10301 = -3,3) + le LIEN
+  # DE VOISINAGE entre les deux. Aucune migration n'insère ni la table `maps`
+  # ni `map_neighbors`, donc sans cette étape EnterGameHandler log
+  # "map not found id=10300" et rejette l'entrée en jeu, et marcher sur un bord
+  # ne change jamais de map. Les données des maps (géométrie + couches de
   # cellules + background) sont FIGÉES dans le dépôt sous
   # tools/data/incarnam-maps.json : le seed est autonome, sans source externe.
   # Identifiants créés : admin / admin, serveur id=1, perso "Admin".
@@ -68,7 +70,7 @@ services:
     volumes:
       - .:/app
     command: sh -c "bun tools/seed-dev-account.mjs && \
-      bun tools/seed-maps-incarnam.mjs --map 10300"
+      bun tools/seed-maps-incarnam.mjs --map 10300 --map 10301 --neighbor 10300:0:10301"
 
   # Core game : logique de jeu, écoute sur /tmp/dofus-gamed.sock.
   core-game:

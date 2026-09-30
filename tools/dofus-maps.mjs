@@ -288,4 +288,196 @@ export function forceWalkable(plans, cellIds) {
   }
 }
 
+/**
+ * Coordonnee (row, col) d'un identifiant de cellule sur la grille Dofus
+ * alternee (longues lignes a `width` cellules, courtes a `width-1`).
+ * Identique a `cellToRowCol` de maps.edge.ts cote serveur.
+ */
+export function cellToRowCol(cellId, mapWidth) {
+  const stride = 2 * mapWidth - 1;
+  const pair = Math.floor(cellId / stride);
+  const offset = cellId - pair * stride;
+  const isLong = offset < mapWidth;
+  return {
+    row: isLong ? pair * 2 : pair * 2 + 1,
+    col: isLong ? offset : offset - mapWidth,
+    isLong,
+  };
+}
+
+/**
+ * Identifiant de cellule a partir d'une coordonnee (row, col). Inverse exact de
+ * `cellToRowCol`.
+ */
+export function rowColToCell(row, col, mapWidth) {
+  const stride = 2 * mapWidth - 1;
+  const pair = Math.floor(row / 2);
+  const isLong = row % 2 === 0;
+  return pair * stride + (isLong ? col : mapWidth + col);
+}
+
+/**
+ * Cellules "de bord" d'une map : celles qui, atteintes, declenchent une
+ * transition de map. Renvoie { direction -> [cellules] }.
+ *
+ * IMPORTANT : cette fonction doit rester le PORTE-FIDÈLE de
+ * `detectExitDirection` de maps.edge.ts (serveur), sinon le seed ouvre des
+ * portes que le serveur n'accepte pas (ou en oublie). Règles serveur :
+ *   - left/right n'existent QUE sur les lignes longues ;
+ *   - priorite : coins (diagonales) > top > bottom > left > right ;
+ *   - une ligne courte (col jusqu'a width-2) sur la derniere paire n'est ni
+ *     top ni bottom (bottom exige row >= 2*height-1) ni left/right -> aucune
+ *     direction (renvoie undefined).
+ */
+export function edgeCellsByDirection(width, height) {
+  const count = cellsCountOf(width, height);
+  const lastRow = 2 * height - 1;
+  const out = { 0: [], 1: [], 2: [], 3: [], 4: [], 5: [], 6: [], 7: [] };
+
+  for (let id = 0; id < count; id++) {
+    const direction = exitDirectionOf(id, width, lastRow);
+    if (direction !== undefined) {
+      out[direction].push(id);
+    }
+  }
+
+  return out;
+}
+
+/** Direction de sortie d'une cellule — miroir exact de detectExitDirection. */
+function exitDirectionOf(cellId, width, lastRow) {
+  const { row, col, isLong } = cellToRowCol(cellId, width);
+
+  const top = row === 0;
+  const bottom = row >= lastRow - 1;
+  const left = isLong && col === 0;
+  const right = isLong && col === width - 1;
+
+  // Ordre identique au match() de maps.edge.ts.
+  if (top && right) {
+    return 7;
+  }
+  if (top && left) {
+    return 5;
+  }
+  if (bottom && right) {
+    return 1;
+  }
+  if (bottom && left) {
+    return 3;
+  }
+  if (top) {
+    return 6;
+  }
+  if (bottom) {
+    return 2;
+  }
+  if (left) {
+    return 4;
+  }
+  if (right) {
+    return 0;
+  }
+  return undefined;
+}
+
+/**
+ * Cellules de bord utilisees comme PORTE vers un voisin dans `direction`.
+ *
+ * Une transition se declenche quand le joueur atteint une cellule de bord :
+ * le serveur deduit la direction (detectExitDirection) puis cherche le voisin
+ * dans map_neighbors. Il faut donc que ces cellules soient MARCHABLES. Les
+ * donnees figees d'Incarnam ne marchent pas toutes les cases de bord (ce sont
+ * des falaises/decor) : on rend praticables uniquement celles qui bordent une
+ * cellule interieure deja marchable, pour que le joueur puisse REELLEMENT
+ * atteindre la porte.
+ *
+ * @returns {number[]} cellules de bord a forcer marchables pour `direction`
+ */
+export function gatewayCellsForDirection(plans, width, height, direction) {
+  const edges = edgeCellsByDirection(width, height)[direction] ?? [];
+  const isWalkable = (id) => {
+    const p = plans[id];
+    return p !== undefined && ((p >> 2n) & 0x7n) !== 0n;
+  };
+
+  const gateways = [];
+  for (const id of edges) {
+    const { row, col, isLong } = cellToRowCol(id, width);
+    // Voisions immediats interieurs (dans les 2 axes) pour verifier qu'une
+    // cellule de bord touche une zone praticable.
+    const neighbours = [];
+    if (isLong) {
+      if (col > 0) {
+        neighbours.push(rowColToCell(row, col - 1, width));
+      }
+      if (col < width - 1) {
+        neighbours.push(rowColToCell(row, col + 1, width));
+      }
+    } else {
+      // ligne courte : colonnes [0, width-2]
+      neighbours.push(rowColToCell(row, col, width));
+      if (col > 0) {
+        neighbours.push(rowColToCell(row, col - 1, width));
+      }
+      if (col < width - 2) {
+        neighbours.push(rowColToCell(row, col + 1, width));
+      }
+    }
+    if (row > 0) {
+      neighbours.push(rowColToCell(row - 1, Math.min(col, width - 1), width));
+    }
+    if (row < 2 * height - 2) {
+      neighbours.push(rowColToCell(row + 1, Math.min(col, width - 1), width));
+    }
+
+    if (neighbours.some((n) => isWalkable(n))) {
+      gateways.push(id);
+    }
+  }
+
+  return gateways;
+}
+
+/**
+ * Cellule miroir sur le bord OPPOSÉ de la map cible, quand un joueur sort par
+ * `exitDirection`. Port fidèle de `oppositeEdgeCell` de maps.edge.ts (mêmes
+ * conventions : les cardinaux conservent l'axe perpendiculaire, les diagonales
+ * atterrissent au coin opposé).
+ */
+export function oppositeEdgeCell(
+  fromCellId,
+  exitDirection,
+  sourceWidth,
+  targetWidth,
+  targetHeight
+) {
+  const { row, col } = cellToRowCol(fromCellId, sourceWidth);
+  const lastLongRow = 2 * targetHeight - 2;
+  const rightCol = targetWidth - 1;
+  const clampCol = Math.min(Math.max(col, 0), rightCol);
+  const clampRow = Math.min(Math.max(row, 0), lastLongRow);
+
+  switch (exitDirection) {
+    case 0:
+      return rowColToCell(clampRow, 0, targetWidth);
+    case 1:
+      return rowColToCell(0, 0, targetWidth);
+    case 2:
+      return rowColToCell(0, clampCol, targetWidth);
+    case 3:
+      return rowColToCell(0, rightCol, targetWidth);
+    case 4:
+      return rowColToCell(clampRow, rightCol, targetWidth);
+    case 5:
+      return rowColToCell(lastLongRow, rightCol, targetWidth);
+    case 6:
+      return rowColToCell(lastLongRow, clampCol, targetWidth);
+    case 7:
+      return rowColToCell(lastLongRow, 0, targetWidth);
+    default:
+      return undefined;
+  }
+}
+
 export { HASH_CELL };

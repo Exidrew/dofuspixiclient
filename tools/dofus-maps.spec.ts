@@ -6,11 +6,16 @@ import { decodeCells } from "../apps/gameserver-ts/src/core/modules/maps/maps.ce
 import {
   CELL_CHAR_LEN,
   cellsCountOf,
+  cellToRowCol,
   decodeHashCells,
+  edgeCellsByDirection,
   encodeHashCells,
   extractMapGeometry,
   findDims,
+  gatewayCellsForDirection,
+  oppositeEdgeCell,
   pack60,
+  rowColToCell,
   unpack60,
 } from "./dofus-maps.mjs";
 
@@ -107,5 +112,51 @@ describe("cells → codec serveur", () => {
     const buf = Buffer.from(maps["10300"].mapData, "ascii");
     const cells = decodeCells(new Uint8Array(buf));
     expect(cells).toHaveLength(479);
+  });
+});
+
+describe("géométrie de bord / transitions de map", () => {
+  test("cellToRowCol / rowColToCell sont inverses", () => {
+    const width = 15;
+    for (let id = 0; id < cellsCountOf(width, 17); id++) {
+      const { row, col } = cellToRowCol(id, width);
+      expect(rowColToCell(row, col, width)).toBe(id);
+    }
+  });
+
+  test("edgeCellsByDirection est le miroir de detectExitDirection (serveur)", () => {
+    const edges = edgeCellsByDirection(15, 17);
+    // E/W : une cellule par ligne longue, SAUF les lignes 0 et la derniere
+    // (celles-ci partent en N/S, ou en diagonal aux coins) -> 15 chacun.
+    expect(edges[0]).toHaveLength(15);
+    expect(edges[4]).toHaveLength(15);
+    // N (ligne 0) et S (ligne 2*H-2) : 15 - 2 coins = 13 chacun.
+    expect(edges[6]).toHaveLength(13);
+    expect(edges[2]).toHaveLength(13);
+    // Les 4 coins diagonaux.
+    expect(edges[5]).toEqual([0]); // NW
+    expect(edges[7]).toEqual([14]); // NE
+    expect(edges[3]).toEqual([464]); // SW
+    expect(edges[1]).toEqual([478]); // SE
+  });
+
+  test("oppositeEdgeCell : sortir E atterrit en colonne 0, sortir W en colonne W-1", () => {
+    // 15x17 : colonne 0 sur une ligne longue.
+    const east = edgeCellsByDirection(15, 17)[0][0];
+    const landingFromEast = oppositeEdgeCell(east, 0, 15, 15, 17);
+    expect(cellToRowCol(landingFromEast, 15).col).toBe(0);
+
+    const west = edgeCellsByDirection(15, 17)[4][0];
+    const landingFromWest = oppositeEdgeCell(west, 4, 15, 15, 17);
+    expect(cellToRowCol(landingFromWest, 15).col).toBe(14);
+  });
+
+  test("gatewayCellsForDirection ne renvoie que des bords adjacents au praticable", () => {
+    const plans = decodeHashCells(maps["10300"].mapData);
+    const gates = gatewayCellsForDirection(plans, 15, 17, 0);
+    // Sur 10300, les portes Est doivent toutes être sur le bord Est (col 14).
+    for (const id of gates) {
+      expect(cellToRowCol(id, 15).col).toBe(14);
+    }
   });
 });

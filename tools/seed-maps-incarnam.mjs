@@ -55,6 +55,8 @@ import {
   encodeHashCells,
   extractMapGeometry,
   forceWalkable,
+  gatewayCellsForDirection,
+  oppositeEdgeCell,
 } from "./dofus-maps.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -107,6 +109,105 @@ function hasFlag(name) {
 const DATABASE_URL =
   process.env.DATABASE_URL ?? "postgres://dofus:dofus@localhost:5432/dofus";
 
+// ── Voisinage (changement de map) ───────────────────────────────────────────
+//
+// Le serveur resout une transition de bord avec `map_neighbors` :
+// MoveAckHandler -> detectExitDirection(cellule d'arrivee) -> pour chaque
+// direction candidate, MapsRepository.findNeighborInDirection(mapId, direction).
+// La table est VIDE au départ (aucune migration ne la peuple) : sans elle,
+// atteindre un bord ne mene nulle part.
+//
+// On la remplit a partir des coordonnees monde (x, y) de map-data.json :
+// deux maps sont voisines «en ligne» quand |dx| <= 1 et |dy| <= 1 (pas les
+// deux nuls). Direction protocolaire depuis (x,y) : 0=E, 2=S, 4=W, 6=N, et les
+// diagonales 1=SE, 3=SW, 5=NW, 7=NE.
+//
+// L'axe «x croit vers l'EST» et «y croit vers le SUD» est la convention Dofus
+// 1.29 (cf. getMapTransitionDirection cote client). On peut surcharger/forcer
+// un lien avec `--neighbor <from>:<dir>:<to>` (repete pour plusieurs liens),
+// utile quand les coordonnees du depot divergent de la demande de jeu.
+
+const DIRECTION_DELTAS = {
+  0: [1, 0], // E
+  1: [1, 1], // SE
+  2: [0, 1], // S
+  3: [-1, 1], // SW
+  4: [-1, 0], // W
+  5: [-1, -1], // NW
+  6: [0, -1], // N
+  7: [1, -1], // NE
+};
+
+const OPPOSITE_DIRECTION = { 0: 4, 1: 5, 2: 6, 3: 7, 4: 0, 5: 1, 6: 2, 7: 3 };
+
+/**
+ * Deduit les liens de voisinage a partir des coordonnees monde des maps.
+ * Retourne un tableau de { mapId, direction, neighborMapId, gateways: true }.
+ */
+function deriveNeighbors(positions, mapIds) {
+  const wanted = new Set(mapIds.map(Number));
+  const links = [];
+  for (const fromId of wanted) {
+    const from = positions[String(fromId)];
+    if (!from) {
+      continue;
+    }
+    for (const [dirStr, [dx, dy]] of Object.entries(DIRECTION_DELTAS)) {
+      const direction = Number(dirStr);
+      const nx = (from.x ?? 0) + dx;
+      const ny = (from.y ?? 0) + dy;
+      const toId = mapIds.find((id) => {
+        const p = positions[String(id)];
+        return p && (p.x ?? 0) === nx && (p.y ?? 0) === ny;
+      });
+      if (toId === undefined) {
+        continue;
+      }
+      links.push({
+        mapId: fromId,
+        direction,
+        neighborMapId: Number(toId),
+      });
+    }
+  }
+  return links;
+}
+
+// Sur une map, les portes utilisables pour chaque direction reliee. Alimente
+// map_triggers ? Non : le serveur deduit la direction depuis la cellule, donc
+// il suffit que la cellule de bord soit marchable.
+function parseForcedNeighbors() {
+  const out = [];
+  for (const spec of argList("neighbor")) {
+    const parts = spec.split(":");
+    if (parts.length !== 3) {
+      console.warn(`  • --neighbor "${spec}" invalide (attendu from:dir:to)`);
+      continue;
+    }
+    const [from, dir, to] = parts.map(Number);
+    if (
+      !Number.isFinite(from) ||
+      !Number.isFinite(dir) ||
+      !Number.isFinite(to)
+    ) {
+      console.warn(`  • --neighbor "${spec}" invalide (nombres attendus)`);
+      continue;
+    }
+    if (!(dir in DIRECTION_DELTAS)) {
+      console.warn(`  • --neighbor "${spec}" : direction ${dir} hors 0..7`);
+      continue;
+    }
+    out.push({ mapId: from, direction: dir, neighborMapId: to });
+    // Lien reciproque, pour permettr\e l'aller-retour.
+    out.push({
+      mapId: to,
+      direction: OPPOSITE_DIRECTION[dir],
+      neighborMapId: from,
+    });
+  }
+  return out;
+}
+
 async function main() {
   const forceSpawn = !hasFlag("no-force-spawn");
   const backgroundOverride = argList("background")[0];
@@ -115,6 +216,9 @@ async function main() {
     : backgroundOverride !== undefined
       ? Number.parseInt(backgroundOverride, 10)
       : INCARNAM_BACKGROUND;
+  // Voisinage : par défaut, on déduit les liens des coordonnées de map-data.json.
+  // `--no-neighbors` désactive ; `--neighbor from:dir:to` ajoute des liens forcés.
+  const wantNeighbors = !hasFlag("no-neighbors");
 
   const maps = JSON.parse(readFileSync(MAPS_FILE, "utf8"));
   const mapDataFile = JSON.parse(readFileSync(MAP_DATA_FILE, "utf8"));
@@ -146,7 +250,39 @@ async function main() {
       process.exit(1);
     }
 
+    // Liens de voisinage : liens automatiques déduits des coordonnées monde
+    // (map-data.json) + liens forcés via --neighbor. On indexe par map source.
+    const forcedNeighbors = parseForcedNeighbors();
+    const autoNeighbors = wantNeighbors
+      ? deriveNeighbors(positions, targets)
+      : [];
+    const allLinks = [...autoNeighbors, ...forcedNeighbors];
+    const linksByMap = new Map();
+    for (const link of allLinks) {
+      const key = link.mapId;
+      const arr = linksByMap.get(key) ?? [];
+      arr.push(link);
+      linksByMap.set(key, arr);
+    }
+    const linksForMap = (id) => linksByMap.get(id) ?? [];
+
+    if (wantNeighbors) {
+      console.log(
+        `Voisinage : ${autoNeighbors.length} lien(s) déduit(s) des coordonnées` +
+          (forcedNeighbors.length > 0
+            ? ` + ${forcedNeighbors.length} lien(s) forcé(s) via --neighbor`
+            : "")
+      );
+    }
+
     let done = 0;
+    const neighborLinks = [];
+
+    // ── Phase 1 : préparer les maps à insérer (décodage + spawn) ───────────
+    // On garde les plans en mémoire pour pouvoir appliquer les portes APRÈS
+    // avoir tout préparé (les portes d'une map dépendent des portes des maps
+    // voisines via les cellules d'atterrissage).
+    const prepared = new Map(); // mapId -> { entry, geometry, plans, info }
     for (const mapId of targets) {
       const entry = maps[String(mapId)];
       if (!entry) {
@@ -164,15 +300,79 @@ async function main() {
         continue;
       }
 
-      // Décodage → forçage de la cellule de spawn → réencodage.
       const plans = decodeHashCells(entry.mapData);
       if (forceSpawn) {
         forceWalkable(plans, [SPAWN_CELL]);
       }
-      const cells = Buffer.from(encodeHashCells(plans), "ascii");
 
-      // Position (x, y) et sous-zone : source = assets du projet.
-      const info = positions[String(mapId)] ?? {};
+      prepared.set(mapId, {
+        entry,
+        geometry,
+        plans,
+        info: positions[String(mapId)] ?? {},
+      });
+    }
+
+    // ── Phase 2 : portes de sortie + cellules d'atterrissage ───────────────
+    // Pour chaque lien A -dir-> B :
+    //   (a) rendre marchables les cellules de bord de A dans `dir` (portes) ;
+    //   (b) rendre marchables les cellules de B où le joueur ATTERRIT en
+    //       venant de A (oppositeEdgeCell), sinon le joueur apparaîtrait
+    //       bloqué sur une case non praticable.
+    // (a) et (b) sont calculés sur les plans AVANT forçage, pour rester
+    // déterministes et éviter d'ouvrir des portes en cascade.
+    const gatewaysByMap = new Map(); // mapId -> Map(dir -> cells[])
+    const addGateway = (mapId, direction, cells) => {
+      const byDir = gatewaysByMap.get(mapId) ?? new Map();
+      const arr = byDir.get(direction) ?? [];
+      byDir.set(direction, arr.concat(cells));
+      gatewaysByMap.set(mapId, byDir);
+    };
+
+    for (const link of allLinks) {
+      const a = prepared.get(link.mapId);
+      const b = prepared.get(link.neighborMapId);
+      if (!a || !b) {
+        continue;
+      }
+
+      // (a) portes de sortie sur A.
+      const exits = gatewayCellsForDirection(
+        a.plans,
+        a.geometry.width,
+        a.geometry.height,
+        link.direction
+      );
+      if (exits.length > 0) {
+        addGateway(link.mapId, link.direction, exits);
+        for (const cellId of exits) {
+          // (b) atterrissage correspondant sur B.
+          const landing = oppositeEdgeCell(
+            cellId,
+            link.direction,
+            a.geometry.width,
+            b.geometry.width,
+            b.geometry.height
+          );
+          if (landing !== undefined) {
+            forceWalkable(b.plans, [landing]);
+          }
+        }
+      }
+    }
+
+    // ── Phase 3 : forcer les cellules puis insérer ─────────────────────────
+    for (const [mapId, prep] of prepared) {
+      const { entry, geometry, plans, info } = prep;
+
+      const byDir = gatewaysByMap.get(mapId);
+      if (byDir) {
+        for (const cells of byDir.values()) {
+          forceWalkable(plans, cells);
+        }
+      }
+
+      const cells = Buffer.from(encodeHashCells(plans), "ascii");
       const x = info.x ?? 0;
       const y = info.y ?? 0;
       const sua = info.sua ?? 0;
@@ -239,7 +439,46 @@ async function main() {
         `  • map ${mapId} (date ${entry.date}) seedée : ${geometry.width}x${geometry.height}, ${geometry.count} cellules, bg=${background}` +
           (forceSpawn ? `, spawn ${SPAWN_CELL} forcé marchable` : "")
       );
+
+      if (byDir && byDir.size > 0) {
+        const summary = [...byDir.entries()]
+          .sort((a, b) => a[0] - b[0])
+          .map(([dir, c]) => `d${dir}=${c.length}`)
+          .join(" ");
+        console.log(`      portes marchables forcées : ${summary}`);
+      }
+
+      // Mémorise les liens sortants (insérés après, la FK neighbor_map_id exige
+      // que toutes les maps cibles existent déjà).
+      for (const link of linksForMap(mapId)) {
+        neighborLinks.push(link);
+      }
       done++;
+    }
+
+    // ── map_neighbors ─────────────────────────────────────────────────────
+    // Insertion APRÈS avoir seedé toutes les maps : neighbor_map_id référence
+    // maps(id), donc la map voisine doit déjà exister.
+    let linksDone = 0;
+    for (const link of neighborLinks) {
+      const { rowCount } = await db.query(
+        `INSERT INTO map_neighbors (map_id, direction, neighbor_map_id)
+           VALUES ($1, $2, $3)
+           ON CONFLICT (map_id, direction) DO UPDATE
+             SET neighbor_map_id = EXCLUDED.neighbor_map_id`,
+        [link.mapId, link.direction, link.neighborMapId]
+      );
+      if (rowCount > 0) {
+        linksDone++;
+      }
+    }
+
+    if (neighborLinks.length > 0) {
+      console.log("");
+      console.log(
+        `✓ ${linksDone} lien(s) de voisinage (map_neighbors) posés : ` +
+          `${neighborLinks.filter((l) => l.mapId <= l.neighborMapId).length} aller(s)`
+      );
     }
 
     console.log("");

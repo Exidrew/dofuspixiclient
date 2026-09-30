@@ -83,11 +83,16 @@ db-migrate:
 #
 # The map data (geometry + per-cell layers + background) is FROZEN in the repo
 # at tools/data/incarnam-maps.json, so the seed is self-contained. Pass extra
-# maps e.g. `just db-seed --map 10301`, or add `--all-incarnam` (all zone-103xx
+# maps e.g. `just db-seed --map 10303`, or add `--all-incarnam` (all zone-103xx
 # maps) / `--background N` inside the recipe.
+#
+# Two maps are seeded by default (Incarnam -4,3 = 10300 and -3,3 = 10301) plus
+# the EDGE LINK between them, so walking off the east/west border actually
+# switches map (map_neighbors was empty before — no migration fills it).
 db-seed:
     DATABASE_URL="{{db_url}}" bun {{root}}/tools/seed-dev-account.mjs
-    DATABASE_URL="{{db_url}}" bun {{root}}/tools/seed-maps-incarnam.mjs --map 10300
+    DATABASE_URL="{{db_url}}" bun {{root}}/tools/seed-maps-incarnam.mjs \
+        --map 10300 --map 10301 --neighbor 10300:0:10301
 
 # Start the game server: gateway + both core processes (game and auth).
 # The gateway only proxies; without the MODE=game and MODE=auth cores talking to

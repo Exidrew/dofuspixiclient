@@ -74,25 +74,32 @@ db-migrate:
     cd {{root}}/apps/gameserver-ts && DATABASE_URL="{{db_url}}" bun run db:migrate
 
 # Seed dev data: playable account (admin/admin), a default game server (id=1)
-# and a character ("Admin"), plus the Incarnam starter map (10300).
-# Without the map, EnterGameHandler rejects with "map not found id=10300"
+# and a character ("Admin"), plus ALL connected Incarnam maps.
+# Without the maps, EnterGameHandler rejects with "map not found id=10300"
 # (no migration inserts maps).
 #
 # Credentials created: admin / admin (password check is disabled in DEV, so any
 # password works — but the UI shows admin/admin).
 #
 # The map data (geometry + per-cell layers + background) is FROZEN in the repo
-# at tools/data/incarnam-maps.json, so the seed is self-contained. Pass extra
-# maps e.g. `just db-seed --map 10303`, or add `--all-incarnam` (all zone-103xx
-# maps) / `--background N` inside the recipe.
+# at tools/data/incarnam-maps.json, so the seed is self-contained. The background
+# is the full-screen SKY tile 56 for every Incarnam map: the `mappos` 3rd field
+# (`<x>,<y>,<N>`) is a decor tile id (e.g. 440 = 366x180, too small for a
+# 15x17 map), NOT a background — using it painted a stray "bridge" at the map
+# origin and left no sky. Pass extra maps e.g. `just db-seed --map 10303`, drop
+# `--all-incarnam` to seed only the starter map, or add `--background N`.
 #
-# Two maps are seeded by default (Incarnam -4,3 = 10300 and -3,3 = 10301) plus
-# the EDGE LINK between them, so walking off the east/west border actually
-# switches map (map_neighbors was empty before — no migration fills it).
+# `--all-incarnam` seeds the 62 zone-103xx maps AND builds the `map_neighbors`
+# mesh from the REAL world coordinates (`mappos`): 10300 (x=-4) real east
+# neighbour is 10305 (x=-3), not 10301 (x=2). Shared coordinates (interiors /
+# variants of a same cell) are de-duplicated so no arbitrary link is created.
+# No `--neighbor` override is needed — every link comes from the coordinates,
+# which connects the whole starter region (37 maps reachable from 10300) instead
+# of a lone 10300<->10301 pair (map_neighbors was empty before — no migration).
 db-seed:
     DATABASE_URL="{{db_url}}" bun {{root}}/tools/seed-dev-account.mjs
     DATABASE_URL="{{db_url}}" bun {{root}}/tools/seed-maps-incarnam.mjs \
-        --map 10300 --map 10301 --neighbor 10300:0:10301
+        --all-incarnam
 
 # Start the game server: gateway + both core processes (game and auth).
 # The gateway only proxies; without the MODE=game and MODE=auth cores talking to

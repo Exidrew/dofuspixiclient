@@ -331,11 +331,10 @@ export function rowColToCell(row, col, mapWidth) {
  */
 export function edgeCellsByDirection(width, height) {
   const count = cellsCountOf(width, height);
-  const lastRow = 2 * height - 1;
   const out = { 0: [], 1: [], 2: [], 3: [], 4: [], 5: [], 6: [], 7: [] };
 
   for (let id = 0; id < count; id++) {
-    const direction = exitDirectionOf(id, width, lastRow);
+    const direction = exitDirectionOf(id, width, height);
     if (direction !== undefined) {
       out[direction].push(id);
     }
@@ -345,37 +344,47 @@ export function edgeCellsByDirection(width, height) {
 }
 
 /** Direction de sortie d'une cellule — miroir exact de detectExitDirection. */
-function exitDirectionOf(cellId, width, lastRow) {
-  const { row, col, isLong } = cellToRowCol(cellId, width);
+// Port StarLoco (OrthogonalProj.isEdgeCellOrth) : le bord est GÉOMÉTRIQUE
+// (coordonnées orthogonales x = (cellId + y*(w-1)) / w, y = lineOff - lineNb).
+// Les 4 équations : sum = x+y (W:0 / E:2*(w-1)), diff = x-y (N:0 / S:2*(h-1)).
+// Couvre TOUTES les rangées (longues ET courtes) — l'ancien test row/col
+// ne classifiait qu'une rangée sur deux (les longues), l'autre moitié des
+// cellules de bord (rangées courtes) donnait undefined → aucune transition.
+function exitDirectionOf(cellId, width, height) {
+  const stride = 2 * width - 1;
+  const lineNb = Math.floor(cellId / stride);
+  const lineOff = (cellId % stride) % width;
+  const y = lineOff - lineNb;
+  const x = (cellId + y * (width - 1)) / width;
+  const diff = x - y;
+  const sum = x + y;
+  const maxSum = (width - 1) * 2;
+  const maxDiff = (height - 1) * 2;
 
-  const top = row === 0;
-  const bottom = row >= lastRow - 1;
-  const left = isLong && col === 0;
-  const right = isLong && col === width - 1;
-
-  // Ordre identique au match() de maps.edge.ts.
-  if (top && right) {
-    return 7;
-  }
-  if (top && left) {
+  // Coins en priorité (mêmes codes diagonaux que le serveur) : NW=5, NE=7,
+  // SW=3, SE=1, puis bord pur N=6 / S=2 / W=4 / E=0.
+  if (sum === 0 && diff === 0) {
     return 5;
   }
-  if (bottom && right) {
-    return 1;
+  if (sum === maxSum && diff === 0) {
+    return 7;
   }
-  if (bottom && left) {
+  if (sum === 0 && diff === maxDiff) {
     return 3;
   }
-  if (top) {
+  if (sum === maxSum && diff === maxDiff) {
+    return 1;
+  }
+  if (diff === 0) {
     return 6;
   }
-  if (bottom) {
+  if (diff === maxDiff) {
     return 2;
   }
-  if (left) {
+  if (sum === 0) {
     return 4;
   }
-  if (right) {
+  if (sum === maxSum) {
     return 0;
   }
   return undefined;
@@ -385,55 +394,90 @@ function exitDirectionOf(cellId, width, lastRow) {
  * Cellules de bord utilisees comme PORTE vers un voisin dans `direction`.
  *
  * Une transition se declenche quand le joueur atteint une cellule de bord :
- * le serveur deduit la direction (detectExitDirection) puis cherche le voisin
- * dans map_neighbors. Il faut donc que ces cellules soient MARCHABLES. Les
- * donnees figees d'Incarnam ne marchent pas toutes les cases de bord (ce sont
- * des falaises/decor) : on rend praticables uniquement celles qui bordent une
- * cellule interieure deja marchable, pour que le joueur puisse REELLEMENT
- * atteindre la porte.
+ * Une PORTE vers un voisin = cellule du bord géométrique déjà MARCHABLE dans
+ * les données d'origine. On ne force plus la marchabilité des falaises (comme
+ * en Dofus 1.29 et dans StarLoco : buter contre un décor non praticable ne
+ * déclenche AUCUNE transition — le joueur ne peut pas "marcher sur l'eau").
  *
- * @returns {number[]} cellules de bord a forcer marchables pour `direction`
+ * @returns {number[]} cellules de bord (marchables) servant de porte pour `direction`
  */
 export function gatewayCellsForDirection(plans, width, height, direction) {
-  const edges = edgeCellsByDirection(width, height)[direction] ?? [];
   const isWalkable = (id) => {
     const p = plans[id];
     return p !== undefined && ((p >> 2n) & 0x7n) !== 0n;
   };
 
+  // ── Porte MINIMALE, fidèle Dofus 1.29 / StarLoco ─────────────────────────
+  // Le bord géométrique (isEdgeCellOrth) reste infranchissable par défaut :
+  // les données Dofus d'origine rendent le bord hors zone praticable NON
+  // praticable (falaise / décor). On n'ouvre pas tout le bord — le joueur
+  // « ne marche pas sur l'eau ». Une PORTE = cellule de bord la plus PROCHE
+  // d'une cellule intérieure praticable (BFS à travers les cellules actives,
+  // pas seulement praticables : un piece de décor *actif mais infranchissable*
+  // en 1.29 reste traversable seulement si elle est praticable… on l'ouvre en
+  // dernier recours), dans une fenêtre BFS bornée.
   const gateways = [];
-  for (const id of edges) {
-    const { row, col, isLong } = cellToRowCol(id, width);
-    // Voisions immediats interieurs (dans les 2 axes) pour verifier qu'une
-    // cellule de bord touche une zone praticable.
-    const neighbours = [];
-    if (isLong) {
-      if (col > 0) {
-        neighbours.push(rowColToCell(row, col - 1, width));
-      }
-      if (col < width - 1) {
-        neighbours.push(rowColToCell(row, col + 1, width));
-      }
-    } else {
-      // ligne courte : colonnes [0, width-2]
-      neighbours.push(rowColToCell(row, col, width));
-      if (col > 0) {
-        neighbours.push(rowColToCell(row, col - 1, width));
-      }
-      if (col < width - 2) {
-        neighbours.push(rowColToCell(row, col + 1, width));
-      }
-    }
-    if (row > 0) {
-      neighbours.push(rowColToCell(row - 1, Math.min(col, width - 1), width));
-    }
-    if (row < 2 * height - 2) {
-      neighbours.push(rowColToCell(row + 1, Math.min(col, width - 1), width));
-    }
+  const edges = edgeCellsByDirection(width, height)[direction] ?? [];
 
-    if (neighbours.some((n) => isWalkable(n))) {
-      gateways.push(id);
+  if (edges.length === 0) {
+    return [];
+  }
+
+  // BFS depuis toutes les cellules intérieures praticables ; on s'arrête à la
+  // première cellule de bord ACTIVE atteinte. Comme les diagonales n'ont
+  // souvent QU'UNE case de bord (le coin), un BFS à travers les cellules
+  // actives-only peut ne jamais l'atteindre : le BFS de secours traverse les
+  // cellules actives NON praticables au-delà de la profondeur 12.
+  const total = cellsCountOf(width, height);
+  const offsets = [
+    1,
+    width,
+    2 * width - 1,
+    width - 1,
+    -1,
+    -width,
+    -(2 * width - 1),
+    -(width - 1),
+  ];
+  const seen = new Set();
+  // Amorce : la pratique intérieure (le spawn, la route au centre).
+  let frontier = [];
+  for (let id = 0; id < total; id++) {
+    if (!edges.includes(id) && isWalkable(id)) {
+      frontier.push(id);
+      seen.add(id);
     }
+  }
+
+  for (let depth = 0; depth < 20 && frontier.length > 0; depth++) {
+    const freeMove = depth < 12; // jusqu'à 12 : seulement praticable
+    const next = [];
+    for (const cur of frontier) {
+      for (const o of offsets) {
+        const nb = cur + o;
+        if (nb < 0 || nb >= total || seen.has(nb)) {
+          continue;
+        }
+        seen.add(nb);
+        if (edges.includes(nb)) {
+          if (((plans[nb] ?? 0n) & 0x1n) !== 0n) {
+            // cellule de bord ACTIVE joignable — et, en dehors du
+            // mode "traverse decoration", déjà PRATICABLE : porte.
+            if (freeMove ? isWalkable(nb) : true) {
+              gateways.push(nb);
+            }
+          }
+          continue;
+        }
+        if (
+          isWalkable(nb) ||
+          (!freeMove && ((plans[nb] ?? 0n) & 0x1n) !== 0n)
+        ) {
+          next.push(nb);
+        }
+      }
+    }
+    frontier = next;
   }
 
   return gateways;

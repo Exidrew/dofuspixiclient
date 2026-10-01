@@ -503,6 +503,13 @@ export default defineConfig({
   server: {
     port: 5173,
     strictPort: true,
+    // Do not watch public/ assets: tens of thousands of sprites/SVGs would exhaust
+    // the fs.inotify watcher limit (ENOSPC: System limit for number of file
+    // watchers reached). They are static files — served unconditionally, no
+    // HMR needed; a hard refresh picks up any change.
+    watch: {
+      ignored: ["**/public/**"],
+    },
     fs: {
       // Allow serving files from the vello-wasm pkg directory (outside project root).
       // NOTE: Vite compares REAL paths (realpath), so we must list the real

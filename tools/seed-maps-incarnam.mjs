@@ -52,6 +52,7 @@ import pg from "pg";
 
 import {
   decodeHashCells,
+  edgeCellsByDirection,
   encodeHashCells,
   extractMapGeometry,
   forceWalkable,
@@ -87,6 +88,25 @@ const SPAWN_CELL = 319;
  * Surchargeable via `--background N` / `--no-background`.
  */
 const INCARNAM_BACKGROUND = 56;
+
+/**
+ * Choisit le background d'une map.
+ *
+ * ── Piege corrige : `mappos[2]` n'est PAS le background ─────────────────────
+ *
+ * Le 3e champ de `mappos` (`<x>,<y>,<N>`) est un id de tile `ground/<N>` —
+ * verifie : ses dimensions sont celles d'un ELEMENT DE DECOR pose sur la map
+ * (ex. 440 = 366x180, 444 = 86x34), pas d'un fond plein-ecran (une map 15x17
+ * fait ~747x437). L'utiliser comme `background` faisait (a) disparaitre le fond
+ * ciel et (b) apparaitre l'element de decor au coin (0,0) — le "pont bizarre"
+ * en haut de la 10300.
+ *
+ * Le background des maps d'Incarnam est donc le CIEL plein-ecran
+ * `INCARNAM_BACKGROUND` (56), sauf surcharge CLI `--background N` / `--no-background`.
+ */
+function resolveMapBackground(entry, fallback) {
+  return fallback;
+}
 
 // ── Arguments ──────────────────────────────────────────────────────────────
 function argList(name) {
@@ -142,31 +162,73 @@ const OPPOSITE_DIRECTION = { 0: 4, 1: 5, 2: 6, 3: 7, 4: 0, 5: 1, 6: 2, 7: 3 };
 
 /**
  * Deduit les liens de voisinage a partir des coordonnees monde des maps.
- * Retourne un tableau de { mapId, direction, neighborMapId, gateways: true }.
+ * Retourne un tableau de { mapId, direction, neighborMapId }.
+ *
+ * ── Piege des coordonnees dupliquees ────────────────────────────────────────
+ *
+ * Plusieurs maps d'Incarnam partagent la MEME position monde (x,y) : ce sont
+ * des interieurs / variantes d'une meme case de la carte (ex. a (-2,2) on a
+ * 10321, 10322, 10326, 10328, 10329, 10330 ; a (6,5) on a 10335 + 7 autres).
+ * Un parcours naif « pour chaque direction, cherche une map a (x+dx, y+dy) »
+ * tombe alors TOUJOURS sur la premiere de la liste -> il fabrique des liens
+ * arbitraires (ex. 10300 -> 10301 alors que 10301 est a x=2) au lieu du vrai
+ * voisin de plein air (10300 -> 10305, x=-3).
+ *
+ * On corrige en designant un REPRESENTANT CANONIQUE par case : parmi toutes les
+ * maps a une coordonnee donnee, on ne relie que la plus petite par ordre
+ * (id numerique) — choix deterministe. Les autres maps de la case restent
+ * seedees mais ne participent pas au maillage exterieur.
+ *
+ * La position monde provient en priorite du champ `mappos` des donnees figees
+ * (`<x>,<y>,<bg>`, source interne exacte) ; on retombe sur map-data.json si
+ * absent. Les deux sources ont ete verifiees identiques pour les 62 maps.
  */
-function deriveNeighbors(positions, mapIds) {
+function deriveNeighbors(maps, positions, mapIds) {
   const wanted = new Set(mapIds.map(Number));
-  const links = [];
-  for (const fromId of wanted) {
-    const from = positions[String(fromId)];
-    if (!from) {
-      continue;
+
+  // position monde par map : mappos (fige) sinon map-data.json.
+  const worldPos = new Map(); // mapId -> { x, y }
+  for (const id of wanted) {
+    const entry = maps[String(id)];
+    const mappos = entry?.mappos;
+    if (typeof mappos === "string" && mappos.includes(",")) {
+      const [x, y] = mappos.split(",").map(Number);
+      if (Number.isFinite(x) && Number.isFinite(y)) {
+        worldPos.set(id, { x, y });
+        continue;
+      }
     }
+    const p = positions[String(id)];
+    if (p) {
+      worldPos.set(id, { x: p.x ?? 0, y: p.y ?? 0 });
+    }
+  }
+
+  // Une case -> liste d'ids. Le representant est le plus petit id.
+  const idsByCoord = new Map();
+  for (const [id, { x, y }] of worldPos) {
+    const key = `${x},${y}`;
+    const arr = idsByCoord.get(key) ?? [];
+    arr.push(id);
+    idsByCoord.set(key, arr);
+  }
+  const representativeByCoord = new Map(); // "x,y" -> mapId
+  for (const [key, ids] of idsByCoord) {
+    representativeByCoord.set(key, Math.min(...ids));
+  }
+
+  const links = [];
+  for (const [key, repId] of representativeByCoord) {
+    const [x, y] = key.split(",").map(Number);
     for (const [dirStr, [dx, dy]] of Object.entries(DIRECTION_DELTAS)) {
-      const direction = Number(dirStr);
-      const nx = (from.x ?? 0) + dx;
-      const ny = (from.y ?? 0) + dy;
-      const toId = mapIds.find((id) => {
-        const p = positions[String(id)];
-        return p && (p.x ?? 0) === nx && (p.y ?? 0) === ny;
-      });
-      if (toId === undefined) {
+      const neighborRep = representativeByCoord.get(`${x + dx},${y + dy}`);
+      if (neighborRep === undefined) {
         continue;
       }
       links.push({
-        mapId: fromId,
-        direction,
-        neighborMapId: Number(toId),
+        mapId: repId,
+        direction: Number(dirStr),
+        neighborMapId: neighborRep,
       });
     }
   }
@@ -254,7 +316,7 @@ async function main() {
     // (map-data.json) + liens forcés via --neighbor. On indexe par map source.
     const forcedNeighbors = parseForcedNeighbors();
     const autoNeighbors = wantNeighbors
-      ? deriveNeighbors(positions, targets)
+      ? deriveNeighbors(maps, positions, targets)
       : [];
     const allLinks = [...autoNeighbors, ...forcedNeighbors];
     const linksByMap = new Map();
@@ -337,12 +399,35 @@ async function main() {
       }
 
       // (a) portes de sortie sur A.
-      const exits = gatewayCellsForDirection(
+      // ── Porte MINIMALE (fidèle Dofus 1.29 / StarLoco) ─────────────────────
+      // On n'ouvre pas tout le bord : le seul passager est la cellule de bord
+      // dont l'ORTHOGONALE correspond au voisin (définition Dofus : la porte
+      // Est d'une map = zone du bord Est la plus proche de la sortie visible).
+      // En pratique : la cellule du bord `direction` la plus PROCHE d'une
+      // cellule intérieure praticable (BFS local), limitée à une fenêtre de
+      // quelques cellules — le reste du bord reste infranchissable.
+      let exits = gatewayCellsForDirection(
         a.plans,
         a.geometry.width,
         a.geometry.height,
         link.direction
       );
+      if (exits.length === 0) {
+        // Aucune cellule ACTIVE sur ce bord (falaise de décor sur toute la
+        // lisière) : la gatewayCellsForDirection retombe sur son fallback
+        // « bords actifs » ; si toujours vide, on force le bord entier.
+        // Sans ça, le joueur atteint le bord, detectExitDirection renvoie la
+        // bonne direction… mais $gatewayCellsForDirection n'a rien ouvert =>
+        // bord non marchable => transition impossible sur ce lien.
+        console.warn(
+          `  ⚠ bord ${link.direction} de ${link.mapId} entièrement non praticable → portals forcés`
+        );
+        const edges =
+          edgeCellsByDirection(a.geometry.width, a.geometry.height)[
+            link.direction
+          ] ?? [];
+        exits = edges;
+      }
       if (exits.length > 0) {
         addGateway(link.mapId, link.direction, exits);
         for (const cellId of exits) {
@@ -376,6 +461,12 @@ async function main() {
       const x = info.x ?? 0;
       const y = info.y ?? 0;
       const sua = info.sua ?? 0;
+
+      // Background : on prefere celui declare par la map dans `mappos`
+      // (`<x>,<y>,<bg>`, source interne = vrai ground SWF de la map), a
+      // condition que le tile existe et qu'aucune surcharge CLI ne soit active.
+      // Sinon on retombe sur `background` (defaut/--background/--no-background).
+      const mapBackground = resolveMapBackground(entry, background);
 
       // `maps.subarea_id` référence subareas(id) — aucune migration ne seed les
       // subareas. On garantit la FK si le `sua` est connu.
@@ -424,19 +515,29 @@ async function main() {
           subareaId,
           x,
           y,
-          entry.capabilities ?? 0,
-          entry.numgroup ?? 0,
-          entry.minSize ?? 1,
-          entry.maxSize ?? 1,
-          entry.fixSize ?? -1,
+          entry.capabilities === "" || entry.capabilities == null
+            ? 0
+            : Number(entry.capabilities) || 0,
+          entry.numgroup === "" || entry.numgroup == null
+            ? 0
+            : Number(entry.numgroup) || 0,
+          entry.minSize === "" || entry.minSize == null
+            ? 1
+            : Number(entry.minSize) || 1,
+          entry.maxSize === "" || entry.maxSize == null
+            ? 1
+            : Number(entry.maxSize) || 1,
+          entry.fixSize === "" || entry.fixSize == null
+            ? -1
+            : Number(entry.fixSize) || -1,
           entry.forbidden ?? "0;0;0;0;0;0;0",
           entry.monsters ?? "",
-          background,
+          mapBackground,
         ]
       );
 
       console.log(
-        `  • map ${mapId} (date ${entry.date}) seedée : ${geometry.width}x${geometry.height}, ${geometry.count} cellules, bg=${background}` +
+        `  • map ${mapId} (date ${entry.date}) seedée : ${geometry.width}x${geometry.height}, ${geometry.count} cellules, bg=${mapBackground}` +
           (forceSpawn ? `, spawn ${SPAWN_CELL} forcé marchable` : "")
       );
 

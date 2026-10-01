@@ -8,7 +8,11 @@ import {
 import { DofusMessageSchema } from "@dofus/proto/server_messages_pb";
 import { FightStartService } from "@features/game/fight-start/fight-start.service";
 import { MapCacheService } from "@modules/maps/maps.cache.service";
-import { detectExitDirection, oppositeEdgeCell } from "@modules/maps/maps.edge";
+import {
+  detectExitDirection,
+  nearestWalkableEdgeCell,
+  oppositeEdgeCell,
+} from "@modules/maps/maps.edge";
 import { MapsRepository } from "@modules/maps/maps.repository";
 import { MapTransitionService } from "@modules/maps/maps.transition.service";
 import { MapMonsterService } from "@modules/monsters/map-monster.service";
@@ -204,7 +208,7 @@ export class MoveAckHandler {
       return;
     }
 
-    const landingCell = oppositeEdgeCell(
+    const idealCell = oppositeEdgeCell(
       cellId,
       resolved.direction,
       sourceMap.width,
@@ -212,7 +216,27 @@ export class MoveAckHandler {
       targetMap.height
     );
 
+    if (idealCell === undefined) {
+      return;
+    }
+
+    // Only land on a walkable cell: a transition whose landing cell is a
+    // cliff/decor would strand the player. We first try the mirrored cell,
+    // then slide along the same edge. If the whole edge is blocked we refuse
+    // the transition (the player just stays on the source map's border cell).
+    const landingCell = nearestWalkableEdgeCell(
+      idealCell,
+      resolved.direction,
+      targetMap.width,
+      targetMap.height,
+      (cell) => targetMap.cells[cell]?.walkable === true
+    );
+
     if (landingCell === undefined) {
+      this.logger.warn(
+        `edge-transition: no walkable landing on map ${resolved.neighborMapId} ` +
+          `(dir=${resolved.direction}, ideal=${idealCell}) — transition refused`
+      );
       return;
     }
 

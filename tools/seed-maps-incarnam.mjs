@@ -43,7 +43,7 @@
  * Idempotent : ON CONFLICT (id) DO UPDATE.
  */
 
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import process from "node:process";
 import { fileURLToPath } from "node:url";
@@ -64,6 +64,15 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dirname, "..");
 
 const MAPS_FILE = join(__dirname, "data", "incarnam-maps.json");
+
+// Cellules-portails `onMovementEnd` (jaunes, sprite objects_4088) extraites
+// UNE FOIS des scripts StarLoco figés (scripts/data/maps/incarnam/*.lua,
+// `map.onMovementEnd[cellId] = moveEndTeleport(map, cell)`). Inserees dans
+// `scripted_cells` en verb `TP` : le `ScriptedCellsService` du serveur les
+// consomme au move-ack, court-circuitant le bord géométrique — fidèle
+// dynamique Dofus 1.29 : le "jaune" est une téléportation porte-à-porte
+// EXPLICITE, pas une transition de bord.
+const PORTALS_FILE = join(__dirname, "data", "incarnam-portals.json");
 const MAP_DATA_FILE = join(
   ROOT,
   "apps/electrobun/public/assets/data/map-data.json"
@@ -104,7 +113,7 @@ const INCARNAM_BACKGROUND = 56;
  * Le background des maps d'Incarnam est donc le CIEL plein-ecran
  * `INCARNAM_BACKGROUND` (56), sauf surcharge CLI `--background N` / `--no-background`.
  */
-function resolveMapBackground(entry, fallback) {
+function resolveMapBackground(_entry, fallback) {
   return fallback;
 }
 
@@ -580,6 +589,55 @@ async function main() {
         `✓ ${linksDone} lien(s) de voisinage (map_neighbors) posés : ` +
           `${neighborLinks.filter((l) => l.mapId <= l.neighborMapId).length} aller(s)`
       );
+    }
+
+    // ── scripted_cells (portails jaunes onMovementEnd) ────────────────────
+    // Chaque entrée {cellId, toMapId, toCellId} d'une map cible seedée devient
+    // une cellule scriptée `TP`. On n'insère un portail QUE si :
+    //  - les DEUX maps (source et destination) font partie des maps seedées
+    //    (sinon teleport aboutirait sur une map absente → enter-game rejette);
+    //  - aucune ligne (map_id, cell_id) n'écrase un TP déjà en base
+    //    (ON CONFLICT DO NOTHING : les TPs de la migration 0032 non Incarnam
+    //    ne sont pas touchés).
+    const seededIds = new Set([...prepared.keys()]);
+    let portalsDone = 0;
+    if (existsSync(PORTALS_FILE)) {
+      const portals = JSON.parse(readFileSync(PORTALS_FILE, "utf8"));
+      const tableExists = await db.query(
+        "SELECT to_regclass('public.scripted_cells') AS t"
+      );
+      if (tableExists.rows[0].t) {
+        for (const [mapIdStr, entries] of Object.entries(portals)) {
+          const srcMap = Number(mapIdStr);
+          if (!seededIds.has(srcMap)) {
+            continue;
+          }
+          for (const { cellId, toMapId, toCellId } of entries) {
+            if (!seededIds.has(toMapId)) {
+              continue;
+            }
+            const { rowCount } = await db.query(
+              `INSERT INTO scripted_cells
+                 (map_id, cell_id, action_id, event_id, verb, actions_args, conditions)
+               VALUES ($1, $2, 0, 0, 'TP', $3, '')
+               ON CONFLICT (map_id, cell_id) DO NOTHING`,
+              [srcMap, cellId, `${toMapId},${toCellId}`]
+            );
+            if (rowCount > 0) {
+              portalsDone++;
+            }
+          }
+        }
+        console.log(
+          `✓ ${portalsDone} cellule(s) TP (portails jaunes onMovementEnd) posées dans scripted_cells`
+        );
+      } else {
+        console.warn(
+          "  ⚠ table scripted_cells absente (migration 0032 non passée ?) → portails ignorés"
+        );
+      }
+    } else {
+      console.warn(`  ⚠ ${PORTALS_FILE} introuvable → aucun portail TP inséré`);
     }
 
     console.log("");

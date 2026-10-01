@@ -13,6 +13,7 @@ import {
   nearestWalkableEdgeCell,
   oppositeEdgeCell,
 } from "@modules/maps/maps.edge";
+import { isPortalCell, mapHasPortal } from "@modules/maps/maps.portals";
 import { MapsRepository } from "@modules/maps/maps.repository";
 import { MapTransitionService } from "@modules/maps/maps.transition.service";
 import { MapMonsterService } from "@modules/monsters/map-monster.service";
@@ -190,6 +191,17 @@ export class MoveAckHandler {
     );
 
     if (detected === undefined) {
+      return;
+    }
+
+    // Maps that carry the yellow portal sprite (objects_<PORTAL_TILE_GFX>)
+    // only transition when the player lands EXACTLY on one of its cells —
+    // the geometric border is a cliff and must not auto-teleport. Maps
+    // without portal data keep the historic open-border behavior.
+    if (
+      mapHasPortal(sourceMap.cells) &&
+      !isPortalCell(sourceMap.cells[cellId])
+    ) {
       return;
     }
 

@@ -185,11 +185,17 @@ export class MapMonsterService {
         continue;
       }
 
-      const levelData = await this.monsters.level(pick.templateId, pick.level);
+      // `monsters_raw` entries are `id,LEVEL` verbatim from the StarLoco dump:
+      // the second field is the monster's LEVEL (not a 1..N grade index) — for
+      // Incarnam it ranges e.g. 2..6 for a Petit Tofu and 8..10 for a Tournesol.
+      // `monster_levels` is seeded for every such level (see
+      // tools/seed-monsters.mjs), so the lookup is a plain level hit.
+      const level = pick.level;
+      const levelData = await this.monsters.level(pick.templateId, level);
 
       members.push({
         templateId: pick.templateId,
-        level: pick.level,
+        level,
         name: template.name,
         gfx: template.gfx,
         life: levelData?.life ?? 50,
@@ -206,6 +212,7 @@ export class MapMonsterService {
   }
 }
 
+/** StarLoco `monsters_raw` entry: a monster template + its level. */
 type MonsterPoolEntry = { templateId: number; level: number };
 
 function parseMonsterPool(raw: string): MonsterPoolEntry[] {

@@ -100,6 +100,7 @@ db-seed:
     DATABASE_URL="{{db_url}}" bun {{root}}/tools/seed-dev-account.mjs
     DATABASE_URL="{{db_url}}" bun {{root}}/tools/seed-maps-incarnam.mjs \
         --all-incarnam
+    DATABASE_URL="{{db_url}}" bun {{root}}/tools/seed-monsters.mjs
 
 # Start the game server: gateway + both core processes (game and auth).
 # The gateway only proxies; without the MODE=game and MODE=auth cores talking to

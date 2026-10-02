@@ -77,7 +77,8 @@ services:
     volumes:
       - .:/app
     command: sh -c "bun tools/seed-dev-account.mjs && \
-      bun tools/seed-maps-incarnam.mjs --all-incarnam"
+      bun tools/seed-maps-incarnam.mjs --all-incarnam && \
+      bun tools/seed-monsters.mjs"
 
   # Core game : logique de jeu, écoute sur /tmp/dofus-gamed.sock.
   core-game:

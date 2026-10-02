@@ -1,0 +1,2385 @@
+{
+  "236": {
+    "id": 236,
+    "name": "Piou Violet",
+    "gfx": 1212,
+    "align": -1,
+    "colors": "a55ee0,ef9f4f,-1",
+    "ai": 3,
+    "aggroDistance": 0,
+    "isBoss": false,
+    "isArchmonster": false,
+    "levels": {
+      "1": {
+        "life": 10,
+        "ap": 2,
+        "mp": 3,
+        "initiative": 1,
+        "xp": 50,
+        "resists": "0;0;25;25;0;0;0",
+        "stats": "0,0,0,0,0",
+        "statsInfos": "0;0;0;0",
+        "spells": [
+          {
+            "spellId": 626,
+            "level": 1
+          }
+        ]
+      },
+      "2": {
+        "life": 12,
+        "ap": 2,
+        "mp": 3,
+        "initiative": 1,
+        "xp": 55,
+        "resists": "0;0;27;27;0;0;0",
+        "stats": "0,0,0,0,0",
+        "statsInfos": "0;0;0;0",
+        "spells": [
+          {
+            "spellId": 626,
+            "level": 2
+          }
+        ]
+      },
+      "3": {
+        "life": 14,
+        "ap": 2,
+        "mp": 3,
+        "initiative": 1,
+        "xp": 60,
+        "resists": "0;0;29;29;0;0;0",
+        "stats": "0,0,0,0,0",
+        "statsInfos": "0;0;0;0",
+        "spells": [
+          {
+            "spellId": 626,
+            "level": 3
+          }
+        ]
+      },
+      "4": {
+        "life": 16,
+        "ap": 2,
+        "mp": 3,
+        "initiative": 1,
+        "xp": 65,
+        "resists": "0;0;31;31;0;0;0",
+        "stats": "0,0,0,0,0",
+        "statsInfos": "0;0;0;0",
+        "spells": [
+          {
+            "spellId": 626,
+            "level": 4
+          }
+        ]
+      },
+      "5": {
+        "life": 18,
+        "ap": 2,
+        "mp": 3,
+        "initiative": 1,
+        "xp": 70,
+        "resists": "0;0;33;33;0;0;0",
+        "stats": "0,0,0,0,0",
+        "statsInfos": "0;0;0;0",
+        "spells": [
+          {
+            "spellId": 626,
+            "level": 5
+          }
+        ]
+      }
+    }
+  },
+  "489": {
+    "id": 489,
+    "name": "Piou Rouge",
+    "gfx": 1212,
+    "align": -1,
+    "colors": "dc622d,ffc0a6,-1",
+    "ai": 2,
+    "aggroDistance": 0,
+    "isBoss": false,
+    "isArchmonster": false,
+    "levels": {
+      "1": {
+        "life": 10,
+        "ap": 2,
+        "mp": 3,
+        "initiative": 1,
+        "xp": 50,
+        "resists": "-5;-5;50;-5;-5;1;1",
+        "stats": "0,0,0,0,0",
+        "statsInfos": "0;0;0;0",
+        "spells": [
+          {
+            "spellId": 626,
+            "level": 1
+          }
+        ]
+      },
+      "2": {
+        "life": 12,
+        "ap": 2,
+        "mp": 3,
+        "initiative": 1,
+        "xp": 70,
+        "resists": "-4;-4;52;-4;-4;2;2",
+        "stats": "0,0,0,0,0",
+        "statsInfos": "0;0;0;0",
+        "spells": [
+          {
+            "spellId": 626,
+            "level": 2
+          }
+        ]
+      },
+      "3": {
+        "life": 14,
+        "ap": 2,
+        "mp": 3,
+        "initiative": 1,
+        "xp": 110,
+        "resists": "-3;-3;54;-3;-3;3;3",
+        "stats": "0,0,0,0,0",
+        "statsInfos": "0;0;0;0",
+        "spells": [
+          {
+            "spellId": 626,
+            "level": 3
+          }
+        ]
+      },
+      "4": {
+        "life": 16,
+        "ap": 2,
+        "mp": 3,
+        "initiative": 1,
+        "xp": 130,
+        "resists": "-2;-2;56;-2;-2;4;4",
+        "stats": "0,0,0,0,0",
+        "statsInfos": "0;0;0;0",
+        "spells": [
+          {
+            "spellId": 626,
+            "level": 4
+          }
+        ]
+      },
+      "5": {
+        "life": 18,
+        "ap": 2,
+        "mp": 3,
+        "initiative": 1,
+        "xp": 150,
+        "resists": "-1;-1;58;-1;-1;5;5",
+        "stats": "0,0,0,0,0",
+        "statsInfos": "0;0;0;0",
+        "spells": [
+          {
+            "spellId": 626,
+            "level": 5
+          }
+        ]
+      }
+    }
+  },
+  "490": {
+    "id": 490,
+    "name": "Piou Vert",
+    "gfx": 1212,
+    "align": -1,
+    "colors": "448051,f9f9a5,-1",
+    "ai": 2,
+    "aggroDistance": 0,
+    "isBoss": false,
+    "isArchmonster": false,
+    "levels": {
+      "1": {
+        "life": 10,
+        "ap": 2,
+        "mp": 3,
+        "initiative": 1,
+        "xp": 50,
+        "resists": "25;25;0;0;0;0;0",
+        "stats": "0,0,0,0,0",
+        "statsInfos": "0;0;0;0",
+        "spells": [
+          {
+            "spellId": 626,
+            "level": 1
+          }
+        ]
+      },
+      "2": {
+        "life": 12,
+        "ap": 2,
+        "mp": 3,
+        "initiative": 1,
+        "xp": 70,
+        "resists": "27;27;0;0;0;0;0",
+        "stats": "0,0,0,0,0",
+        "statsInfos": "0;0;0;0",
+        "spells": [
+          {
+            "spellId": 626,
+            "level": 2
+          }
+        ]
+      },
+      "3": {
+        "life": 14,
+        "ap": 2,
+        "mp": 3,
+        "initiative": 1,
+        "xp": 110,
+        "resists": "29;29;0;0;0;0;0",
+        "stats": "0,0,0,0,0",
+        "statsInfos": "0;0;0;0",
+        "spells": [
+          {
+            "spellId": 626,
+            "level": 3
+          }
+        ]
+      },
+      "4": {
+        "life": 16,
+        "ap": 2,
+        "mp": 3,
+        "initiative": 1,
+        "xp": 130,
+        "resists": "31;31;0;0;0;0;0",
+        "stats": "0,0,0,0,0",
+        "statsInfos": "0;0;0;0",
+        "spells": [
+          {
+            "spellId": 626,
+            "level": 4
+          }
+        ]
+      },
+      "5": {
+        "life": 18,
+        "ap": 2,
+        "mp": 3,
+        "initiative": 1,
+        "xp": 150,
+        "resists": "33;33;0;0;0;0;0",
+        "stats": "0,0,0,0,0",
+        "statsInfos": "0;0;0;0",
+        "spells": [
+          {
+            "spellId": 626,
+            "level": 5
+          }
+        ]
+      }
+    }
+  },
+  "491": {
+    "id": 491,
+    "name": "Piou Bleu",
+    "gfx": 1212,
+    "align": -1,
+    "colors": "-1,-1,-1",
+    "ai": 2,
+    "aggroDistance": 0,
+    "isBoss": false,
+    "isArchmonster": false,
+    "levels": {
+      "1": {
+        "life": 10,
+        "ap": 2,
+        "mp": 3,
+        "initiative": 1,
+        "xp": 50,
+        "resists": "0;0;0;25;0;0;0",
+        "stats": "0,0,0,0,0",
+        "statsInfos": "0;0;0;0",
+        "spells": [
+          {
+            "spellId": 626,
+            "level": 1
+          }
+        ]
+      },
+      "2": {
+        "life": 12,
+        "ap": 2,
+        "mp": 3,
+        "initiative": 1,
+        "xp": 70,
+        "resists": "0;0;0;27;0;0;0",
+        "stats": "0,0,0,0,0",
+        "statsInfos": "0;0;0;0",
+        "spells": [
+          {
+            "spellId": 626,
+            "level": 2
+          }
+        ]
+      },
+      "3": {
+        "life": 14,
+        "ap": 2,
+        "mp": 3,
+        "initiative": 1,
+        "xp": 110,
+        "resists": "0;0;0;29;0;0;0",
+        "stats": "0,0,0,0,0",
+        "statsInfos": "0;0;0;0",
+        "spells": [
+          {
+            "spellId": 626,
+            "level": 3
+          }
+        ]
+      },
+      "4": {
+        "life": 16,
+        "ap": 2,
+        "mp": 3,
+        "initiative": 1,
+        "xp": 130,
+        "resists": "0;0;0;31;0;0;0",
+        "stats": "0,0,0,0,0",
+        "statsInfos": "0;0;0;0",
+        "spells": [
+          {
+            "spellId": 626,
+            "level": 4
+          }
+        ]
+      },
+      "5": {
+        "life": 18,
+        "ap": 2,
+        "mp": 3,
+        "initiative": 1,
+        "xp": 150,
+        "resists": "0;0;0;33;0;0;0",
+        "stats": "0,0,0,0,0",
+        "statsInfos": "0;0;0;0",
+        "spells": [
+          {
+            "spellId": 626,
+            "level": 5
+          }
+        ]
+      }
+    }
+  },
+  "492": {
+    "id": 492,
+    "name": "Piou Rose",
+    "gfx": 1212,
+    "align": -1,
+    "colors": "e689d9,ebbfe5,-1",
+    "ai": 2,
+    "aggroDistance": 0,
+    "isBoss": false,
+    "isArchmonster": false,
+    "levels": {
+      "2": {
+        "life": 10,
+        "ap": 2,
+        "mp": 4,
+        "initiative": 1,
+        "xp": 75,
+        "resists": "0;0;25;0;25;0;0",
+        "stats": "0,0,0,0,0",
+        "statsInfos": "0;0;0;0",
+        "spells": [
+          {
+            "spellId": 626,
+            "level": 1
+          }
+        ]
+      },
+      "3": {
+        "life": 12,
+        "ap": 2,
+        "mp": 4,
+        "initiative": 1,
+        "xp": 100,
+        "resists": "0;0;27;0;27;0;0",
+        "stats": "0,0,0,0,0",
+        "statsInfos": "0;0;0;0",
+        "spells": [
+          {
+            "spellId": 626,
+            "level": 2
+          }
+        ]
+      },
+      "4": {
+        "life": 14,
+        "ap": 2,
+        "mp": 4,
+        "initiative": 1,
+        "xp": 125,
+        "resists": "0;0;29;0;29;0;0",
+        "stats": "0,0,0,0,0",
+        "statsInfos": "0;0;0;0",
+        "spells": [
+          {
+            "spellId": 626,
+            "level": 3
+          }
+        ]
+      },
+      "5": {
+        "life": 16,
+        "ap": 2,
+        "mp": 4,
+        "initiative": 1,
+        "xp": 150,
+        "resists": "0;0;31;0;31;0;0",
+        "stats": "0,0,0,0,0",
+        "statsInfos": "0;0;0;0",
+        "spells": [
+          {
+            "spellId": 626,
+            "level": 4
+          }
+        ]
+      },
+      "6": {
+        "life": 18,
+        "ap": 2,
+        "mp": 4,
+        "initiative": 1,
+        "xp": 175,
+        "resists": "0;0;33;0;33;0;0",
+        "stats": "0,0,0,0,0",
+        "statsInfos": "0;0;0;0",
+        "spells": [
+          {
+            "spellId": 626,
+            "level": 5
+          }
+        ]
+      }
+    }
+  },
+  "493": {
+    "id": 493,
+    "name": "Piou Jaune",
+    "gfx": 1212,
+    "align": -1,
+    "colors": "f2c40c,bda64d,-1",
+    "ai": 2,
+    "aggroDistance": 0,
+    "isBoss": false,
+    "isArchmonster": false,
+    "levels": {
+      "1": {
+        "life": 10,
+        "ap": 2,
+        "mp": 3,
+        "initiative": 1,
+        "xp": 50,
+        "resists": "0;0;0;25;25;0;0",
+        "stats": "0,0,0,0,0",
+        "statsInfos": "0;0;0;0",
+        "spells": [
+          {
+            "spellId": 626,
+            "level": 1
+          }
+        ]
+      },
+      "2": {
+        "life": 12,
+        "ap": 2,
+        "mp": 3,
+        "initiative": 1,
+        "xp": 70,
+        "resists": "0;0;0;27;27;0;0",
+        "stats": "0,0,0,0,0",
+        "statsInfos": "0;0;0;0",
+        "spells": [
+          {
+            "spellId": 626,
+            "level": 2
+          }
+        ]
+      },
+      "3": {
+        "life": 14,
+        "ap": 2,
+        "mp": 3,
+        "initiative": 1,
+        "xp": 110,
+        "resists": "0;0;0;29;29;0;0",
+        "stats": "0,0,0,0,0",
+        "statsInfos": "0;0;0;0",
+        "spells": [
+          {
+            "spellId": 626,
+            "level": 3
+          }
+        ]
+      },
+      "4": {
+        "life": 16,
+        "ap": 2,
+        "mp": 3,
+        "initiative": 1,
+        "xp": 130,
+        "resists": "0;0;0;31;31;0;0",
+        "stats": "0,0,0,0,0",
+        "statsInfos": "0;0;0;0",
+        "spells": [
+          {
+            "spellId": 626,
+            "level": 4
+          }
+        ]
+      },
+      "5": {
+        "life": 18,
+        "ap": 2,
+        "mp": 3,
+        "initiative": 1,
+        "xp": 150,
+        "resists": "0;0;0;33;33;0;0",
+        "stats": "0,0,0,0,0",
+        "statsInfos": "0;0;0;0",
+        "spells": [
+          {
+            "spellId": 626,
+            "level": 5
+          }
+        ]
+      }
+    }
+  },
+  "970": {
+    "id": 970,
+    "name": "Petit Tofu",
+    "gfx": 1558,
+    "align": -1,
+    "colors": "-1,-1,-1",
+    "ai": 3,
+    "aggroDistance": 0,
+    "isBoss": false,
+    "isArchmonster": false,
+    "levels": {
+      "2": {
+        "life": 6,
+        "ap": 4,
+        "mp": 6,
+        "initiative": 20,
+        "xp": 100,
+        "resists": "0;0;0;0;0;0;0",
+        "stats": "0,0,0,0,20",
+        "statsInfos": "1;0;0;1",
+        "spells": [
+          {
+            "spellId": 201,
+            "level": 1
+          }
+        ]
+      },
+      "3": {
+        "life": 8,
+        "ap": 4,
+        "mp": 6,
+        "initiative": 22,
+        "xp": 110,
+        "resists": "0;0;0;0;0;0;0",
+        "stats": "0,0,0,0,22",
+        "statsInfos": "1;0;0;1",
+        "spells": [
+          {
+            "spellId": 201,
+            "level": 2
+          }
+        ]
+      },
+      "4": {
+        "life": 10,
+        "ap": 4,
+        "mp": 6,
+        "initiative": 24,
+        "xp": 120,
+        "resists": "0;0;0;0;0;0;0",
+        "stats": "0,0,0,0,24",
+        "statsInfos": "1;0;0;1",
+        "spells": [
+          {
+            "spellId": 201,
+            "level": 3
+          }
+        ]
+      },
+      "5": {
+        "life": 12,
+        "ap": 4,
+        "mp": 6,
+        "initiative": 26,
+        "xp": 130,
+        "resists": "0;0;0;0;0;0;0",
+        "stats": "0,0,0,0,26",
+        "statsInfos": "1;0;0;1",
+        "spells": [
+          {
+            "spellId": 201,
+            "level": 4
+          }
+        ]
+      },
+      "6": {
+        "life": 14,
+        "ap": 4,
+        "mp": 6,
+        "initiative": 28,
+        "xp": 140,
+        "resists": "0;0;0;0;0;0;0",
+        "stats": "0,0,0,0,28",
+        "statsInfos": "1;0;0;1",
+        "spells": [
+          {
+            "spellId": 201,
+            "level": 5
+          }
+        ]
+      }
+    }
+  },
+  "971": {
+    "id": 971,
+    "name": "Petit Bouftou",
+    "gfx": 1566,
+    "align": -1,
+    "colors": "-1,-1,-1",
+    "ai": 3,
+    "aggroDistance": 0,
+    "isBoss": false,
+    "isArchmonster": false,
+    "levels": {
+      "3": {
+        "life": 20,
+        "ap": 5,
+        "mp": 3,
+        "initiative": 10,
+        "xp": 100,
+        "resists": "0;0;0;0;0;1;1",
+        "stats": "0,0,0,0,10",
+        "statsInfos": "0;0;0;1",
+        "spells": [
+          {
+            "spellId": 247,
+            "level": 1
+          }
+        ]
+      },
+      "4": {
+        "life": 23,
+        "ap": 5,
+        "mp": 3,
+        "initiative": 11,
+        "xp": 120,
+        "resists": "0;0;0;0;0;1;1",
+        "stats": "0,0,0,0,11",
+        "statsInfos": "0;0;0;1",
+        "spells": [
+          {
+            "spellId": 247,
+            "level": 2
+          }
+        ]
+      },
+      "5": {
+        "life": 26,
+        "ap": 5,
+        "mp": 3,
+        "initiative": 12,
+        "xp": 140,
+        "resists": "0;0;0;0;0;1;1",
+        "stats": "0,0,0,0,12",
+        "statsInfos": "0;0;0;1",
+        "spells": [
+          {
+            "spellId": 247,
+            "level": 3
+          }
+        ]
+      },
+      "6": {
+        "life": 29,
+        "ap": 5,
+        "mp": 3,
+        "initiative": 13,
+        "xp": 160,
+        "resists": "0;0;0;0;0;2;2",
+        "stats": "0,0,0,0,13",
+        "statsInfos": "0;0;0;1",
+        "spells": [
+          {
+            "spellId": 247,
+            "level": 4
+          }
+        ]
+      },
+      "7": {
+        "life": 32,
+        "ap": 5,
+        "mp": 3,
+        "initiative": 14,
+        "xp": 180,
+        "resists": "0;0;0;0;0;2;2",
+        "stats": "0,0,0,0,14",
+        "statsInfos": "0;0;0;1",
+        "spells": [
+          {
+            "spellId": 247,
+            "level": 5
+          }
+        ]
+      }
+    }
+  },
+  "972": {
+    "id": 972,
+    "name": "Jeune Boufton Blanc",
+    "gfx": 1570,
+    "align": -1,
+    "colors": "-1,-1,-1",
+    "ai": 2,
+    "aggroDistance": 0,
+    "isBoss": false,
+    "isArchmonster": false,
+    "levels": {
+      "1": {
+        "life": 15,
+        "ap": 4,
+        "mp": 2,
+        "initiative": 15,
+        "xp": 50,
+        "resists": "2;1;-5;-5;1;0;0",
+        "stats": "0,0,0,0,15",
+        "statsInfos": "0;0;0;1",
+        "spells": [
+          {
+            "spellId": 249,
+            "level": 1
+          },
+          {
+            "spellId": 259,
+            "level": 1
+          }
+        ]
+      },
+      "2": {
+        "life": 17,
+        "ap": 4,
+        "mp": 2,
+        "initiative": 20,
+        "xp": 80,
+        "resists": "4;2;-4;-4;2;0;0",
+        "stats": "0,0,0,0,20",
+        "statsInfos": "0;0;0;1",
+        "spells": [
+          {
+            "spellId": 249,
+            "level": 2
+          },
+          {
+            "spellId": 259,
+            "level": 2
+          }
+        ]
+      },
+      "3": {
+        "life": 19,
+        "ap": 4,
+        "mp": 2,
+        "initiative": 25,
+        "xp": 110,
+        "resists": "6;3;-3;-3;3;0;0",
+        "stats": "0,0,0,0,25",
+        "statsInfos": "0;0;0;1",
+        "spells": [
+          {
+            "spellId": 249,
+            "level": 3
+          },
+          {
+            "spellId": 259,
+            "level": 3
+          }
+        ]
+      },
+      "4": {
+        "life": 21,
+        "ap": 4,
+        "mp": 2,
+        "initiative": 30,
+        "xp": 140,
+        "resists": "8;4;-2;-2;4;0;0",
+        "stats": "0,0,0,0,30",
+        "statsInfos": "0;0;0;1",
+        "spells": [
+          {
+            "spellId": 249,
+            "level": 4
+          },
+          {
+            "spellId": 259,
+            "level": 4
+          }
+        ]
+      },
+      "5": {
+        "life": 23,
+        "ap": 4,
+        "mp": 2,
+        "initiative": 35,
+        "xp": 170,
+        "resists": "10;5;-1;-1;5;0;0",
+        "stats": "0,0,0,0,35",
+        "statsInfos": "0;0;0;1",
+        "spells": [
+          {
+            "spellId": 249,
+            "level": 5
+          },
+          {
+            "spellId": 259,
+            "level": 5
+          }
+        ]
+      }
+    }
+  },
+  "973": {
+    "id": 973,
+    "name": "Jeune Boufton Noir",
+    "gfx": 1571,
+    "align": -1,
+    "colors": "-1,-1,-1",
+    "ai": 3,
+    "aggroDistance": 0,
+    "isBoss": false,
+    "isArchmonster": false,
+    "levels": {
+      "1": {
+        "life": 15,
+        "ap": 4,
+        "mp": 2,
+        "initiative": 15,
+        "xp": 50,
+        "resists": "2;-10;-8;-8;2;0;0",
+        "stats": "0,0,0,0,15",
+        "statsInfos": "0;0;0;1",
+        "spells": [
+          {
+            "spellId": 250,
+            "level": 1
+          },
+          {
+            "spellId": 259,
+            "level": 1
+          }
+        ]
+      },
+      "2": {
+        "life": 17,
+        "ap": 4,
+        "mp": 2,
+        "initiative": 20,
+        "xp": 80,
+        "resists": "3;-8;-9;-9;4;0;0",
+        "stats": "0,0,0,0,20",
+        "statsInfos": "0;0;0;1",
+        "spells": [
+          {
+            "spellId": 250,
+            "level": 2
+          },
+          {
+            "spellId": 259,
+            "level": 2
+          }
+        ]
+      },
+      "3": {
+        "life": 19,
+        "ap": 4,
+        "mp": 2,
+        "initiative": 25,
+        "xp": 110,
+        "resists": "4;-6;-10;-10;6;0;0",
+        "stats": "0,0,0,0,25",
+        "statsInfos": "0;0;0;1",
+        "spells": [
+          {
+            "spellId": 250,
+            "level": 3
+          },
+          {
+            "spellId": 259,
+            "level": 3
+          }
+        ]
+      },
+      "4": {
+        "life": 21,
+        "ap": 4,
+        "mp": 2,
+        "initiative": 30,
+        "xp": 140,
+        "resists": "5;-4;-11;-11;8;0;0",
+        "stats": "0,0,0,0,30",
+        "statsInfos": "0;0;0;1",
+        "spells": [
+          {
+            "spellId": 250,
+            "level": 4
+          },
+          {
+            "spellId": 259,
+            "level": 4
+          }
+        ]
+      },
+      "5": {
+        "life": 23,
+        "ap": 4,
+        "mp": 2,
+        "initiative": 35,
+        "xp": 170,
+        "resists": "6;-2;-12;-12;10;0;0",
+        "stats": "0,0,0,0,35",
+        "statsInfos": "0;0;0;1",
+        "spells": [
+          {
+            "spellId": 250,
+            "level": 5
+          },
+          {
+            "spellId": 259,
+            "level": 5
+          }
+        ]
+      }
+    }
+  },
+  "974": {
+    "id": 974,
+    "name": "Moskito Peureux",
+    "gfx": 1572,
+    "align": -1,
+    "colors": "-1,-1,-1",
+    "ai": 3,
+    "aggroDistance": 0,
+    "isBoss": false,
+    "isArchmonster": false,
+    "levels": {
+      "1": {
+        "life": 10,
+        "ap": 3,
+        "mp": 5,
+        "initiative": 1,
+        "xp": 80,
+        "resists": "10;10;0;0;-10;1;1",
+        "stats": "0,0,0,0,0",
+        "statsInfos": "0;0;0;1",
+        "spells": [
+          {
+            "spellId": 325,
+            "level": 1
+          }
+        ]
+      },
+      "2": {
+        "life": 13,
+        "ap": 3,
+        "mp": 5,
+        "initiative": 1,
+        "xp": 90,
+        "resists": "10;10;0;0;-10;2;2",
+        "stats": "0,0,0,0,0",
+        "statsInfos": "0;0;0;1",
+        "spells": [
+          {
+            "spellId": 325,
+            "level": 2
+          }
+        ]
+      },
+      "3": {
+        "life": 16,
+        "ap": 3,
+        "mp": 5,
+        "initiative": 1,
+        "xp": 100,
+        "resists": "10;10;0;0;-10;3;3",
+        "stats": "0,0,0,0,0",
+        "statsInfos": "0;0;0;1",
+        "spells": [
+          {
+            "spellId": 325,
+            "level": 3
+          }
+        ]
+      },
+      "4": {
+        "life": 19,
+        "ap": 3,
+        "mp": 5,
+        "initiative": 1,
+        "xp": 110,
+        "resists": "10;10;0;0;-10;5;5",
+        "stats": "0,0,0,0,0",
+        "statsInfos": "0;0;0;1",
+        "spells": [
+          {
+            "spellId": 325,
+            "level": 4
+          }
+        ]
+      },
+      "5": {
+        "life": 22,
+        "ap": 3,
+        "mp": 5,
+        "initiative": 1,
+        "xp": 120,
+        "resists": "10;10;0;0;-10;6;6",
+        "stats": "0,0,0,0,0",
+        "statsInfos": "0;0;0;1",
+        "spells": [
+          {
+            "spellId": 325,
+            "level": 5
+          }
+        ]
+      }
+    }
+  },
+  "975": {
+    "id": 975,
+    "name": "Larve Bleue Immature",
+    "gfx": 1563,
+    "align": -1,
+    "colors": "-1,-1,-1",
+    "ai": 3,
+    "aggroDistance": 0,
+    "isBoss": false,
+    "isArchmonster": false,
+    "levels": {
+      "2": {
+        "life": 10,
+        "ap": 3,
+        "mp": 2,
+        "initiative": 10,
+        "xp": 100,
+        "resists": "1;5;5;-9;-9;0;0",
+        "stats": "10,0,0,0,0",
+        "statsInfos": "0;0;0;1",
+        "spells": [
+          {
+            "spellId": 212,
+            "level": 1
+          },
+          {
+            "spellId": 213,
+            "level": 1
+          }
+        ]
+      },
+      "3": {
+        "life": 12,
+        "ap": 3,
+        "mp": 2,
+        "initiative": 10,
+        "xp": 125,
+        "resists": "2;6;6;-8;-8;0;0",
+        "stats": "10,0,0,0,0",
+        "statsInfos": "0;0;0;1",
+        "spells": [
+          {
+            "spellId": 212,
+            "level": 2
+          },
+          {
+            "spellId": 213,
+            "level": 2
+          }
+        ]
+      },
+      "4": {
+        "life": 14,
+        "ap": 3,
+        "mp": 2,
+        "initiative": 10,
+        "xp": 150,
+        "resists": "3;7;7;-7;-7;0;0",
+        "stats": "10,0,0,0,0",
+        "statsInfos": "0;0;0;1",
+        "spells": [
+          {
+            "spellId": 212,
+            "level": 3
+          },
+          {
+            "spellId": 213,
+            "level": 3
+          }
+        ]
+      },
+      "5": {
+        "life": 16,
+        "ap": 3,
+        "mp": 2,
+        "initiative": 10,
+        "xp": 175,
+        "resists": "4;8;8;-6;-6;0;0",
+        "stats": "10,0,0,0,0",
+        "statsInfos": "0;0;0;1",
+        "spells": [
+          {
+            "spellId": 212,
+            "level": 4
+          },
+          {
+            "spellId": 213,
+            "level": 4
+          }
+        ]
+      },
+      "6": {
+        "life": 18,
+        "ap": 3,
+        "mp": 2,
+        "initiative": 10,
+        "xp": 200,
+        "resists": "5;9;9;-5;-5;0;0",
+        "stats": "10,0,0,0,0",
+        "statsInfos": "0;0;0;1",
+        "spells": [
+          {
+            "spellId": 212,
+            "level": 5
+          },
+          {
+            "spellId": 213,
+            "level": 5
+          }
+        ]
+      }
+    }
+  },
+  "976": {
+    "id": 976,
+    "name": "Larve Orange Immature",
+    "gfx": 1567,
+    "align": -1,
+    "colors": "-1,-1,-1",
+    "ai": 2,
+    "aggroDistance": 0,
+    "isBoss": false,
+    "isArchmonster": false,
+    "levels": {
+      "5": {
+        "life": 25,
+        "ap": 4,
+        "mp": 2,
+        "initiative": 20,
+        "xp": 200,
+        "resists": "5;-9;-9;10;1;0;0",
+        "stats": "10,0,10,0,0",
+        "statsInfos": "0;0;0;1",
+        "spells": [
+          {
+            "spellId": 212,
+            "level": 1
+          },
+          {
+            "spellId": 213,
+            "level": 1
+          }
+        ]
+      },
+      "6": {
+        "life": 27,
+        "ap": 4,
+        "mp": 2,
+        "initiative": 40,
+        "xp": 225,
+        "resists": "6;-8;-8;11;2;0;0",
+        "stats": "20,0,20,0,0",
+        "statsInfos": "0;0;0;1",
+        "spells": [
+          {
+            "spellId": 212,
+            "level": 2
+          },
+          {
+            "spellId": 213,
+            "level": 2
+          }
+        ]
+      },
+      "7": {
+        "life": 29,
+        "ap": 4,
+        "mp": 2,
+        "initiative": 60,
+        "xp": 250,
+        "resists": "7;-7;-7;12;3;0;0",
+        "stats": "30,0,30,0,0",
+        "statsInfos": "0;0;0;1",
+        "spells": [
+          {
+            "spellId": 212,
+            "level": 3
+          },
+          {
+            "spellId": 213,
+            "level": 3
+          }
+        ]
+      },
+      "8": {
+        "life": 31,
+        "ap": 4,
+        "mp": 2,
+        "initiative": 80,
+        "xp": 275,
+        "resists": "8;-6;-6;13;4;0;0",
+        "stats": "40,0,40,0,0",
+        "statsInfos": "0;0;0;1",
+        "spells": [
+          {
+            "spellId": 212,
+            "level": 4
+          },
+          {
+            "spellId": 213,
+            "level": 4
+          }
+        ]
+      },
+      "9": {
+        "life": 33,
+        "ap": 4,
+        "mp": 2,
+        "initiative": 100,
+        "xp": 300,
+        "resists": "9;-5;-5;14;5;0;0",
+        "stats": "50,0,50,0,0",
+        "statsInfos": "0;0;0;1",
+        "spells": [
+          {
+            "spellId": 212,
+            "level": 5
+          },
+          {
+            "spellId": 213,
+            "level": 5
+          }
+        ]
+      }
+    }
+  },
+  "977": {
+    "id": 977,
+    "name": "Larve Verte Immature",
+    "gfx": 1568,
+    "align": -1,
+    "colors": "-1,-1,-1",
+    "ai": 2,
+    "aggroDistance": 0,
+    "isBoss": false,
+    "isArchmonster": false,
+    "levels": {
+      "4": {
+        "life": 15,
+        "ap": 4,
+        "mp": 2,
+        "initiative": 35,
+        "xp": 150,
+        "resists": "6;5;-10;6;10;2;2",
+        "stats": "5,0,0,30,0",
+        "statsInfos": "0;0;0;1",
+        "spells": [
+          {
+            "spellId": 212,
+            "level": 1
+          },
+          {
+            "spellId": 213,
+            "level": 1
+          }
+        ]
+      },
+      "5": {
+        "life": 16,
+        "ap": 4,
+        "mp": 2,
+        "initiative": 40,
+        "xp": 175,
+        "resists": "7;6;-9;7;11;2;2",
+        "stats": "10,0,0,30,0",
+        "statsInfos": "0;0;0;1",
+        "spells": [
+          {
+            "spellId": 212,
+            "level": 2
+          },
+          {
+            "spellId": 213,
+            "level": 2
+          }
+        ]
+      },
+      "6": {
+        "life": 17,
+        "ap": 4,
+        "mp": 2,
+        "initiative": 45,
+        "xp": 200,
+        "resists": "8;7;-8;8;12;2;2",
+        "stats": "15,0,0,30,0",
+        "statsInfos": "0;0;0;1",
+        "spells": [
+          {
+            "spellId": 212,
+            "level": 3
+          },
+          {
+            "spellId": 213,
+            "level": 3
+          }
+        ]
+      },
+      "7": {
+        "life": 18,
+        "ap": 4,
+        "mp": 2,
+        "initiative": 50,
+        "xp": 225,
+        "resists": "9;8;-7;9;13;2;2",
+        "stats": "20,0,0,30,0",
+        "statsInfos": "0;0;0;1",
+        "spells": [
+          {
+            "spellId": 212,
+            "level": 4
+          },
+          {
+            "spellId": 213,
+            "level": 4
+          }
+        ]
+      },
+      "8": {
+        "life": 19,
+        "ap": 4,
+        "mp": 2,
+        "initiative": 55,
+        "xp": 250,
+        "resists": "10;9;-6;10;14;2;2",
+        "stats": "25,0,0,30,0",
+        "statsInfos": "0;0;0;1",
+        "spells": [
+          {
+            "spellId": 212,
+            "level": 5
+          },
+          {
+            "spellId": 213,
+            "level": 5
+          }
+        ]
+      }
+    }
+  },
+  "978": {
+    "id": 978,
+    "name": "Champ Champ Vulnérable",
+    "gfx": 1565,
+    "align": -1,
+    "colors": "-1,-1,-1",
+    "ai": 2,
+    "aggroDistance": 0,
+    "isBoss": false,
+    "isArchmonster": false,
+    "levels": {
+      "3": {
+        "life": 10,
+        "ap": 4,
+        "mp": 3,
+        "initiative": 10,
+        "xp": 120,
+        "resists": "5;5;-10;-20;-10;1;1",
+        "stats": "0,0,0,0,10",
+        "statsInfos": "0;0;0;1",
+        "spells": [
+          {
+            "spellId": 200,
+            "level": 1
+          },
+          {
+            "spellId": 219,
+            "level": 1
+          },
+          {
+            "spellId": 213,
+            "level": 1
+          }
+        ]
+      },
+      "4": {
+        "life": 12,
+        "ap": 4,
+        "mp": 3,
+        "initiative": 10,
+        "xp": 150,
+        "resists": "6;6;-9;-18;-9;1;2",
+        "stats": "0,0,0,0,10",
+        "statsInfos": "0;0;0;1",
+        "spells": [
+          {
+            "spellId": 200,
+            "level": 2
+          },
+          {
+            "spellId": 219,
+            "level": 2
+          },
+          {
+            "spellId": 213,
+            "level": 2
+          }
+        ]
+      },
+      "5": {
+        "life": 14,
+        "ap": 4,
+        "mp": 3,
+        "initiative": 10,
+        "xp": 180,
+        "resists": "7;7;-8;-16;-8;1;3",
+        "stats": "0,0,0,0,10",
+        "statsInfos": "0;0;0;1",
+        "spells": [
+          {
+            "spellId": 200,
+            "level": 3
+          },
+          {
+            "spellId": 219,
+            "level": 3
+          },
+          {
+            "spellId": 213,
+            "level": 3
+          }
+        ]
+      },
+      "6": {
+        "life": 16,
+        "ap": 4,
+        "mp": 3,
+        "initiative": 10,
+        "xp": 210,
+        "resists": "8;8;-7;-14;-7;1;4",
+        "stats": "0,0,0,0,10",
+        "statsInfos": "0;0;0;1",
+        "spells": [
+          {
+            "spellId": 200,
+            "level": 4
+          },
+          {
+            "spellId": 219,
+            "level": 4
+          },
+          {
+            "spellId": 213,
+            "level": 4
+          }
+        ]
+      },
+      "7": {
+        "life": 18,
+        "ap": 4,
+        "mp": 3,
+        "initiative": 10,
+        "xp": 240,
+        "resists": "9;9;-6;-12;-6;1;5",
+        "stats": "0,0,0,0,10",
+        "statsInfos": "0;0;0;1",
+        "spells": [
+          {
+            "spellId": 200,
+            "level": 5
+          },
+          {
+            "spellId": 219,
+            "level": 5
+          },
+          {
+            "spellId": 213,
+            "level": 5
+          }
+        ]
+      }
+    }
+  },
+  "979": {
+    "id": 979,
+    "name": "Pissenlit Diabolique Apeuré",
+    "gfx": 1560,
+    "align": -1,
+    "colors": "-1,-1,-1",
+    "ai": 3,
+    "aggroDistance": 0,
+    "isBoss": false,
+    "isArchmonster": false,
+    "levels": {
+      "2": {
+        "life": 15,
+        "ap": 6,
+        "mp": 3,
+        "initiative": 1,
+        "xp": 100,
+        "resists": "-25;5;-25;-10;2;0;0",
+        "stats": "0,0,0,0,0",
+        "statsInfos": "2;10;0;1",
+        "spells": [
+          {
+            "spellId": 220,
+            "level": 1
+          },
+          {
+            "spellId": 185,
+            "level": 1
+          }
+        ]
+      },
+      "3": {
+        "life": 16,
+        "ap": 6,
+        "mp": 3,
+        "initiative": 1,
+        "xp": 120,
+        "resists": "-20;10;-20;-8;4;0;0",
+        "stats": "0,0,0,0,0",
+        "statsInfos": "2;10;0;1",
+        "spells": [
+          {
+            "spellId": 220,
+            "level": 2
+          },
+          {
+            "spellId": 185,
+            "level": 2
+          }
+        ]
+      },
+      "5": {
+        "life": 17,
+        "ap": 6,
+        "mp": 3,
+        "initiative": 1,
+        "xp": 140,
+        "resists": "-15;15;-15;-6;6;0;0",
+        "stats": "0,0,0,0,0",
+        "statsInfos": "2;10;0;1",
+        "spells": [
+          {
+            "spellId": 220,
+            "level": 3
+          },
+          {
+            "spellId": 185,
+            "level": 3
+          }
+        ]
+      },
+      "6": {
+        "life": 18,
+        "ap": 6,
+        "mp": 3,
+        "initiative": 1,
+        "xp": 160,
+        "resists": "-10;20;-10;-4;8;0;0",
+        "stats": "0,0,0,0,0",
+        "statsInfos": "2;10;0;1",
+        "spells": [
+          {
+            "spellId": 220,
+            "level": 4
+          },
+          {
+            "spellId": 185,
+            "level": 4
+          }
+        ]
+      },
+      "7": {
+        "life": 19,
+        "ap": 6,
+        "mp": 3,
+        "initiative": 1,
+        "xp": 180,
+        "resists": "-5;25;-5;-2;10;0;0",
+        "stats": "0,0,0,0,0",
+        "statsInfos": "2;10;0;1",
+        "spells": [
+          {
+            "spellId": 220,
+            "level": 5
+          },
+          {
+            "spellId": 185,
+            "level": 5
+          }
+        ]
+      }
+    }
+  },
+  "980": {
+    "id": 980,
+    "name": "Rose Démoniaque Fragile",
+    "gfx": 1561,
+    "align": -1,
+    "colors": "-1,-1,-1",
+    "ai": 2,
+    "aggroDistance": 0,
+    "isBoss": false,
+    "isArchmonster": false,
+    "levels": {
+      "4": {
+        "life": 10,
+        "ap": 4,
+        "mp": 3,
+        "initiative": 10,
+        "xp": 150,
+        "resists": "5;-10;5;-10;5;0;0",
+        "stats": "0,0,10,0,0",
+        "statsInfos": "2;10;0;1",
+        "spells": [
+          {
+            "spellId": 220,
+            "level": 1
+          },
+          {
+            "spellId": 219,
+            "level": 1
+          }
+        ]
+      },
+      "5": {
+        "life": 12,
+        "ap": 4,
+        "mp": 3,
+        "initiative": 10,
+        "xp": 170,
+        "resists": "6;-9;6;-9;6;0;0",
+        "stats": "0,0,10,0,0",
+        "statsInfos": "2;10;0;1",
+        "spells": [
+          {
+            "spellId": 220,
+            "level": 2
+          },
+          {
+            "spellId": 219,
+            "level": 2
+          }
+        ]
+      },
+      "6": {
+        "life": 14,
+        "ap": 4,
+        "mp": 3,
+        "initiative": 10,
+        "xp": 190,
+        "resists": "7;-8;7;-8;7;0;0",
+        "stats": "0,0,10,0,0",
+        "statsInfos": "2;10;0;1",
+        "spells": [
+          {
+            "spellId": 220,
+            "level": 3
+          },
+          {
+            "spellId": 219,
+            "level": 3
+          }
+        ]
+      },
+      "7": {
+        "life": 16,
+        "ap": 4,
+        "mp": 3,
+        "initiative": 10,
+        "xp": 210,
+        "resists": "8;-7;8;-7;8;0;0",
+        "stats": "0,0,10,0,0",
+        "statsInfos": "2;10;0;1",
+        "spells": [
+          {
+            "spellId": 220,
+            "level": 4
+          },
+          {
+            "spellId": 219,
+            "level": 4
+          }
+        ]
+      },
+      "8": {
+        "life": 18,
+        "ap": 4,
+        "mp": 3,
+        "initiative": 10,
+        "xp": 230,
+        "resists": "9;-6;9;-6;9;0;0",
+        "stats": "0,0,10,0,0",
+        "statsInfos": "2;10;0;1",
+        "spells": [
+          {
+            "spellId": 220,
+            "level": 5
+          },
+          {
+            "spellId": 219,
+            "level": 5
+          }
+        ]
+      }
+    }
+  },
+  "981": {
+    "id": 981,
+    "name": "Petit Tournesol Sauvage",
+    "gfx": 1569,
+    "align": -1,
+    "colors": "-1,-1,-1",
+    "ai": 2,
+    "aggroDistance": 0,
+    "isBoss": false,
+    "isArchmonster": false,
+    "levels": {
+      "8": {
+        "life": 40,
+        "ap": 5,
+        "mp": 3,
+        "initiative": 1,
+        "xp": 400,
+        "resists": "2;2;-10;3;-15;0;0",
+        "stats": "0,0,0,0,0",
+        "statsInfos": "2;10;0;1",
+        "spells": [
+          {
+            "spellId": 183,
+            "level": 1
+          },
+          {
+            "spellId": 200,
+            "level": 1
+          }
+        ]
+      },
+      "9": {
+        "life": 45,
+        "ap": 5,
+        "mp": 3,
+        "initiative": 1,
+        "xp": 450,
+        "resists": "4;4;-8;6;-12;0;0",
+        "stats": "0,0,0,0,0",
+        "statsInfos": "2;10;0;1",
+        "spells": [
+          {
+            "spellId": 183,
+            "level": 2
+          },
+          {
+            "spellId": 200,
+            "level": 2
+          }
+        ]
+      },
+      "10": {
+        "life": 50,
+        "ap": 5,
+        "mp": 3,
+        "initiative": 1,
+        "xp": 500,
+        "resists": "6;6;-6;9;-9;0;0",
+        "stats": "0,0,0,0,0",
+        "statsInfos": "2;10;0;1",
+        "spells": [
+          {
+            "spellId": 183,
+            "level": 3
+          },
+          {
+            "spellId": 200,
+            "level": 3
+          }
+        ]
+      },
+      "11": {
+        "life": 55,
+        "ap": 5,
+        "mp": 3,
+        "initiative": 1,
+        "xp": 550,
+        "resists": "8;8;-4;12;-6;0;0",
+        "stats": "0,0,0,0,0",
+        "statsInfos": "2;10;0;1",
+        "spells": [
+          {
+            "spellId": 183,
+            "level": 4
+          },
+          {
+            "spellId": 200,
+            "level": 4
+          }
+        ]
+      },
+      "12": {
+        "life": 60,
+        "ap": 5,
+        "mp": 3,
+        "initiative": 1,
+        "xp": 600,
+        "resists": "10;10;-2;15;-3;0;0",
+        "stats": "0,0,0,0,0",
+        "statsInfos": "2;10;0;1",
+        "spells": [
+          {
+            "spellId": 183,
+            "level": 5
+          },
+          {
+            "spellId": 200,
+            "level": 5
+          }
+        ]
+      }
+    }
+  },
+  "982": {
+    "id": 982,
+    "name": "Arakne Immature",
+    "gfx": 1564,
+    "align": -1,
+    "colors": "-1,-1,-1",
+    "ai": 2,
+    "aggroDistance": 0,
+    "isBoss": false,
+    "isArchmonster": false,
+    "levels": {
+      "1": {
+        "life": 10,
+        "ap": 4,
+        "mp": 3,
+        "initiative": 1,
+        "xp": 50,
+        "resists": "-10;1;1;-5;2;2;2",
+        "stats": "0,0,0,0,0",
+        "statsInfos": "0;10;0;1",
+        "spells": [
+          {
+            "spellId": 213,
+            "level": 1
+          }
+        ]
+      },
+      "2": {
+        "life": 15,
+        "ap": 4,
+        "mp": 3,
+        "initiative": 1,
+        "xp": 80,
+        "resists": "-8;2;2;-4;4;3;3",
+        "stats": "0,0,0,0,0",
+        "statsInfos": "0;10;0;1",
+        "spells": [
+          {
+            "spellId": 213,
+            "level": 2
+          }
+        ]
+      },
+      "3": {
+        "life": 20,
+        "ap": 4,
+        "mp": 3,
+        "initiative": 1,
+        "xp": 110,
+        "resists": "-6;3;3;-3;6;4;4",
+        "stats": "0,0,0,0,0",
+        "statsInfos": "0;10;0;1",
+        "spells": [
+          {
+            "spellId": 213,
+            "level": 3
+          }
+        ]
+      },
+      "4": {
+        "life": 25,
+        "ap": 4,
+        "mp": 3,
+        "initiative": 1,
+        "xp": 140,
+        "resists": "-4;4;4;-2;8;5;5",
+        "stats": "0,0,0,0,0",
+        "statsInfos": "0;10;0;1",
+        "spells": [
+          {
+            "spellId": 213,
+            "level": 4
+          }
+        ]
+      },
+      "5": {
+        "life": 30,
+        "ap": 4,
+        "mp": 3,
+        "initiative": 1,
+        "xp": 170,
+        "resists": "-2;5;5;-1;10;6;6",
+        "stats": "0,0,0,0,0",
+        "statsInfos": "0;10;0;1",
+        "spells": [
+          {
+            "spellId": 213,
+            "level": 5
+          }
+        ]
+      }
+    }
+  },
+  "983": {
+    "id": 983,
+    "name": "Jeune Sanglier",
+    "gfx": 1562,
+    "align": -1,
+    "colors": "-1,-1,-1",
+    "ai": 2,
+    "aggroDistance": 0,
+    "isBoss": false,
+    "isArchmonster": false,
+    "levels": {
+      "10": {
+        "life": 80,
+        "ap": 4,
+        "mp": 3,
+        "initiative": 140,
+        "xp": 600,
+        "resists": "0;5;0;-5;5;1;1",
+        "stats": "100,5,0,0,40",
+        "statsInfos": "3;10;0;1",
+        "spells": [
+          {
+            "spellId": 204,
+            "level": 1
+          }
+        ]
+      },
+      "11": {
+        "life": 85,
+        "ap": 4,
+        "mp": 3,
+        "initiative": 155,
+        "xp": 650,
+        "resists": "0;5;0;-5;5;2;2",
+        "stats": "110,10,0,0,45",
+        "statsInfos": "3;10;0;1",
+        "spells": [
+          {
+            "spellId": 204,
+            "level": 2
+          }
+        ]
+      },
+      "12": {
+        "life": 90,
+        "ap": 4,
+        "mp": 3,
+        "initiative": 170,
+        "xp": 700,
+        "resists": "0;5;0;-5;5;3;3",
+        "stats": "120,15,0,0,50",
+        "statsInfos": "3;10;0;1",
+        "spells": [
+          {
+            "spellId": 204,
+            "level": 3
+          }
+        ]
+      },
+      "13": {
+        "life": 95,
+        "ap": 4,
+        "mp": 3,
+        "initiative": 185,
+        "xp": 750,
+        "resists": "0;5;0;-5;5;5;5",
+        "stats": "130,20,0,0,55",
+        "statsInfos": "3;10;0;1",
+        "spells": [
+          {
+            "spellId": 204,
+            "level": 4
+          }
+        ]
+      },
+      "14": {
+        "life": 100,
+        "ap": 4,
+        "mp": 3,
+        "initiative": 200,
+        "xp": 800,
+        "resists": "0;5;0;-5;5;6;6",
+        "stats": "140,25,0,0,60",
+        "statsInfos": "3;10;0;1",
+        "spells": [
+          {
+            "spellId": 204,
+            "level": 5
+          }
+        ]
+      }
+    }
+  },
+  "984": {
+    "id": 984,
+    "name": "Petit Chef de Guerre Bouftou",
+    "gfx": 1573,
+    "align": -1,
+    "colors": "-1,-1,-1",
+    "ai": 2,
+    "aggroDistance": 0,
+    "isBoss": false,
+    "isArchmonster": false,
+    "levels": {
+      "10": {
+        "life": 80,
+        "ap": 6,
+        "mp": 4,
+        "initiative": 35,
+        "xp": 900,
+        "resists": "2;2;-10;-10;2;32;32",
+        "stats": "10,10,0,0,25",
+        "statsInfos": "5;10;0;0",
+        "spells": [
+          {
+            "spellId": 202,
+            "level": 1
+          },
+          {
+            "spellId": 253,
+            "level": 1
+          }
+        ]
+      },
+      "11": {
+        "life": 85,
+        "ap": 6,
+        "mp": 4,
+        "initiative": 45,
+        "xp": 925,
+        "resists": "4;4;-8;-8;4;45;45",
+        "stats": "15,15,0,0,30",
+        "statsInfos": "5;10;0;0",
+        "spells": [
+          {
+            "spellId": 202,
+            "level": 2
+          },
+          {
+            "spellId": 253,
+            "level": 2
+          }
+        ]
+      },
+      "12": {
+        "life": 90,
+        "ap": 6,
+        "mp": 4,
+        "initiative": 55,
+        "xp": 950,
+        "resists": "6;6;-6;-6;6;57;57",
+        "stats": "20,20,0,0,35",
+        "statsInfos": "5;10;0;0",
+        "spells": [
+          {
+            "spellId": 202,
+            "level": 3
+          },
+          {
+            "spellId": 253,
+            "level": 3
+          }
+        ]
+      },
+      "13": {
+        "life": 95,
+        "ap": 6,
+        "mp": 4,
+        "initiative": 65,
+        "xp": 975,
+        "resists": "8;8;-4;-4;8;70;70",
+        "stats": "25,25,0,0,40",
+        "statsInfos": "5;10;0;0",
+        "spells": [
+          {
+            "spellId": 202,
+            "level": 4
+          },
+          {
+            "spellId": 253,
+            "level": 4
+          }
+        ]
+      },
+      "14": {
+        "life": 100,
+        "ap": 6,
+        "mp": 4,
+        "initiative": 75,
+        "xp": 1000,
+        "resists": "10;10;-2;-2;10;82;82",
+        "stats": "30,30,0,0,45",
+        "statsInfos": "5;10;0;0",
+        "spells": [
+          {
+            "spellId": 202,
+            "level": 5
+          },
+          {
+            "spellId": 253,
+            "level": 5
+          }
+        ]
+      }
+    }
+  },
+  "996": {
+    "id": 996,
+    "name": "Chafer Prépubère",
+    "gfx": 1014,
+    "align": -1,
+    "colors": "-1,-1,-1",
+    "ai": 2,
+    "aggroDistance": 1,
+    "isBoss": false,
+    "isArchmonster": false,
+    "levels": {
+      "10": {
+        "life": 50,
+        "ap": 5,
+        "mp": 4,
+        "initiative": 1,
+        "xp": 600,
+        "resists": "0;-10;10;0;5;0;0",
+        "stats": "0,0,0,0,0",
+        "statsInfos": "0;10;0;1",
+        "spells": [
+          {
+            "spellId": 268,
+            "level": 1
+          }
+        ]
+      },
+      "11": {
+        "life": 55,
+        "ap": 5,
+        "mp": 4,
+        "initiative": 1,
+        "xp": 650,
+        "resists": "0;-10;10;0;5;0;0",
+        "stats": "0,0,0,0,0",
+        "statsInfos": "0;10;0;1",
+        "spells": [
+          {
+            "spellId": 268,
+            "level": 2
+          }
+        ]
+      },
+      "12": {
+        "life": 60,
+        "ap": 5,
+        "mp": 4,
+        "initiative": 1,
+        "xp": 700,
+        "resists": "0;-10;10;0;5;0;0",
+        "stats": "0,0,0,0,0",
+        "statsInfos": "0;10;0;1",
+        "spells": [
+          {
+            "spellId": 268,
+            "level": 3
+          }
+        ]
+      },
+      "13": {
+        "life": 65,
+        "ap": 5,
+        "mp": 4,
+        "initiative": 1,
+        "xp": 750,
+        "resists": "0;-10;10;0;5;0;0",
+        "stats": "0,0,0,0,0",
+        "statsInfos": "0;10;0;1",
+        "spells": [
+          {
+            "spellId": 268,
+            "level": 4
+          }
+        ]
+      },
+      "14": {
+        "life": 70,
+        "ap": 5,
+        "mp": 4,
+        "initiative": 1,
+        "xp": 800,
+        "resists": "0;-10;10;0;5;0;0",
+        "stats": "0,0,0,0,0",
+        "statsInfos": "0;10;0;1",
+        "spells": [
+          {
+            "spellId": 268,
+            "level": 5
+          }
+        ]
+      }
+    }
+  },
+  "998": {
+    "id": 998,
+    "name": "Crabe Imprudent",
+    "gfx": 1475,
+    "align": -1,
+    "colors": "-1,-1,-1",
+    "ai": 2,
+    "aggroDistance": 0,
+    "isBoss": false,
+    "isArchmonster": false,
+    "levels": {
+      "3": {
+        "life": 20,
+        "ap": 5,
+        "mp": 3,
+        "initiative": 1,
+        "xp": 200,
+        "resists": "0;0;0;0;0;10;2",
+        "stats": "0,0,0,0,0",
+        "statsInfos": "0;20;0;1",
+        "spells": [
+          {
+            "spellId": 221,
+            "level": 1
+          }
+        ]
+      },
+      "4": {
+        "life": 25,
+        "ap": 5,
+        "mp": 3,
+        "initiative": 1,
+        "xp": 250,
+        "resists": "0;0;0;0;0;12;5",
+        "stats": "0,0,0,0,0",
+        "statsInfos": "0;20;0;1",
+        "spells": [
+          {
+            "spellId": 221,
+            "level": 2
+          }
+        ]
+      },
+      "5": {
+        "life": 30,
+        "ap": 5,
+        "mp": 3,
+        "initiative": 1,
+        "xp": 300,
+        "resists": "0;0;0;0;0;14;8",
+        "stats": "0,0,0,0,0",
+        "statsInfos": "0;20;0;1",
+        "spells": [
+          {
+            "spellId": 221,
+            "level": 3
+          }
+        ]
+      },
+      "6": {
+        "life": 35,
+        "ap": 5,
+        "mp": 3,
+        "initiative": 1,
+        "xp": 350,
+        "resists": "0;0;0;0;0;16;11",
+        "stats": "0,0,0,0,0",
+        "statsInfos": "0;20;0;1",
+        "spells": [
+          {
+            "spellId": 221,
+            "level": 4
+          }
+        ]
+      },
+      "7": {
+        "life": 40,
+        "ap": 5,
+        "mp": 3,
+        "initiative": 1,
+        "xp": 400,
+        "resists": "0;0;0;0;0;18;14",
+        "stats": "0,0,0,0,0",
+        "statsInfos": "0;20;0;1",
+        "spells": [
+          {
+            "spellId": 221,
+            "level": 5
+          }
+        ]
+      }
+    }
+  },
+  "1003": {
+    "id": 1003,
+    "name": "Épouvantail d'Entraînement",
+    "gfx": 1219,
+    "align": -1,
+    "colors": "-1,-1,-1",
+    "ai": 0,
+    "aggroDistance": 0,
+    "isBoss": false,
+    "isArchmonster": false,
+    "levels": {
+      "1": {
+        "life": 20,
+        "ap": 1,
+        "mp": 1,
+        "initiative": 1,
+        "xp": 0,
+        "resists": "0;0;0;0;0;0;0",
+        "stats": "0,0,0,0,0",
+        "statsInfos": "0;0;0;1",
+        "spells": []
+      }
+    }
+  }
+}

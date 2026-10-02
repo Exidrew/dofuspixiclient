@@ -1,8 +1,8 @@
 import { Container } from "pixi.js";
-import { useEffect, useRef, useSyncExternalStore } from "react";
+import { useCallback, useEffect, useRef, useSyncExternalStore } from "react";
 
 import { hudStore } from "@/game/stores";
-import { MinimapRenderer } from "@/game/worldmap";
+import { MinimapRenderer, resolveWorldMapForMapId } from "@/game/worldmap";
 
 import { usePixiSlot } from "../hooks/usePixiSlot";
 
@@ -57,18 +57,30 @@ export function Minimap() {
     }
 
     let cancelled = false;
-    renderer.loadWorldMap(0).then(() => {
+    const superareaPromise = resolveWorldMapForMapId(
+      hudStore.getSnapshot().minimapMapId ?? 0
+    );
+
+    superareaPromise.then((superarea) => {
       if (cancelled) {
         return;
       }
 
-      readyRef.current = true;
-      recenter();
-      const currentMapId = hudStore.getSnapshot().minimapMapId;
+      renderer.loadWorldMap(superarea).then(() => {
+        if (cancelled) {
+          return;
+        }
 
-      if (currentMapId != null) {
-        renderer.centerOnMap(currentMapId);
-      }
+        readyRef.current = true;
+        recenter();
+        // The worldmap view was probed with the map id snapshot at factory
+        // time (often null → superarea 0). Re-sync now that the renderer is
+        // ready: if the player already spawned on another map (gameMapData
+        // fired before the slot mounted), this recenters and switches the
+        // view — otherwise the marker stays absent until the FIRST map
+        // change.
+        syncMap(hudStore.getSnapshot().minimapMapId);
+      });
     });
 
     const handleResize = recenter;
@@ -84,13 +96,49 @@ export function Minimap() {
     };
   }, []);
 
+  // Re-center (and switch the backing worldmap view if needed) whenever the
+  // current map changes. `force` skips the readyRef gate for the one-shot
+  // sync inside the slot factory above, where readyRef is false.
+  const syncMap = useCallback((mapId: number | null) => {
+    const renderer = rendererRef.current;
+
+    if (!renderer || mapId == null) {
+      return;
+    }
+
+    let cancelled = false;
+
+    // Switch the backing worldmap view when the current map belongs to a
+    // different superarea (e.g. leaving Amakna for Incarnam), then recenter.
+    resolveWorldMapForMapId(mapId).then((superarea) => {
+      if (cancelled) {
+        return;
+      }
+
+      if (renderer.isIncarnamView !== (superarea !== 0)) {
+        renderer.loadWorldMap(superarea).then(() => {
+          if (!cancelled) {
+            renderer.centerOnMap(mapId, true);
+          }
+        });
+        return;
+      }
+
+      renderer.centerOnMap(mapId, true);
+    });
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   useEffect(() => {
     if (!readyRef.current || minimapMapId == null) {
       return;
     }
 
-    rendererRef.current?.centerOnMap(minimapMapId, true);
-  }, [minimapMapId]);
+    return syncMap(minimapMapId);
+  }, [minimapMapId, syncMap]);
 
   return <div ref={ref} className="absolute inset-0" />;
 }

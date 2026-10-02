@@ -36,6 +36,10 @@ export class MinimapRenderer {
 
   private currentSuperarea = 0;
 
+  get isIncarnamView(): boolean {
+    return this.currentSuperarea !== 0;
+  }
+
   private tileSprites: Sprite[] = [];
   private hintSprites: Sprite[] = [];
 

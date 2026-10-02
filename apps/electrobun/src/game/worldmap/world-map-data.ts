@@ -62,6 +62,36 @@ export async function loadWorldMapData(
   return dataSet;
 }
 
+/**
+ * Resolve which worldmap view should be shown for a game map id.
+ * Currently only two views exist: "amakna" (superarea 0) and "incarnam"
+ * (superarea 3). Chooses the view whose coordinate bounds actually contain
+ * the map, so the marker can be centered on it.
+ */
+export async function resolveWorldMapForMapId(mapId: number): Promise<number> {
+  let mapCoord: MapCoordinates[number] | undefined;
+
+  try {
+    const data = (await fetch("/assets/data/map-data.json").then((r) =>
+      r.json()
+    )) as { maps: MapCoordinates };
+
+    mapCoord = data.maps[mapId.toString()];
+  } catch {
+    return 0;
+  }
+
+  if (!mapCoord) {
+    return 0;
+  }
+
+  if (mapCoord.sua === 3) {
+    return 3;
+  }
+
+  return 0;
+}
+
 export async function loadWorldMapTiles(
   manifest: WorldMapManifest
 ): Promise<Map<string, import("pixi.js").Texture>> {

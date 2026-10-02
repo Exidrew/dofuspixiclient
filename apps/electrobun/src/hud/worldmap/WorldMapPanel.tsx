@@ -1,7 +1,7 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useSyncExternalStore } from "react";
 
 import { hudStore, toggleWorldMap } from "@/game/stores";
-import { WorldMapRenderer } from "@/game/worldmap";
+import { resolveWorldMapForMapId, WorldMapRenderer } from "@/game/worldmap";
 
 import { usePixiApp } from "../contexts/PixiAppContext";
 
@@ -25,7 +25,12 @@ export function WorldMapPanel({
 }: WorldMapPanelProps) {
   const app = usePixiApp();
   const rendererRef = useRef<WorldMapRenderer | null>(null);
-  const loadedRef = useRef(false);
+  const loadedSuperareaRef = useRef<number | null>(null);
+
+  const { minimapMapId } = useSyncExternalStore(
+    hudStore.subscribe,
+    hudStore.getSnapshot
+  );
 
   useEffect(() => {
     if (!app || !visible) {
@@ -55,12 +60,17 @@ export function WorldMapPanel({
       const renderer = rendererRef.current;
       renderer.setViewSize(canvasWidth, canvasHeight);
 
-      if (!loadedRef.current) {
-        await renderer.loadWorldMap(0);
-        loadedRef.current = true;
+      const currentMapId = hudStore.getSnapshot().minimapMapId;
+      const superarea = await resolveWorldMapForMapId(currentMapId ?? 0);
+
+      // Load (or reload) the backing view whenever the shown superarea doesn't
+      // match the player's current one — covers both the first open (nothing
+      // loaded yet) and a map change across superareas while the app lives.
+      if (loadedSuperareaRef.current !== superarea) {
+        await renderer.loadWorldMap(superarea);
+        loadedSuperareaRef.current = superarea;
       }
 
-      const currentMapId = hudStore.getSnapshot().minimapMapId;
       renderer.show();
 
       if (currentMapId != null) {
@@ -68,7 +78,7 @@ export function WorldMapPanel({
       }
     }
 
-    init();
+    void init();
 
     return () => {
       rendererRef.current?.hide();
@@ -76,10 +86,45 @@ export function WorldMapPanel({
   }, [app, visible, canvasWidth, canvasHeight]);
 
   useEffect(() => {
+    if (!visible || minimapMapId == null) {
+      return;
+    }
+
+    // Live update while the panel is open: resolve the superarea for the new
+    // map, reload the backing view if it changed (Amakna ↔ Incarnam), then
+    // re-center + move the marker. Skipped on the first render — the open
+    // effect above already handles initial centering once it resolves.
+    let cancelled = false;
+
+    resolveWorldMapForMapId(minimapMapId).then((superarea) => {
+      const renderer = rendererRef.current;
+
+      if (cancelled || !renderer || !visible) {
+        return;
+      }
+
+      const reload =
+        loadedSuperareaRef.current !== superarea
+          ? renderer.loadWorldMap(superarea).then(() => {
+              loadedSuperareaRef.current = superarea;
+            })
+          : Promise.resolve();
+
+      void reload.then(() => {
+        renderer.centerOnMapId(minimapMapId);
+      });
+    });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [visible, minimapMapId]);
+
+  useEffect(() => {
     return () => {
       rendererRef.current?.destroy();
       rendererRef.current = null;
-      loadedRef.current = false;
+      loadedSuperareaRef.current = null;
     };
   }, []);
 

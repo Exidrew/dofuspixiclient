@@ -215,11 +215,44 @@ function loadJson(rel) {
 const DEFAULT_WIDTH = 15;
 
 /**
- * Fond des maps d'Incarnam (zone de départ, superarea 3) : un CIEL. Tile
- * `ground/56` — seul fond plein qui soit un ciel bleu uniforme dans les assets
- * du projet. Voir tools/seed-maps-incarnam.mjs pour le détail.
+ * Fond des maps d'Incarnam (zone de départ, superarea 3) : le SOL d'Incarnam
+ * (herbe/route beige), tile `ground/438` (747x437) — valeur de référence
+ * des fixtures `assets/maps/10302.json` -> `backgroundNum: 438`. Voir
+ * tools/seed-maps-incarnam.mjs pour le détail.
  */
-const INCARNAM_BACKGROUND = 56;
+const INCARNAM_BACKGROUND = 438;
+
+/**
+ * Fond "comme StarLoco" : le 3e champ de `mappos` du dump (`x,y,BG`) EST le
+ * background (cf. resolveMapBackground dans seed-maps-incarnam.mjs). On lit
+ * les données figées d'Incarnam pour les maps couvertes ; les autres (petit
+ * décor, champ absent) retombent sur le fond par défaut d'Incarnam (438),
+ * PAS 0 (sinon tout Incarnam perd son fond)
+ */
+const INCARNAM_DATA = loadJson("tools/data/incarnam-maps.json");
+
+function resolveBackground(mapId, info) {
+  const entry = INCARNAM_DATA[String(mapId)];
+  const mappos = typeof entry?.mappos === "string" ? entry.mappos : "";
+  const raw = mappos.split(",")[2];
+  const tile = raw !== undefined && raw !== "" ? Number.parseInt(raw, 10) : NaN;
+  if (Number.isFinite(tile) && tile > 0) {
+    try {
+      const meta = loadJson(
+        `apps/electrobun/public/assets/spritesheets/tiles/ground/${tile}/manifest.json`
+      );
+      const w = meta?.animations?.tile?.width ?? 0;
+      // fond plein-écran uniquement (une map 15x17 ≈ 747x437) : un petit
+      // décor posé en fond = élément figé au coin (0,0) ("pont bizarre").
+      if (w >= 700) {
+        return tile;
+      }
+    } catch {
+      /* tile absent → fallback */
+    }
+  }
+  return info.sua === 3 ? INCARNAM_BACKGROUND : 0;
+}
 
 async function main() {
   const mapDataFile = loadJson(
@@ -305,10 +338,9 @@ async function main() {
         );
       }
 
-      // Incarnam (zone de départ, superarea 3) est une zone EXTÉRIEURE : son
-      // fond est un ciel (tile ground/56). Les autres maps n'ont pas de fond
-      // connu ici -> 0 (le client n'en peint aucun).
-      const background = info.sua === 3 ? INCARNAM_BACKGROUND : 0;
+      // Incarnam (zone de départ, superarea 3) : fond SOL par défaut (tile
+      // ground/438), sauf si mappos désigne un fond plein-écran spécifique.
+      const background = resolveBackground(mapId, info);
 
       await db.query(
         `INSERT INTO maps

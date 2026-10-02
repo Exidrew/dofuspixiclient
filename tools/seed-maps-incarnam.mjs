@@ -37,7 +37,7 @@
  *   node tools/seed-maps-incarnam.mjs --map 10300
  *   node tools/seed-maps-incarnam.mjs --all-incarnam
  *   node tools/seed-maps-incarnam.mjs --map 10300 --no-force-spawn
- *   node tools/seed-maps-incarnam.mjs --map 10300 --background 56
+ *   node tools/seed-maps-incarnam.mjs --map 10300 --background 438
  *   node tools/seed-maps-incarnam.mjs --map 10300 --no-background
  *
  * Idempotent : ON CONFLICT (id) DO UPDATE.
@@ -84,19 +84,27 @@ const SPAWN_CELL = 319;
 /**
  * Background (image de fond SWF) des maps d'Incarnam — zone de départ 103xx.
  *
- * Incarnam est une zone EXTÉRIEURE : on y voit un CIEL au-dessus du décor. Le
- * tile de fond correspondant est `ground/<INCARNAM_BACKGROUND>.dofasset` ; il
- * est chargé par le client via `MapHandler.renderBackground(backgroundNum)` et
- * peint derrière les tuiles de sol.
- *
- * La valeur a été déterminée empiriquement à partir des assets du projet : le
- * tile 56 (990x618) est le seul fond plein qui soit un CIEL bleu uniforme
- * (moyenne RGB ≈ 54,122,231). Les autres fonds de taille map sont des sols
- * (beige/vert/brun) ou de l'eau, pas un ciel.
+ * Incarnam est une zone EXTÉRIEURE : son fond par défaut est le SOL d'Incarnam
+ * (tile `ground/438`, 747x437 — valeur de référence des fixtures
+ * `assets/maps/10302.json` -> `backgroundNum: 438`). Il est chargé par le
+ * client via `MapHandler.renderBackground(backgroundNum)` et peint derrière
+ * les tuiles de sol. Le fond « ciel / vue d'Astrub du dessus » (bords de
+ * carte, Incarnam étant dans les airs) n'a pas encore de tile d'asset : à
+ * ajouter plus tard côté assets puis via `--background <n>`.
  *
  * Surchargeable via `--background N` / `--no-background`.
  */
-const INCARNAM_BACKGROUND = 56;
+/**
+ * Background PAR DÉFAUT des maps d'Incarnam sans fond plein-écran connu :
+ * le SOL d'Incarnam (herbe/route beige), tile `ground/438.dofasset` (747x437).
+ * C'est la valeur de référence confirmée par les fixtures du projet
+ * `assets/maps/10302.json` -> `backgroundNum: 438`. (NB : 438 est déjà un
+ * fond plein-écran ; le ciel « vue d'Astrub du dessus » pour les bords de
+ * cartes n'a pas encore de tile — à ajouter côté assets plus tard.)
+ *
+ * Surchargeable via `--background N` / `--no-background`.
+ */
+const INCARNAM_BACKGROUND = 438;
 
 /**
  * Choisit le background d'une map.
@@ -110,10 +118,74 @@ const INCARNAM_BACKGROUND = 56;
  * ciel et (b) apparaitre l'element de decor au coin (0,0) — le "pont bizarre"
  * en haut de la 10300.
  *
- * Le background des maps d'Incarnam est donc le CIEL plein-ecran
- * `INCARNAM_BACKGROUND` (56), sauf surcharge CLI `--background N` / `--no-background`.
+ * StarLoco ne stocke PAS le background dans `maps` (pas de colonne ; le client
+ * retro 1.29 derivait ce rendu de ses .swf). MAIS son dump `mappos` vaut
+ * `x,y,BG` et le 3e champ correspond 1:1 aux ids de tiles `ground/<N>` du
+ * pack d'assets du projet (40x maps d'Incarnam dont 60 % partagent 444 ; les
+ * exterieurs Ny ilgingleton auch atagora zones le "canevas" 440/444).
+ *
+ * Toutefois ce n'est PAS un fond plein-ecran pour TOUTES les maps : quelques
+ * quelques fiches du dump deviennent des elements de DECOR (443 162x61,
+ * 450 57x32, 444 86x34, 12, 32, 37, 180, 182...). Or `MapHandler.renderBackground`
+ * ATTEND un fond PLEIN-ECRAN (`computeMapScale` le cale en 0,0 avec pivot map)
+ * — poser la 443 162x61 en fond = element de decor fige au coin (0,0)
+ * ("pont bizarre" en haut de la 10300, exactement ce que les fixtures
+ * `assets/maps/10302.json` refusent aussi : leur unique `backgroundNum`
+ * plein-ecran est 438).
+ *
+ * REGLE :
+ *   1. si `mappos[2]` existe ET que le tile `ground/<N>/atlas.svg` est un
+ *      fond plein-écran (largeur >= 700 px, ≈ 747x437 d'une map 15x17 ;
+ *      vérifié sur le dataset : seul 441 (761x459) et 445 (753x446)
+ *      qualifient) -> on l'UTILISE (fidélité StarLoco) ;
+ *   2. si `mappos[2]` est un petit décor (440 366x180, 444 86x34, 443, 446,
+ *      447-450, 12, 32, 37, 180, 182...) -> IGNORED (ce n'est PAS un fond) et
+ *      on retombe sur le fallback : le SOL d'Incarnam 438 par défaut, PAS 0.
+ *      (Régression corrigée : retourner 0 pour un petit décor supprimait le
+ *      fond de TOUT Incarnam.)
+ *   3. sinon -> fallback CLI (438 par défaut, ou `--background N` /
+ *      `--no-background`).
+ *
+ * NB : le tile 438 (fond plein-écran sol Incarnam des fixtures 10302.json)
+ * n'apparaît JAMAIS dans mappos du dump — c'est le fallback par défaut, et il
+ * est directement affichable via `--background 438`.
  */
-function resolveMapBackground(_entry, fallback) {
+const BACKGROUND_MIN_FULLSCREEN_PX = 700;
+
+function resolveMapBackground(entry, fallback) {
+  const mappos = typeof entry?.mappos === "string" ? entry.mappos : "";
+  const raw = mappos.split(",")[2];
+  const tile = raw !== undefined && raw !== "" ? Number.parseInt(raw, 10) : NaN;
+
+  if (Number.isFinite(tile) && tile > 0) {
+    const manifest = join(
+      ROOT,
+      "apps",
+      "electrobun",
+      "public",
+      "assets",
+      "spritesheets",
+      "tiles",
+      "ground",
+      String(tile),
+      "manifest.json"
+    );
+    try {
+      const meta = JSON.parse(readFileSync(manifest, "utf8"));
+      const w =
+        meta?.animations?.tile?.width ?? meta?.width ?? meta?.size?.width ?? 0;
+      if (w >= BACKGROUND_MIN_FULLSCREEN_PX) {
+        return tile;
+      }
+      // petit decor : on IGNORE (pas un fond) et on retombe sur le fallback
+      // (SOL Incarnam par défaut) — PAS 0, sinon tout Incarnam perd son fond.
+      console.warn(
+        `    · bg ${tile} (mappos) = decor ${w}px < ${BACKGROUND_MIN_FULLSCREEN_PX}px — fond ignoré`
+      );
+    } catch {
+      // manifest/pas de tile : fallback en dessous
+    }
+  }
   return fallback;
 }
 

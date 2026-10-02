@@ -1,21 +1,33 @@
 import { useState } from "react";
 
 import type { GameClient } from "@/game/game-client";
+import { loginActor } from "@/game/machines/actors";
+
+import { AuthButton, AuthField, AuthMessage, AuthShell } from "./auth-shell";
 
 interface Props {
   client: GameClient;
   failureReason: string | null;
   busy: boolean;
+  /** Set when the user just registered — drives the success banner. */
+  registrationSucceeded: boolean;
 }
 
-export function LoginScreen({ client, failureReason, busy }: Props) {
+export function LoginScreen({
+  client,
+  failureReason,
+  busy,
+  registrationSucceeded,
+}: Props) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!username || !password || submitting) return;
+    if (!username || !password || submitting) {
+      return;
+    }
     setSubmitting(true);
     try {
       await client.login(username, password);
@@ -27,44 +39,46 @@ export function LoginScreen({ client, failureReason, busy }: Props) {
   const disabled = busy || submitting || !username || !password;
 
   return (
-    <div className="flex h-full w-full items-center justify-center">
-      <form
-        onSubmit={submit}
-        className="w-80 rounded-lg bg-neutral-900/80 p-6 shadow-xl ring-1 ring-white/10"
-      >
-        <h1 className="mb-4 text-xl font-semibold text-white">Sign in</h1>
-        <label className="mb-3 block">
-          <span className="mb-1 block text-sm text-neutral-300">Username</span>
-          <input
-            autoFocus
-            type="text"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            className="w-full rounded bg-neutral-800 px-3 py-2 text-white outline-none ring-1 ring-white/10 focus:ring-white/30"
-          />
-        </label>
-        <label className="mb-4 block">
-          <span className="mb-1 block text-sm text-neutral-300">Password</span>
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="w-full rounded bg-neutral-800 px-3 py-2 text-white outline-none ring-1 ring-white/10 focus:ring-white/30"
-          />
-        </label>
-        {failureReason && (
-          <div className="mb-3 rounded bg-red-950/60 px-3 py-2 text-sm text-red-300 ring-1 ring-red-500/30">
-            {failureReason}
-          </div>
-        )}
+    <AuthShell
+      title="Dofus Remastered"
+      subtitle="Connecte-toi pour rejoindre le monde."
+      footer={
         <button
-          type="submit"
-          disabled={disabled}
-          className="w-full rounded bg-white/90 px-3 py-2 font-medium text-neutral-900 transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-50"
+          type="button"
+          onClick={() => loginActor.send({ type: "START_REGISTER" })}
+          className="font-semibold text-[#ffd9a0] underline-offset-2 hover:underline"
         >
-          {submitting ? "Signing in…" : busy ? "Connecting…" : "Sign in"}
+          Pas encore de compte ? Créer un compte
         </button>
+      }
+    >
+      {registrationSucceeded && !failureReason && (
+        <div className="mb-3 rounded-md border-2 border-[#4cae4c]/50 bg-[#e6f6e6] px-3 py-2 text-sm text-[#2f6b2f]">
+          Compte créé ! Tu peux maintenant te connecter.
+        </div>
+      )}
+
+      <form onSubmit={submit}>
+        <AuthField
+          label="Nom de compte"
+          autoFocus
+          type="text"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+        />
+        <AuthField
+          label="Mot de passe"
+          type="password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+        />
+
+        {failureReason && <AuthMessage>{failureReason}</AuthMessage>}
+
+        <AuthButton type="submit" disabled={disabled}>
+          {submitting ? "Connexion…" : busy ? "Connexion…" : "Se connecter"}
+        </AuthButton>
       </form>
-    </div>
+    </AuthShell>
   );
 }

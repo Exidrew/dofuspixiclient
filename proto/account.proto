@@ -116,6 +116,25 @@ message AccountCharacterAdd {
   string error_code = 2;  // s=subscription, f=full, a=name exists, n=bad name
 }
 
+// Account self-registration failure reasons. Unlike the legacy 1.29 protocol
+// (which had no self-service signup), this project exposes an in-client
+// registration flow, so the error enum is explicit instead of a single char.
+enum RegisterError {
+  REGISTER_ERROR_UNSPECIFIED         = 0;
+  REGISTER_ERROR_INVALID_USERNAME    = 1;  // too short / bad characters / already taken
+  REGISTER_ERROR_WEAK_PASSWORD       = 2;  // too short
+  REGISTER_ERROR_INVALID_PSEUDO      = 3;  // nickname malformed
+  REGISTER_ERROR_BACKEND             = 4;  // unexpected DB/server error
+}
+
+// Response to AccountCreateAccount.
+message AccountCreateAccountResponse {
+  bool          success    = 1;
+  RegisterError error_code = 2;
+}
+
+// Select-server failure reasons. Canonical enum; legacy single-char codes
+
 // AT - Ticket response
 message AccountTicketResponse {
   bool   success = 1;
@@ -429,6 +448,14 @@ message AccountSelectServerRequest {
 // Client sends AS<charId>
 message AccountSelectCharacter {
   int32 character_id = 1;
+}
+
+// Client sends a self-service signup: username + password (both stretched
+// client-side exactly like AccountSendIdentity) + optional nickname.
+message AccountCreateAccount {
+  string username = 1;
+  string encrypted_password = 2;
+  string pseudo = 3;         // display nickname; falls back to username when empty
 }
 
 // Client sends AA<name>|<class>|<sex>|<c1>|<c2>|<c3>

@@ -61,6 +61,7 @@ message DofusMessage {
     AccountFriendServerList      account_friend_server_list     = 45;  // AF
     AccountEditPlayer            account_edit_player            = 46;  // AE
     AccountMiniClipInfo          account_miniclip_info          = 47;  // Am
+    AccountCreateAccountResponse account_create_account_response = 48;  // signup result
 
     // --- Game (G) ---
     GameCreate                   game_create                    = 100; // GC

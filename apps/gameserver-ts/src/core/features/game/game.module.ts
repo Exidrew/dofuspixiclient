@@ -1,3 +1,5 @@
+import { CharacterCreateModule } from "@features/game/character-create/character-create.module";
+import { CharacterDeleteModule } from "@features/game/character-delete/character-delete.module";
 import { CharacterListModule } from "@features/game/character-list/character-list.module";
 import { ChatModule } from "@features/game/chat/chat.module";
 import { EnterGameModule } from "@features/game/enter-game/enter-game.module";
@@ -27,6 +29,8 @@ import { GameRuntimeConfigModule } from "@shared/config/game-runtime";
     FightModule,
     ExchangeTicketModule,
     CharacterListModule,
+    CharacterCreateModule,
+    CharacterDeleteModule,
     SelectCharacterModule,
     EnterGameModule,
     ExtraInfoModule,

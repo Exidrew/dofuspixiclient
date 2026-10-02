@@ -24,6 +24,9 @@ import {
   type MessageHandler,
 } from "@/game/network/message-handler";
 import {
+  AccountCreateAccountSchema,
+  AccountCreateCharacterSchema,
+  AccountDeleteCharacterSchema,
   AccountGetCharactersListSchema,
   AccountGetServersListSchema,
   AccountSelectCharacterSchema,
@@ -954,9 +957,75 @@ export class GameClient {
     );
   }
 
+  /**
+   * Self-service signup. Mirrors `login`: the password is stretched
+   * client-side (PBKDF2 over a username-derived salt) before leaving the
+   * browser, so the server only ever sees the derived key.
+   */
+  async createAccount(
+    username: string,
+    password: string,
+    pseudo: string
+  ): Promise<void> {
+    const passwordKey = await derivePasswordKey(password, username);
+    loginActor.send({ type: "START_REGISTER" });
+    this.connection.send(
+      encodeClient(
+        "accountCreateAccount",
+        create(AccountCreateAccountSchema, {
+          username,
+          encryptedPassword: passwordKey,
+          pseudo,
+        })
+      )
+    );
+  }
+
+  /**
+   * Create a character on the currently-selected game server. Must be called
+   * after the session has been authenticated against gamed (the character
+   * screen is only reachable post-login).
+   */
+  createCharacter(input: {
+    name: string;
+    classId: number;
+    sex: number;
+    color1: number;
+    color2: number;
+    color3: number;
+  }): void {
+    this.connection.send(
+      encodeClient(
+        "accountCreateCharacter",
+        create(AccountCreateCharacterSchema, {
+          name: input.name,
+          classId: input.classId,
+          sex: input.sex,
+          color1: input.color1,
+          color2: input.color2,
+          color3: input.color3,
+        })
+      )
+    );
+  }
+
   requestServers(): void {
     this.connection.send(
       encodeClient("accountGetServers", create(AccountGetServersListSchema, {}))
+    );
+  }
+
+  /**
+   * Soft-delete a character on the currently-selected game server. The server
+   * echoes `accountCharacterDelete` then pushes a refreshed character list,
+   * which updates the select screen.
+   */
+  deleteCharacter(characterId: number): void {
+    this.connection.send(
+      encodeClient(
+        "accountDeleteCharacter",
+        create(AccountDeleteCharacterSchema, { characterId })
+      )
     );
   }
 

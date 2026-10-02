@@ -4,5 +4,6 @@ import { Module } from "@nestjs/common";
 
 @Module({
   providers: [CharacterListHandler, CharacterListRepository],
+  exports: [CharacterListRepository],
 })
 export class CharacterListModule {}

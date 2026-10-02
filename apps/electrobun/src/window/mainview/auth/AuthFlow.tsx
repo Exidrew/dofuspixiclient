@@ -5,7 +5,9 @@ import type { GameClient } from "@/game/game-client";
 import { loginActor } from "@/game/machines/actors";
 
 import { CharacterSelectScreen } from "./CharacterSelectScreen";
+import { CreateCharacterScreen } from "./CreateCharacterScreen";
 import { LoginScreen } from "./LoginScreen";
+import { RegisterScreen } from "./RegisterScreen";
 import { ServerSelectScreen } from "./ServerSelectScreen";
 
 interface Props {
@@ -48,16 +50,31 @@ export function AuthFlow({ client, onEnterGame }: Props) {
   const busy = useMemo(
     () =>
       state === "authenticating" ||
+      state === "registering" ||
       state === "waitingServers" ||
       state === "selectingServer" ||
       state === "waitingCharacters" ||
+      state === "creatingCharacter" ||
+      state === "submittingCharacter" ||
       state === "loadingCharacter",
     [state]
   );
 
+  // --- Login / signup -------------------------------------------------------
   if (state === "idle" || state === "authenticating" || state === "failed") {
     return (
       <LoginScreen
+        client={client}
+        failureReason={context.failureReason}
+        busy={busy}
+        registrationSucceeded={context.registrationSucceeded}
+      />
+    );
+  }
+
+  if (state === "registering" || state === "registerFailed") {
+    return (
+      <RegisterScreen
         client={client}
         failureReason={context.failureReason}
         busy={busy}
@@ -65,6 +82,13 @@ export function AuthFlow({ client, onEnterGame }: Props) {
     );
   }
 
+  // Successful signup bounces back to the login form with a success banner;
+  // `registered` stays mounted briefly while the user reads it.
+  if (state === "registered") {
+    return <RegisterScreen client={client} failureReason={null} busy={busy} />;
+  }
+
+  // --- Server select --------------------------------------------------------
   if (
     state === "waitingServers" ||
     state === "serverSelect" ||
@@ -79,6 +103,22 @@ export function AuthFlow({ client, onEnterGame }: Props) {
     );
   }
 
+  // --- Character create -----------------------------------------------------
+  if (
+    state === "creatingCharacter" ||
+    state === "submittingCharacter" ||
+    state === "createCharacterFailed"
+  ) {
+    return (
+      <CreateCharacterScreen
+        client={client}
+        error={context.createCharacterError}
+        busy={state === "submittingCharacter"}
+      />
+    );
+  }
+
+  // --- Character select -----------------------------------------------------
   if (
     state === "waitingCharacters" ||
     state === "characterSelect" ||

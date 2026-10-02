@@ -12,7 +12,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file account.proto.
  */
 export const file_account: GenFile = /*@__PURE__*/
-  fileDesc("Cg1hY2NvdW50LnByb3RvEgVkb2Z1cyIwChZIYW5kc2hha2VDb25uZWN0aW9uS2V5EhYKDmNvbm5lY3Rpb25fa2V5GAEgASgJIiYKEkhhbmRzaGFrZVRlbGVtZXRyeRIQCghoZXhfZGF0YRgBIAEoCSIpChNIYW5kc2hha2VHYW1lU2VydmVyEhIKCmV4dHJhX2RhdGEYASABKAkiLwoYSGFuZHNoYWtlQ2hhcmFjdGVyU3dpdGNoEhMKC3RpY2tldF9kYXRhGAEgASgJItkBChRBY2NvdW50TG9naW5SZXNwb25zZRIPCgdzdWNjZXNzGAEgASgIEhUKDWlzX2F1dGhvcml6ZWQYAiABKAgSJQoKZXJyb3JfY29kZRgDIAEoDjIRLmRvZnVzLkxvZ2luRXJyb3ISGAoQcmVxdWlyZWRfdmVyc2lvbhgEIAEoCRIUCgxraWNrX3JlYXNvbnMYBSADKAkSEgoKa2lja190aXRsZRgGIAEoCRIUCgxraWNrX21lc3NhZ2UYByABKAkSGAoQa2lja19jdXN0b21faW5mbxgIIAEoCSIoChBBY2NvdW50Q29tbXVuaXR5EhQKDGNvbW11bml0eV9pZBgBIAEoBSIkChJBY2NvdW50RG9mdXNQc2V1ZG8SDgoGcHNldWRvGAEgASgJIp8BChVBY2NvdW50Q2hhcmFjdGVyc0xpc3QSDwoHc3VjY2VzcxgBIAEoCBIXCg9zdWJzY3JpYmVyX3RpbWUYAiABKAUSFwoPY2hhcmFjdGVyX2NvdW50GAMgASgFEi0KCmNoYXJhY3RlcnMYBCADKAsyGS5kb2Z1cy5DaGFyYWN0ZXJMaXN0RW50cnkSFAoMaXNfbWlncmF0aW9uGAUgASgIIvMBChJDaGFyYWN0ZXJMaXN0RW50cnkSCgoCaWQYASABKAkSDAoEbmFtZRgCIAEoCRINCgVsZXZlbBgDIAEoBRIOCgZnZnhfaWQYBCABKAUSDgoGY29sb3IxGAUgASgFEg4KBmNvbG9yMhgGIAEoBRIOCgZjb2xvcjMYByABKAUSEwoLYWNjZXNzb3JpZXMYCCABKAkSEwoLaXNfbWVyY2hhbnQYCSABKAgSEQoJc2VydmVyX2lkGAogASgFEg8KB2lzX2RlYWQYCyABKAgSEwoLZGVhdGhfY291bnQYDCABKAUSEQoJbGV2ZWxfbWF4GA0gASgFImIKEkFjY291bnRTZXJ2ZXJzTGlzdBIPCgdzdWNjZXNzGAEgASgIEhYKDnJlbWFpbmluZ190aW1lGAIgASgFEiMKB3NlcnZlcnMYAyADKAsyEi5kb2Z1cy5TZXJ2ZXJFbnRyeSJzCgtTZXJ2ZXJFbnRyeRIRCglzZXJ2ZXJfaWQYASABKAUSFwoPY2hhcmFjdGVyX2NvdW50GAIgASgFEg0KBXN0YXRlGAMgASgFEhIKCmNvbXBsZXRpb24YBCABKAUSFQoNaXNfc2VsZWN0YWJsZRgFIAEoCCI6ChNBY2NvdW50Q2hhcmFjdGVyQWRkEg8KB3N1Y2Nlc3MYASABKAgSEgoKZXJyb3JfY29kZRgCIAEoCSJKChVBY2NvdW50VGlja2V0UmVzcG9uc2USDwoHc3VjY2VzcxgBIAEoCBIOCgZrZXlfaWQYAiABKAUSEAoIa2V5X2RhdGEYAyABKAkilwEKE0FjY291bnRTZWxlY3RTZXJ2ZXISDwoHc3VjY2VzcxgBIAEoCBIXCg91c2VfaXBfZW5jb2RpbmcYAiABKAgSCgoCaXAYAyABKAkSDAoEcG9ydBgEIAEoBRIOCgZ0aWNrZXQYBSABKAkSLAoKZXJyb3JfY29kZRgGIAEoDjIYLmRvZnVzLlNlbGVjdFNlcnZlckVycm9yIi8KGkFjY291bnRTZWxlY3RTZXJ2ZXJNaW5pbWFsEhEKCXNlcnZlcl9pZBgBIAEoBSLYAQoYQWNjb3VudENoYXJhY3RlclNlbGVjdGVkEg8KB3N1Y2Nlc3MYASABKAgSFAoMY2hhcmFjdGVyX2lkGAIgASgFEhYKDmNoYXJhY3Rlcl9uYW1lGAMgASgJEg0KBWxldmVsGAQgASgFEhIKCmd1aWxkX25hbWUYBSABKAkSCwoDc2V4GAYgASgFEg4KBmdmeF9pZBgHIAEoBRIOCgZjb2xvcjEYCCABKAUSDgoGY29sb3IyGAkgASgFEg4KBmNvbG9yMxgKIAEoBRINCgVpdGVtcxgLIAEoCSKrDwoMQWNjb3VudFN0YXRzEgoKAnhwGAEgASgDEg4KBnhwX2xvdxgCIAEoAxIPCgd4cF9oaWdoGAMgASgDEgwKBGthbWEYBCABKAMSFAoMYm9udXNfcG9pbnRzGAUgASgFEhoKEmJvbnVzX3BvaW50c19zcGVsbBgGIAEoBRInCglhbGlnbm1lbnQYByABKAsyFC5kb2Z1cy5BbGlnbm1lbnRJbmZvEgoKAmxwGAggASgFEg4KBmxwX21heBgJIAEoBRIOCgZlbmVyZ3kYCiABKAUSEgoKZW5lcmd5X21heBgLIAEoBRISCgppbml0aWF0aXZlGAwgASgFEhMKC2Rpc2Nlcm5tZW50GA0gASgFEhwKAmFwGA4gASgLMhAuZG9mdXMuU3RhdEVudHJ5EhwKAm1wGA8gASgLMhAuZG9mdXMuU3RhdEVudHJ5EiIKCHN0cmVuZ3RoGBAgASgLMhAuZG9mdXMuU3RhdEVudHJ5EiIKCHZpdGFsaXR5GBEgASgLMhAuZG9mdXMuU3RhdEVudHJ5EiAKBndpc2RvbRgSIAEoCzIQLmRvZnVzLlN0YXRFbnRyeRIgCgZjaGFuY2UYEyABKAsyEC5kb2Z1cy5TdGF0RW50cnkSIQoHYWdpbGl0eRgUIAEoCzIQLmRvZnVzLlN0YXRFbnRyeRImCgxpbnRlbGxpZ2VuY2UYFSABKAsyEC5kb2Z1cy5TdGF0RW50cnkSHwoFcmFuZ2UYFiABKAsyEC5kb2Z1cy5TdGF0RW50cnkSJQoLbWF4X3N1bW1vbnMYFyABKAsyEC5kb2Z1cy5TdGF0RW50cnkSKQoPZGFtYWdlX3BoeXNpY2FsGBggASgLMhAuZG9mdXMuU3RhdEVudHJ5EiYKDGRhbWFnZV9tYWdpYxgZIAEoCzIQLmRvZnVzLlN0YXRFbnRyeRIoCg5kYW1hZ2VfcGVyY2VudBgaIAEoCzIQLmRvZnVzLlN0YXRFbnRyeRImCgxjcml0aWNhbF9oaXQYGyABKAsyEC5kb2Z1cy5TdGF0RW50cnkSHwoFaGVhbHMYHCABKAsyEC5kb2Z1cy5TdGF0RW50cnkSJgoMZGFtYWdlX3RyYXBzGB0gASgLMhAuZG9mdXMuU3RhdEVudHJ5Ei4KFGRhbWFnZV90cmFwc19wZXJjZW50GB4gASgLMhAuZG9mdXMuU3RhdEVudHJ5EigKDnJlZmxlY3RfZGFtYWdlGB8gASgLMhAuZG9mdXMuU3RhdEVudHJ5EigKDnJlc2lzdF9uZXV0cmFsGCAgASgLMhAuZG9mdXMuU3RhdEVudHJ5EjAKFnJlc2lzdF9uZXV0cmFsX3BlcmNlbnQYISABKAsyEC5kb2Z1cy5TdGF0RW50cnkSJgoMcmVzaXN0X2VhcnRoGCIgASgLMhAuZG9mdXMuU3RhdEVudHJ5Ei4KFHJlc2lzdF9lYXJ0aF9wZXJjZW50GCMgASgLMhAuZG9mdXMuU3RhdEVudHJ5EiYKDHJlc2lzdF93YXRlchgkIAEoCzIQLmRvZnVzLlN0YXRFbnRyeRIuChRyZXNpc3Rfd2F0ZXJfcGVyY2VudBglIAEoCzIQLmRvZnVzLlN0YXRFbnRyeRIkCgpyZXNpc3RfYWlyGCYgASgLMhAuZG9mdXMuU3RhdEVudHJ5EiwKEnJlc2lzdF9haXJfcGVyY2VudBgnIAEoCzIQLmRvZnVzLlN0YXRFbnRyeRIlCgtyZXNpc3RfZmlyZRgoIAEoCzIQLmRvZnVzLlN0YXRFbnRyeRItChNyZXNpc3RfZmlyZV9wZXJjZW50GCkgASgLMhAuZG9mdXMuU3RhdEVudHJ5EiIKCGRvZGdlX2FwGCogASgLMhAuZG9mdXMuU3RhdEVudHJ5EiIKCGRvZGdlX21wGCsgASgLMhAuZG9mdXMuU3RhdEVudHJ5EigKDmRhbWFnZV9uZXV0cmFsGCwgASgLMhAuZG9mdXMuU3RhdEVudHJ5EiYKDGRhbWFnZV9lYXJ0aBgtIAEoCzIQLmRvZnVzLlN0YXRFbnRyeRImCgxkYW1hZ2Vfd2F0ZXIYLiABKAsyEC5kb2Z1cy5TdGF0RW50cnkSJAoKZGFtYWdlX2FpchgvIAEoCzIQLmRvZnVzLlN0YXRFbnRyeRIlCgtkYW1hZ2VfZmlyZRgwIAEoCzIQLmRvZnVzLlN0YXRFbnRyeRIoCg5hcF9sb3NzX3Jlc2lzdBgxIAEoCzIQLmRvZnVzLlN0YXRFbnRyeRIoCg5tcF9sb3NzX3Jlc2lzdBgyIAEoCzIQLmRvZnVzLlN0YXRFbnRyeRIfCgVwb3dlchgzIAEoCzIQLmRvZnVzLlN0YXRFbnRyeRIlCgtwdXNoX2RhbWFnZRg0IAEoCzIQLmRvZnVzLlN0YXRFbnRyeRIsChJwdXNoX2RhbWFnZV9yZXNpc3QYNSABKAsyEC5kb2Z1cy5TdGF0RW50cnkSKQoPY3JpdGljYWxfZGFtYWdlGDYgASgLMhAuZG9mdXMuU3RhdEVudHJ5EikKD2NyaXRpY2FsX3Jlc2lzdBg3IAEoCzIQLmRvZnVzLlN0YXRFbnRyeRIUCgxzaG93ZWRfbGV2ZWwYOCABKAUiJAoPQWNjb3VudE5ld0xldmVsEhEKCW5ld19sZXZlbBgBIAEoBSIrChNBY2NvdW50UmVzdHJpY3Rpb25zEhQKDHJlc3RyaWN0aW9ucxgBIAEoBSIvCgxBY2NvdW50SG9zdHMSHwoFaG9zdHMYASADKAsyEC5kb2Z1cy5Ib3N0RW50cnkiUAoJSG9zdEVudHJ5EhEKCXNlcnZlcl9pZBgBIAEoBRIQCgh0eXBlX251bRgCIAEoBRIMCgRwb3J0GAMgASgFEhAKCHJlcXVpcmVkGAQgASgIIiAKDUFjY291bnRSZXNjdWUSDwoHc3VjY2VzcxgBIAEoCCIzChBBY2NvdW50R2lmdHNMaXN0Eh8KBWdpZnRzGAEgAygLMhAuZG9mdXMuR2lmdEVudHJ5IoEBCglHaWZ0RW50cnkSEQoJZ2lmdF90eXBlGAEgASgFEg8KB2dpZnRfaWQYAiABKAUSDQoFdGl0bGUYAyABKAkSEwoLZGVzY3JpcHRpb24YBCABKAkSDwoHZ2Z4X3VybBgFIAEoCRIMCgRkYXRlGAYgASgDEg0KBWl0ZW1zGAcgAygJIiQKEUFjY291bnRHaWZ0U3RvcmVkEg8KB3N1Y2Nlc3MYASABKAgiIAoMQWNjb3VudFF1ZXVlEhAKCHBvc2l0aW9uGAEgASgFIoYBCg9BY2NvdW50TmV3UXVldWUSEAoIcG9zaXRpb24YASABKAUSGQoRdG90YWxfc3Vic2NyaWJlcnMYAiABKAUSHQoVdG90YWxfbm9uX3N1YnNjcmliZXJzGAMgASgFEhUKDWlzX3N1YnNjcmliZXIYBCABKAgSEAoIcXVldWVfaWQYBSABKAUiKQoWQWNjb3VudFJlZ2lvbmFsVmVyc2lvbhIPCgd2ZXJzaW9uGAEgASgFIlIKHUFjY291bnRDaGFyYWN0ZXJOYW1lR2VuZXJhdGVkEg8KB3N1Y2Nlc3MYASABKAgSDAoEbmFtZRgCIAEoCRISCgplcnJvcl9jb2RlGAMgASgJIi4KCkFjY291bnRLZXkSDgoGa2V5X2lkGAEgASgFEhAKCGtleV9kYXRhGAIgASgJIikKFUFjY291bnRTZWNyZXRRdWVzdGlvbhIQCghxdWVzdGlvbhgBIAEoCSIpChZBY2NvdW50Q2hhcmFjdGVyRGVsZXRlEg8KB3N1Y2Nlc3MYASABKAgilgIKGUFjY291bnRDaGFyYWN0ZXJNaWdyYXRpb24SPAoEdHlwZRgBIAEoDjIuLmRvZnVzLkFjY291bnRDaGFyYWN0ZXJNaWdyYXRpb24uTWlncmF0aW9uVHlwZRIUCgxjaGFyYWN0ZXJfaWQYAiABKAUSFgoOY2hhcmFjdGVyX25hbWUYAyABKAkSNQoPY2hhcmFjdGVyc19saXN0GAQgASgLMhwuZG9mdXMuQWNjb3VudENoYXJhY3RlcnNMaXN0IlYKDU1pZ3JhdGlvblR5cGUSHgoaTUlHUkFUSU9OX1RZUEVfVU5TUEVDSUZJRUQQABIPCgtBU0tfQ09ORklSTRABEggKBERBVEEQAhIKCgZERUxFVEUQAyJEChdBY2NvdW50RnJpZW5kU2VydmVyTGlzdBIpCgdzZXJ2ZXJzGAEgAygLMhguZG9mdXMuRnJpZW5kU2VydmVyRW50cnkiPwoRRnJpZW5kU2VydmVyRW50cnkSEQoJc2VydmVyX2lkGAEgASgFEhcKD2NoYXJhY3Rlcl9jb3VudBgCIAEoBSJjChFBY2NvdW50RWRpdFBsYXllchIRCgllZGl0X25hbWUYASABKAgSEwoLZWRpdF9jb2xvcnMYAiABKAgSFgoOZWRpdF9taW1pYmlvdGUYAyABKAgSDgoGZm9yY2VkGAQgASgIIhUKE0FjY291bnRNaW5pQ2xpcEluZm8iIwoRQWNjb3VudFNlbmRUaWNrZXQSDgoGdGlja2V0GAEgASgJIkMKE0FjY291bnRTZW5kSWRlbnRpdHkSEAoIdXNlcm5hbWUYASABKAkSGgoSZW5jcnlwdGVkX3Bhc3N3b3JkGAIgASgJIh8KHUFjY291bnRSZXF1ZXN0UmVnaW9uYWxWZXJzaW9uIh8KD0FjY291bnRTZW5kUG9ydBIMCgRwb3J0GAEgASgFIisKE0FjY291bnRTZXRDb21tdW5pdHkSFAoMY29tbXVuaXR5X2lkGAEgASgFIicKFUFjY291bnRTZXREb2Z1c1BzZXVkbxIOCgZwc2V1ZG8YASABKAkiKgoYQWNjb3VudEdldENoYXJhY3RlcnNMaXN0Eg4KBmZvcmNlZBgBIAEoCCIXChVBY2NvdW50R2V0U2VydmVyc0xpc3QiLwoaQWNjb3VudFNlbGVjdFNlcnZlclJlcXVlc3QSEQoJc2VydmVyX2lkGAEgASgFIi4KFkFjY291bnRTZWxlY3RDaGFyYWN0ZXISFAoMY2hhcmFjdGVyX2lkGAEgASgFInUKFkFjY291bnRDcmVhdGVDaGFyYWN0ZXISDAoEbmFtZRgBIAEoCRIQCghjbGFzc19pZBgCIAEoBRILCgNzZXgYAyABKAUSDgoGY29sb3IxGAQgASgFEg4KBmNvbG9yMhgFIAEoBRIOCgZjb2xvcjMYBiABKAUiRQoWQWNjb3VudERlbGV0ZUNoYXJhY3RlchIUCgxjaGFyYWN0ZXJfaWQYASABKAUSFQoNc2VjcmV0X2Fuc3dlchgCIAEoCSItChVBY2NvdW50UmVzZXRDaGFyYWN0ZXISFAoMY2hhcmFjdGVyX2lkGAEgASgFIjQKD0FjY291bnRVc2VCb29zdBIPCgdzdGF0X2lkGAEgASgFEhAKCHF1YW50aXR5GAIgASgFIjwKFEFjY291bnRSZXNjdWVSZXF1ZXN0Eg4KBnRpY2tldBgBIAEoCRIUCgxmaWdodF9zdGF0dXMYAiABKAUiIwoPQWNjb3VudEdldEdpZnRzEhAKCGxhbmd1YWdlGAEgASgJIj0KFEFjY291bnRBdHRyaWJ1dGVHaWZ0Eg8KB2dpZnRfaWQYASABKAUSFAoMY2hhcmFjdGVyX2lkGAIgASgFIhkKF0FjY291bnRHZXRRdWV1ZVBvc2l0aW9uIhYKFEFjY291bnRHZXRSYW5kb21OYW1lIh8KDUFjY291bnRVc2VLZXkSDgoGa2V5X2lkGAEgASgFIh8KD0FjY291bnRFZGl0TmFtZRIMCgRuYW1lGAEgASgJIkMKEUFjY291bnRFZGl0Q29sb3JzEg4KBmNvbG9yMRgBIAEoBRIOCgZjb2xvcjIYAiABKAUSDgoGY29sb3IzGAMgASgFIicKE0FjY291bnRTZWFyY2hGcmllbmQSEAoIbmlja25hbWUYASABKAkihQEKF0FjY291bnRNaWdyYXRpb25SZXF1ZXN0EjwKBHR5cGUYASABKA4yLi5kb2Z1cy5BY2NvdW50Q2hhcmFjdGVyTWlncmF0aW9uLk1pZ3JhdGlvblR5cGUSFAoMY2hhcmFjdGVyX2lkGAIgASgFEhYKDmNoYXJhY3Rlcl9uYW1lGAMgASgJKowCCgpMb2dpbkVycm9yEhsKF0xPR0lOX0VSUk9SX1VOU1BFQ0lGSUVEEAASIwofTE9HSU5fRVJST1JfSU5WQUxJRF9DUkVERU5USUFMUxABEhYKEkxPR0lOX0VSUk9SX0JBTk5FRBACEh4KGkxPR0lOX0VSUk9SX0FMUkVBRFlfT05MSU5FEAMSGQoVTE9HSU5fRVJST1JfTUFMRk9STUVEEAQSFwoTTE9HSU5fRVJST1JfQkFDS0VORBAFEhYKEkxPR0lOX0VSUk9SX1FVRVVFRBAGEiAKHExPR0lOX0VSUk9SX1ZFUlNJT05fTUlTTUFUQ0gQBxIWChJMT0dJTl9FUlJPUl9LSUNLRUQQCCqjAgoRU2VsZWN0U2VydmVyRXJyb3ISIwofU0VMRUNUX1NFUlZFUl9FUlJPUl9VTlNQRUNJRklFRBAAEhwKGFNFTEVDVF9TRVJWRVJfRVJST1JfRE9XThABEhwKGFNFTEVDVF9TRVJWRVJfRVJST1JfRlVMTBACEicKI1NFTEVDVF9TRVJWRVJfRVJST1JfRlVMTF9OT05fTUVNQkVSEAMSHAoYU0VMRUNUX1NFUlZFUl9FUlJPUl9TSE9QEAQSIgoeU0VMRUNUX1NFUlZFUl9FUlJPUl9SRVNUUklDVEVEEAUSIQodU0VMRUNUX1NFUlZFUl9FUlJPUl9OT1RfRk9VTkQQBhIfChtTRUxFQ1RfU0VSVkVSX0VSUk9SX1VOS05PV04QB2IGcHJvdG8z", [file_common]);
+  fileDesc("Cg1hY2NvdW50LnByb3RvEgVkb2Z1cyIwChZIYW5kc2hha2VDb25uZWN0aW9uS2V5EhYKDmNvbm5lY3Rpb25fa2V5GAEgASgJIiYKEkhhbmRzaGFrZVRlbGVtZXRyeRIQCghoZXhfZGF0YRgBIAEoCSIpChNIYW5kc2hha2VHYW1lU2VydmVyEhIKCmV4dHJhX2RhdGEYASABKAkiLwoYSGFuZHNoYWtlQ2hhcmFjdGVyU3dpdGNoEhMKC3RpY2tldF9kYXRhGAEgASgJItkBChRBY2NvdW50TG9naW5SZXNwb25zZRIPCgdzdWNjZXNzGAEgASgIEhUKDWlzX2F1dGhvcml6ZWQYAiABKAgSJQoKZXJyb3JfY29kZRgDIAEoDjIRLmRvZnVzLkxvZ2luRXJyb3ISGAoQcmVxdWlyZWRfdmVyc2lvbhgEIAEoCRIUCgxraWNrX3JlYXNvbnMYBSADKAkSEgoKa2lja190aXRsZRgGIAEoCRIUCgxraWNrX21lc3NhZ2UYByABKAkSGAoQa2lja19jdXN0b21faW5mbxgIIAEoCSIoChBBY2NvdW50Q29tbXVuaXR5EhQKDGNvbW11bml0eV9pZBgBIAEoBSIkChJBY2NvdW50RG9mdXNQc2V1ZG8SDgoGcHNldWRvGAEgASgJIp8BChVBY2NvdW50Q2hhcmFjdGVyc0xpc3QSDwoHc3VjY2VzcxgBIAEoCBIXCg9zdWJzY3JpYmVyX3RpbWUYAiABKAUSFwoPY2hhcmFjdGVyX2NvdW50GAMgASgFEi0KCmNoYXJhY3RlcnMYBCADKAsyGS5kb2Z1cy5DaGFyYWN0ZXJMaXN0RW50cnkSFAoMaXNfbWlncmF0aW9uGAUgASgIIvMBChJDaGFyYWN0ZXJMaXN0RW50cnkSCgoCaWQYASABKAkSDAoEbmFtZRgCIAEoCRINCgVsZXZlbBgDIAEoBRIOCgZnZnhfaWQYBCABKAUSDgoGY29sb3IxGAUgASgFEg4KBmNvbG9yMhgGIAEoBRIOCgZjb2xvcjMYByABKAUSEwoLYWNjZXNzb3JpZXMYCCABKAkSEwoLaXNfbWVyY2hhbnQYCSABKAgSEQoJc2VydmVyX2lkGAogASgFEg8KB2lzX2RlYWQYCyABKAgSEwoLZGVhdGhfY291bnQYDCABKAUSEQoJbGV2ZWxfbWF4GA0gASgFImIKEkFjY291bnRTZXJ2ZXJzTGlzdBIPCgdzdWNjZXNzGAEgASgIEhYKDnJlbWFpbmluZ190aW1lGAIgASgFEiMKB3NlcnZlcnMYAyADKAsyEi5kb2Z1cy5TZXJ2ZXJFbnRyeSJzCgtTZXJ2ZXJFbnRyeRIRCglzZXJ2ZXJfaWQYASABKAUSFwoPY2hhcmFjdGVyX2NvdW50GAIgASgFEg0KBXN0YXRlGAMgASgFEhIKCmNvbXBsZXRpb24YBCABKAUSFQoNaXNfc2VsZWN0YWJsZRgFIAEoCCI6ChNBY2NvdW50Q2hhcmFjdGVyQWRkEg8KB3N1Y2Nlc3MYASABKAgSEgoKZXJyb3JfY29kZRgCIAEoCSJZChxBY2NvdW50Q3JlYXRlQWNjb3VudFJlc3BvbnNlEg8KB3N1Y2Nlc3MYASABKAgSKAoKZXJyb3JfY29kZRgCIAEoDjIULmRvZnVzLlJlZ2lzdGVyRXJyb3IiSgoVQWNjb3VudFRpY2tldFJlc3BvbnNlEg8KB3N1Y2Nlc3MYASABKAgSDgoGa2V5X2lkGAIgASgFEhAKCGtleV9kYXRhGAMgASgJIpcBChNBY2NvdW50U2VsZWN0U2VydmVyEg8KB3N1Y2Nlc3MYASABKAgSFwoPdXNlX2lwX2VuY29kaW5nGAIgASgIEgoKAmlwGAMgASgJEgwKBHBvcnQYBCABKAUSDgoGdGlja2V0GAUgASgJEiwKCmVycm9yX2NvZGUYBiABKA4yGC5kb2Z1cy5TZWxlY3RTZXJ2ZXJFcnJvciIvChpBY2NvdW50U2VsZWN0U2VydmVyTWluaW1hbBIRCglzZXJ2ZXJfaWQYASABKAUi2AEKGEFjY291bnRDaGFyYWN0ZXJTZWxlY3RlZBIPCgdzdWNjZXNzGAEgASgIEhQKDGNoYXJhY3Rlcl9pZBgCIAEoBRIWCg5jaGFyYWN0ZXJfbmFtZRgDIAEoCRINCgVsZXZlbBgEIAEoBRISCgpndWlsZF9uYW1lGAUgASgJEgsKA3NleBgGIAEoBRIOCgZnZnhfaWQYByABKAUSDgoGY29sb3IxGAggASgFEg4KBmNvbG9yMhgJIAEoBRIOCgZjb2xvcjMYCiABKAUSDQoFaXRlbXMYCyABKAkiqw8KDEFjY291bnRTdGF0cxIKCgJ4cBgBIAEoAxIOCgZ4cF9sb3cYAiABKAMSDwoHeHBfaGlnaBgDIAEoAxIMCgRrYW1hGAQgASgDEhQKDGJvbnVzX3BvaW50cxgFIAEoBRIaChJib251c19wb2ludHNfc3BlbGwYBiABKAUSJwoJYWxpZ25tZW50GAcgASgLMhQuZG9mdXMuQWxpZ25tZW50SW5mbxIKCgJscBgIIAEoBRIOCgZscF9tYXgYCSABKAUSDgoGZW5lcmd5GAogASgFEhIKCmVuZXJneV9tYXgYCyABKAUSEgoKaW5pdGlhdGl2ZRgMIAEoBRITCgtkaXNjZXJubWVudBgNIAEoBRIcCgJhcBgOIAEoCzIQLmRvZnVzLlN0YXRFbnRyeRIcCgJtcBgPIAEoCzIQLmRvZnVzLlN0YXRFbnRyeRIiCghzdHJlbmd0aBgQIAEoCzIQLmRvZnVzLlN0YXRFbnRyeRIiCgh2aXRhbGl0eRgRIAEoCzIQLmRvZnVzLlN0YXRFbnRyeRIgCgZ3aXNkb20YEiABKAsyEC5kb2Z1cy5TdGF0RW50cnkSIAoGY2hhbmNlGBMgASgLMhAuZG9mdXMuU3RhdEVudHJ5EiEKB2FnaWxpdHkYFCABKAsyEC5kb2Z1cy5TdGF0RW50cnkSJgoMaW50ZWxsaWdlbmNlGBUgASgLMhAuZG9mdXMuU3RhdEVudHJ5Eh8KBXJhbmdlGBYgASgLMhAuZG9mdXMuU3RhdEVudHJ5EiUKC21heF9zdW1tb25zGBcgASgLMhAuZG9mdXMuU3RhdEVudHJ5EikKD2RhbWFnZV9waHlzaWNhbBgYIAEoCzIQLmRvZnVzLlN0YXRFbnRyeRImCgxkYW1hZ2VfbWFnaWMYGSABKAsyEC5kb2Z1cy5TdGF0RW50cnkSKAoOZGFtYWdlX3BlcmNlbnQYGiABKAsyEC5kb2Z1cy5TdGF0RW50cnkSJgoMY3JpdGljYWxfaGl0GBsgASgLMhAuZG9mdXMuU3RhdEVudHJ5Eh8KBWhlYWxzGBwgASgLMhAuZG9mdXMuU3RhdEVudHJ5EiYKDGRhbWFnZV90cmFwcxgdIAEoCzIQLmRvZnVzLlN0YXRFbnRyeRIuChRkYW1hZ2VfdHJhcHNfcGVyY2VudBgeIAEoCzIQLmRvZnVzLlN0YXRFbnRyeRIoCg5yZWZsZWN0X2RhbWFnZRgfIAEoCzIQLmRvZnVzLlN0YXRFbnRyeRIoCg5yZXNpc3RfbmV1dHJhbBggIAEoCzIQLmRvZnVzLlN0YXRFbnRyeRIwChZyZXNpc3RfbmV1dHJhbF9wZXJjZW50GCEgASgLMhAuZG9mdXMuU3RhdEVudHJ5EiYKDHJlc2lzdF9lYXJ0aBgiIAEoCzIQLmRvZnVzLlN0YXRFbnRyeRIuChRyZXNpc3RfZWFydGhfcGVyY2VudBgjIAEoCzIQLmRvZnVzLlN0YXRFbnRyeRImCgxyZXNpc3Rfd2F0ZXIYJCABKAsyEC5kb2Z1cy5TdGF0RW50cnkSLgoUcmVzaXN0X3dhdGVyX3BlcmNlbnQYJSABKAsyEC5kb2Z1cy5TdGF0RW50cnkSJAoKcmVzaXN0X2FpchgmIAEoCzIQLmRvZnVzLlN0YXRFbnRyeRIsChJyZXNpc3RfYWlyX3BlcmNlbnQYJyABKAsyEC5kb2Z1cy5TdGF0RW50cnkSJQoLcmVzaXN0X2ZpcmUYKCABKAsyEC5kb2Z1cy5TdGF0RW50cnkSLQoTcmVzaXN0X2ZpcmVfcGVyY2VudBgpIAEoCzIQLmRvZnVzLlN0YXRFbnRyeRIiCghkb2RnZV9hcBgqIAEoCzIQLmRvZnVzLlN0YXRFbnRyeRIiCghkb2RnZV9tcBgrIAEoCzIQLmRvZnVzLlN0YXRFbnRyeRIoCg5kYW1hZ2VfbmV1dHJhbBgsIAEoCzIQLmRvZnVzLlN0YXRFbnRyeRImCgxkYW1hZ2VfZWFydGgYLSABKAsyEC5kb2Z1cy5TdGF0RW50cnkSJgoMZGFtYWdlX3dhdGVyGC4gASgLMhAuZG9mdXMuU3RhdEVudHJ5EiQKCmRhbWFnZV9haXIYLyABKAsyEC5kb2Z1cy5TdGF0RW50cnkSJQoLZGFtYWdlX2ZpcmUYMCABKAsyEC5kb2Z1cy5TdGF0RW50cnkSKAoOYXBfbG9zc19yZXNpc3QYMSABKAsyEC5kb2Z1cy5TdGF0RW50cnkSKAoObXBfbG9zc19yZXNpc3QYMiABKAsyEC5kb2Z1cy5TdGF0RW50cnkSHwoFcG93ZXIYMyABKAsyEC5kb2Z1cy5TdGF0RW50cnkSJQoLcHVzaF9kYW1hZ2UYNCABKAsyEC5kb2Z1cy5TdGF0RW50cnkSLAoScHVzaF9kYW1hZ2VfcmVzaXN0GDUgASgLMhAuZG9mdXMuU3RhdEVudHJ5EikKD2NyaXRpY2FsX2RhbWFnZRg2IAEoCzIQLmRvZnVzLlN0YXRFbnRyeRIpCg9jcml0aWNhbF9yZXNpc3QYNyABKAsyEC5kb2Z1cy5TdGF0RW50cnkSFAoMc2hvd2VkX2xldmVsGDggASgFIiQKD0FjY291bnROZXdMZXZlbBIRCgluZXdfbGV2ZWwYASABKAUiKwoTQWNjb3VudFJlc3RyaWN0aW9ucxIUCgxyZXN0cmljdGlvbnMYASABKAUiLwoMQWNjb3VudEhvc3RzEh8KBWhvc3RzGAEgAygLMhAuZG9mdXMuSG9zdEVudHJ5IlAKCUhvc3RFbnRyeRIRCglzZXJ2ZXJfaWQYASABKAUSEAoIdHlwZV9udW0YAiABKAUSDAoEcG9ydBgDIAEoBRIQCghyZXF1aXJlZBgEIAEoCCIgCg1BY2NvdW50UmVzY3VlEg8KB3N1Y2Nlc3MYASABKAgiMwoQQWNjb3VudEdpZnRzTGlzdBIfCgVnaWZ0cxgBIAMoCzIQLmRvZnVzLkdpZnRFbnRyeSKBAQoJR2lmdEVudHJ5EhEKCWdpZnRfdHlwZRgBIAEoBRIPCgdnaWZ0X2lkGAIgASgFEg0KBXRpdGxlGAMgASgJEhMKC2Rlc2NyaXB0aW9uGAQgASgJEg8KB2dmeF91cmwYBSABKAkSDAoEZGF0ZRgGIAEoAxINCgVpdGVtcxgHIAMoCSIkChFBY2NvdW50R2lmdFN0b3JlZBIPCgdzdWNjZXNzGAEgASgIIiAKDEFjY291bnRRdWV1ZRIQCghwb3NpdGlvbhgBIAEoBSKGAQoPQWNjb3VudE5ld1F1ZXVlEhAKCHBvc2l0aW9uGAEgASgFEhkKEXRvdGFsX3N1YnNjcmliZXJzGAIgASgFEh0KFXRvdGFsX25vbl9zdWJzY3JpYmVycxgDIAEoBRIVCg1pc19zdWJzY3JpYmVyGAQgASgIEhAKCHF1ZXVlX2lkGAUgASgFIikKFkFjY291bnRSZWdpb25hbFZlcnNpb24SDwoHdmVyc2lvbhgBIAEoBSJSCh1BY2NvdW50Q2hhcmFjdGVyTmFtZUdlbmVyYXRlZBIPCgdzdWNjZXNzGAEgASgIEgwKBG5hbWUYAiABKAkSEgoKZXJyb3JfY29kZRgDIAEoCSIuCgpBY2NvdW50S2V5Eg4KBmtleV9pZBgBIAEoBRIQCghrZXlfZGF0YRgCIAEoCSIpChVBY2NvdW50U2VjcmV0UXVlc3Rpb24SEAoIcXVlc3Rpb24YASABKAkiKQoWQWNjb3VudENoYXJhY3RlckRlbGV0ZRIPCgdzdWNjZXNzGAEgASgIIpYCChlBY2NvdW50Q2hhcmFjdGVyTWlncmF0aW9uEjwKBHR5cGUYASABKA4yLi5kb2Z1cy5BY2NvdW50Q2hhcmFjdGVyTWlncmF0aW9uLk1pZ3JhdGlvblR5cGUSFAoMY2hhcmFjdGVyX2lkGAIgASgFEhYKDmNoYXJhY3Rlcl9uYW1lGAMgASgJEjUKD2NoYXJhY3RlcnNfbGlzdBgEIAEoCzIcLmRvZnVzLkFjY291bnRDaGFyYWN0ZXJzTGlzdCJWCg1NaWdyYXRpb25UeXBlEh4KGk1JR1JBVElPTl9UWVBFX1VOU1BFQ0lGSUVEEAASDwoLQVNLX0NPTkZJUk0QARIICgREQVRBEAISCgoGREVMRVRFEAMiRAoXQWNjb3VudEZyaWVuZFNlcnZlckxpc3QSKQoHc2VydmVycxgBIAMoCzIYLmRvZnVzLkZyaWVuZFNlcnZlckVudHJ5Ij8KEUZyaWVuZFNlcnZlckVudHJ5EhEKCXNlcnZlcl9pZBgBIAEoBRIXCg9jaGFyYWN0ZXJfY291bnQYAiABKAUiYwoRQWNjb3VudEVkaXRQbGF5ZXISEQoJZWRpdF9uYW1lGAEgASgIEhMKC2VkaXRfY29sb3JzGAIgASgIEhYKDmVkaXRfbWltaWJpb3RlGAMgASgIEg4KBmZvcmNlZBgEIAEoCCIVChNBY2NvdW50TWluaUNsaXBJbmZvIiMKEUFjY291bnRTZW5kVGlja2V0Eg4KBnRpY2tldBgBIAEoCSJDChNBY2NvdW50U2VuZElkZW50aXR5EhAKCHVzZXJuYW1lGAEgASgJEhoKEmVuY3J5cHRlZF9wYXNzd29yZBgCIAEoCSIfCh1BY2NvdW50UmVxdWVzdFJlZ2lvbmFsVmVyc2lvbiIfCg9BY2NvdW50U2VuZFBvcnQSDAoEcG9ydBgBIAEoBSIrChNBY2NvdW50U2V0Q29tbXVuaXR5EhQKDGNvbW11bml0eV9pZBgBIAEoBSInChVBY2NvdW50U2V0RG9mdXNQc2V1ZG8SDgoGcHNldWRvGAEgASgJIioKGEFjY291bnRHZXRDaGFyYWN0ZXJzTGlzdBIOCgZmb3JjZWQYASABKAgiFwoVQWNjb3VudEdldFNlcnZlcnNMaXN0Ii8KGkFjY291bnRTZWxlY3RTZXJ2ZXJSZXF1ZXN0EhEKCXNlcnZlcl9pZBgBIAEoBSIuChZBY2NvdW50U2VsZWN0Q2hhcmFjdGVyEhQKDGNoYXJhY3Rlcl9pZBgBIAEoBSJUChRBY2NvdW50Q3JlYXRlQWNjb3VudBIQCgh1c2VybmFtZRgBIAEoCRIaChJlbmNyeXB0ZWRfcGFzc3dvcmQYAiABKAkSDgoGcHNldWRvGAMgASgJInUKFkFjY291bnRDcmVhdGVDaGFyYWN0ZXISDAoEbmFtZRgBIAEoCRIQCghjbGFzc19pZBgCIAEoBRILCgNzZXgYAyABKAUSDgoGY29sb3IxGAQgASgFEg4KBmNvbG9yMhgFIAEoBRIOCgZjb2xvcjMYBiABKAUiRQoWQWNjb3VudERlbGV0ZUNoYXJhY3RlchIUCgxjaGFyYWN0ZXJfaWQYASABKAUSFQoNc2VjcmV0X2Fuc3dlchgCIAEoCSItChVBY2NvdW50UmVzZXRDaGFyYWN0ZXISFAoMY2hhcmFjdGVyX2lkGAEgASgFIjQKD0FjY291bnRVc2VCb29zdBIPCgdzdGF0X2lkGAEgASgFEhAKCHF1YW50aXR5GAIgASgFIjwKFEFjY291bnRSZXNjdWVSZXF1ZXN0Eg4KBnRpY2tldBgBIAEoCRIUCgxmaWdodF9zdGF0dXMYAiABKAUiIwoPQWNjb3VudEdldEdpZnRzEhAKCGxhbmd1YWdlGAEgASgJIj0KFEFjY291bnRBdHRyaWJ1dGVHaWZ0Eg8KB2dpZnRfaWQYASABKAUSFAoMY2hhcmFjdGVyX2lkGAIgASgFIhkKF0FjY291bnRHZXRRdWV1ZVBvc2l0aW9uIhYKFEFjY291bnRHZXRSYW5kb21OYW1lIh8KDUFjY291bnRVc2VLZXkSDgoGa2V5X2lkGAEgASgFIh8KD0FjY291bnRFZGl0TmFtZRIMCgRuYW1lGAEgASgJIkMKEUFjY291bnRFZGl0Q29sb3JzEg4KBmNvbG9yMRgBIAEoBRIOCgZjb2xvcjIYAiABKAUSDgoGY29sb3IzGAMgASgFIicKE0FjY291bnRTZWFyY2hGcmllbmQSEAoIbmlja25hbWUYASABKAkihQEKF0FjY291bnRNaWdyYXRpb25SZXF1ZXN0EjwKBHR5cGUYASABKA4yLi5kb2Z1cy5BY2NvdW50Q2hhcmFjdGVyTWlncmF0aW9uLk1pZ3JhdGlvblR5cGUSFAoMY2hhcmFjdGVyX2lkGAIgASgFEhYKDmNoYXJhY3Rlcl9uYW1lGAMgASgJKowCCgpMb2dpbkVycm9yEhsKF0xPR0lOX0VSUk9SX1VOU1BFQ0lGSUVEEAASIwofTE9HSU5fRVJST1JfSU5WQUxJRF9DUkVERU5USUFMUxABEhYKEkxPR0lOX0VSUk9SX0JBTk5FRBACEh4KGkxPR0lOX0VSUk9SX0FMUkVBRFlfT05MSU5FEAMSGQoVTE9HSU5fRVJST1JfTUFMRk9STUVEEAQSFwoTTE9HSU5fRVJST1JfQkFDS0VORBAFEhYKEkxPR0lOX0VSUk9SX1FVRVVFRBAGEiAKHExPR0lOX0VSUk9SX1ZFUlNJT05fTUlTTUFUQ0gQBxIWChJMT0dJTl9FUlJPUl9LSUNLRUQQCCq1AQoNUmVnaXN0ZXJFcnJvchIeChpSRUdJU1RFUl9FUlJPUl9VTlNQRUNJRklFRBAAEiMKH1JFR0lTVEVSX0VSUk9SX0lOVkFMSURfVVNFUk5BTUUQARIgChxSRUdJU1RFUl9FUlJPUl9XRUFLX1BBU1NXT1JEEAISIQodUkVHSVNURVJfRVJST1JfSU5WQUxJRF9QU0VVRE8QAxIaChZSRUdJU1RFUl9FUlJPUl9CQUNLRU5EEAQqowIKEVNlbGVjdFNlcnZlckVycm9yEiMKH1NFTEVDVF9TRVJWRVJfRVJST1JfVU5TUEVDSUZJRUQQABIcChhTRUxFQ1RfU0VSVkVSX0VSUk9SX0RPV04QARIcChhTRUxFQ1RfU0VSVkVSX0VSUk9SX0ZVTEwQAhInCiNTRUxFQ1RfU0VSVkVSX0VSUk9SX0ZVTExfTk9OX01FTUJFUhADEhwKGFNFTEVDVF9TRVJWRVJfRVJST1JfU0hPUBAEEiIKHlNFTEVDVF9TRVJWRVJfRVJST1JfUkVTVFJJQ1RFRBAFEiEKHVNFTEVDVF9TRVJWRVJfRVJST1JfTk9UX0ZPVU5EEAYSHwobU0VMRUNUX1NFUlZFUl9FUlJPUl9VTktOT1dOEAdiBnByb3RvMw", [file_common]);
 
 /**
  * HC - Connection key provided at handshake
@@ -413,6 +413,30 @@ export const AccountCharacterAddSchema: GenMessage<AccountCharacterAdd> = /*@__P
   messageDesc(file_account, 11);
 
 /**
+ * Response to AccountCreateAccount.
+ *
+ * @generated from message dofus.AccountCreateAccountResponse
+ */
+export type AccountCreateAccountResponse = Message<"dofus.AccountCreateAccountResponse"> & {
+  /**
+   * @generated from field: bool success = 1;
+   */
+  success: boolean;
+
+  /**
+   * @generated from field: dofus.RegisterError error_code = 2;
+   */
+  errorCode: RegisterError;
+};
+
+/**
+ * Describes the message dofus.AccountCreateAccountResponse.
+ * Use `create(AccountCreateAccountResponseSchema)` to create a new message.
+ */
+export const AccountCreateAccountResponseSchema: GenMessage<AccountCreateAccountResponse> = /*@__PURE__*/
+  messageDesc(file_account, 12);
+
+/**
  * AT - Ticket response
  *
  * @generated from message dofus.AccountTicketResponse
@@ -441,7 +465,7 @@ export type AccountTicketResponse = Message<"dofus.AccountTicketResponse"> & {
  * Use `create(AccountTicketResponseSchema)` to create a new message.
  */
 export const AccountTicketResponseSchema: GenMessage<AccountTicketResponse> = /*@__PURE__*/
-  messageDesc(file_account, 12);
+  messageDesc(file_account, 13);
 
 /**
  * AX / AY - Select server response
@@ -487,7 +511,7 @@ export type AccountSelectServer = Message<"dofus.AccountSelectServer"> & {
  * Use `create(AccountSelectServerSchema)` to create a new message.
  */
 export const AccountSelectServerSchema: GenMessage<AccountSelectServer> = /*@__PURE__*/
-  messageDesc(file_account, 13);
+  messageDesc(file_account, 14);
 
 /**
  * AZ - Select server minimal
@@ -506,7 +530,7 @@ export type AccountSelectServerMinimal = Message<"dofus.AccountSelectServerMinim
  * Use `create(AccountSelectServerMinimalSchema)` to create a new message.
  */
 export const AccountSelectServerMinimalSchema: GenMessage<AccountSelectServerMinimal> = /*@__PURE__*/
-  messageDesc(file_account, 14);
+  messageDesc(file_account, 15);
 
 /**
  * AS - Character selected
@@ -579,7 +603,7 @@ export type AccountCharacterSelected = Message<"dofus.AccountCharacterSelected">
  * Use `create(AccountCharacterSelectedSchema)` to create a new message.
  */
 export const AccountCharacterSelectedSchema: GenMessage<AccountCharacterSelected> = /*@__PURE__*/
-  messageDesc(file_account, 15);
+  messageDesc(file_account, 16);
 
 /**
  * As - Character stats (the big one)
@@ -913,7 +937,7 @@ export type AccountStats = Message<"dofus.AccountStats"> & {
  * Use `create(AccountStatsSchema)` to create a new message.
  */
 export const AccountStatsSchema: GenMessage<AccountStats> = /*@__PURE__*/
-  messageDesc(file_account, 16);
+  messageDesc(file_account, 17);
 
 /**
  * AN - New level
@@ -932,7 +956,7 @@ export type AccountNewLevel = Message<"dofus.AccountNewLevel"> & {
  * Use `create(AccountNewLevelSchema)` to create a new message.
  */
 export const AccountNewLevelSchema: GenMessage<AccountNewLevel> = /*@__PURE__*/
-  messageDesc(file_account, 17);
+  messageDesc(file_account, 18);
 
 /**
  * AR - Restrictions change
@@ -953,7 +977,7 @@ export type AccountRestrictions = Message<"dofus.AccountRestrictions"> & {
  * Use `create(AccountRestrictionsSchema)` to create a new message.
  */
 export const AccountRestrictionsSchema: GenMessage<AccountRestrictions> = /*@__PURE__*/
-  messageDesc(file_account, 18);
+  messageDesc(file_account, 19);
 
 /**
  * AH - Game server hosts
@@ -972,7 +996,7 @@ export type AccountHosts = Message<"dofus.AccountHosts"> & {
  * Use `create(AccountHostsSchema)` to create a new message.
  */
 export const AccountHostsSchema: GenMessage<AccountHosts> = /*@__PURE__*/
-  messageDesc(file_account, 19);
+  messageDesc(file_account, 20);
 
 /**
  * @generated from message dofus.HostEntry
@@ -1004,7 +1028,7 @@ export type HostEntry = Message<"dofus.HostEntry"> & {
  * Use `create(HostEntrySchema)` to create a new message.
  */
 export const HostEntrySchema: GenMessage<HostEntry> = /*@__PURE__*/
-  messageDesc(file_account, 20);
+  messageDesc(file_account, 21);
 
 /**
  * Ar - Rescue response
@@ -1023,7 +1047,7 @@ export type AccountRescue = Message<"dofus.AccountRescue"> & {
  * Use `create(AccountRescueSchema)` to create a new message.
  */
 export const AccountRescueSchema: GenMessage<AccountRescue> = /*@__PURE__*/
-  messageDesc(file_account, 21);
+  messageDesc(file_account, 22);
 
 /**
  * Ag - Gifts list
@@ -1042,7 +1066,7 @@ export type AccountGiftsList = Message<"dofus.AccountGiftsList"> & {
  * Use `create(AccountGiftsListSchema)` to create a new message.
  */
 export const AccountGiftsListSchema: GenMessage<AccountGiftsList> = /*@__PURE__*/
-  messageDesc(file_account, 22);
+  messageDesc(file_account, 23);
 
 /**
  * @generated from message dofus.GiftEntry
@@ -1099,7 +1123,7 @@ export type GiftEntry = Message<"dofus.GiftEntry"> & {
  * Use `create(GiftEntrySchema)` to create a new message.
  */
 export const GiftEntrySchema: GenMessage<GiftEntry> = /*@__PURE__*/
-  messageDesc(file_account, 23);
+  messageDesc(file_account, 24);
 
 /**
  * AG - Gift stored
@@ -1118,7 +1142,7 @@ export type AccountGiftStored = Message<"dofus.AccountGiftStored"> & {
  * Use `create(AccountGiftStoredSchema)` to create a new message.
  */
 export const AccountGiftStoredSchema: GenMessage<AccountGiftStored> = /*@__PURE__*/
-  messageDesc(file_account, 24);
+  messageDesc(file_account, 25);
 
 /**
  * Aq - Queue position (simple)
@@ -1137,7 +1161,7 @@ export type AccountQueue = Message<"dofus.AccountQueue"> & {
  * Use `create(AccountQueueSchema)` to create a new message.
  */
 export const AccountQueueSchema: GenMessage<AccountQueue> = /*@__PURE__*/
-  messageDesc(file_account, 25);
+  messageDesc(file_account, 26);
 
 /**
  * Af - New queue (detailed)
@@ -1176,7 +1200,7 @@ export type AccountNewQueue = Message<"dofus.AccountNewQueue"> & {
  * Use `create(AccountNewQueueSchema)` to create a new message.
  */
 export const AccountNewQueueSchema: GenMessage<AccountNewQueue> = /*@__PURE__*/
-  messageDesc(file_account, 26);
+  messageDesc(file_account, 27);
 
 /**
  * AV - Regional version
@@ -1195,7 +1219,7 @@ export type AccountRegionalVersion = Message<"dofus.AccountRegionalVersion"> & {
  * Use `create(AccountRegionalVersionSchema)` to create a new message.
  */
 export const AccountRegionalVersionSchema: GenMessage<AccountRegionalVersion> = /*@__PURE__*/
-  messageDesc(file_account, 27);
+  messageDesc(file_account, 28);
 
 /**
  * AP - Generated character name
@@ -1228,7 +1252,7 @@ export type AccountCharacterNameGenerated = Message<"dofus.AccountCharacterNameG
  * Use `create(AccountCharacterNameGeneratedSchema)` to create a new message.
  */
 export const AccountCharacterNameGeneratedSchema: GenMessage<AccountCharacterNameGenerated> = /*@__PURE__*/
-  messageDesc(file_account, 28);
+  messageDesc(file_account, 29);
 
 /**
  * AK - Encryption key
@@ -1254,7 +1278,7 @@ export type AccountKey = Message<"dofus.AccountKey"> & {
  * Use `create(AccountKeySchema)` to create a new message.
  */
 export const AccountKeySchema: GenMessage<AccountKey> = /*@__PURE__*/
-  messageDesc(file_account, 29);
+  messageDesc(file_account, 30);
 
 /**
  * AQ - Secret question
@@ -1273,7 +1297,7 @@ export type AccountSecretQuestion = Message<"dofus.AccountSecretQuestion"> & {
  * Use `create(AccountSecretQuestionSchema)` to create a new message.
  */
 export const AccountSecretQuestionSchema: GenMessage<AccountSecretQuestion> = /*@__PURE__*/
-  messageDesc(file_account, 30);
+  messageDesc(file_account, 31);
 
 /**
  * AD - Character delete
@@ -1292,7 +1316,7 @@ export type AccountCharacterDelete = Message<"dofus.AccountCharacterDelete"> & {
  * Use `create(AccountCharacterDeleteSchema)` to create a new message.
  */
 export const AccountCharacterDeleteSchema: GenMessage<AccountCharacterDelete> = /*@__PURE__*/
-  messageDesc(file_account, 31);
+  messageDesc(file_account, 32);
 
 /**
  * AM - Character migration
@@ -1328,7 +1352,7 @@ export type AccountCharacterMigration = Message<"dofus.AccountCharacterMigration
  * Use `create(AccountCharacterMigrationSchema)` to create a new message.
  */
 export const AccountCharacterMigrationSchema: GenMessage<AccountCharacterMigration> = /*@__PURE__*/
-  messageDesc(file_account, 32);
+  messageDesc(file_account, 33);
 
 /**
  * @generated from enum dofus.AccountCharacterMigration.MigrationType
@@ -1365,7 +1389,7 @@ export enum AccountCharacterMigration_MigrationType {
  * Describes the enum dofus.AccountCharacterMigration.MigrationType.
  */
 export const AccountCharacterMigration_MigrationTypeSchema: GenEnum<AccountCharacterMigration_MigrationType> = /*@__PURE__*/
-  enumDesc(file_account, 32, 0);
+  enumDesc(file_account, 33, 0);
 
 /**
  * AF - Friend server list
@@ -1384,7 +1408,7 @@ export type AccountFriendServerList = Message<"dofus.AccountFriendServerList"> &
  * Use `create(AccountFriendServerListSchema)` to create a new message.
  */
 export const AccountFriendServerListSchema: GenMessage<AccountFriendServerList> = /*@__PURE__*/
-  messageDesc(file_account, 33);
+  messageDesc(file_account, 34);
 
 /**
  * @generated from message dofus.FriendServerEntry
@@ -1406,7 +1430,7 @@ export type FriendServerEntry = Message<"dofus.FriendServerEntry"> & {
  * Use `create(FriendServerEntrySchema)` to create a new message.
  */
 export const FriendServerEntrySchema: GenMessage<FriendServerEntry> = /*@__PURE__*/
-  messageDesc(file_account, 34);
+  messageDesc(file_account, 35);
 
 /**
  * AE - Edit player appearance
@@ -1440,7 +1464,7 @@ export type AccountEditPlayer = Message<"dofus.AccountEditPlayer"> & {
  * Use `create(AccountEditPlayerSchema)` to create a new message.
  */
 export const AccountEditPlayerSchema: GenMessage<AccountEditPlayer> = /*@__PURE__*/
-  messageDesc(file_account, 35);
+  messageDesc(file_account, 36);
 
 /**
  * Am - MiniClip info
@@ -1457,7 +1481,7 @@ export type AccountMiniClipInfo = Message<"dofus.AccountMiniClipInfo"> & {
  * Use `create(AccountMiniClipInfoSchema)` to create a new message.
  */
 export const AccountMiniClipInfoSchema: GenMessage<AccountMiniClipInfo> = /*@__PURE__*/
-  messageDesc(file_account, 36);
+  messageDesc(file_account, 37);
 
 /**
  * Client sends AT<ticket>
@@ -1476,7 +1500,7 @@ export type AccountSendTicket = Message<"dofus.AccountSendTicket"> & {
  * Use `create(AccountSendTicketSchema)` to create a new message.
  */
 export const AccountSendTicketSchema: GenMessage<AccountSendTicket> = /*@__PURE__*/
-  messageDesc(file_account, 37);
+  messageDesc(file_account, 38);
 
 /**
  * Login credentials. Username is plaintext; password is encrypted by
@@ -1502,7 +1526,7 @@ export type AccountSendIdentity = Message<"dofus.AccountSendIdentity"> & {
  * Use `create(AccountSendIdentitySchema)` to create a new message.
  */
 export const AccountSendIdentitySchema: GenMessage<AccountSendIdentity> = /*@__PURE__*/
-  messageDesc(file_account, 38);
+  messageDesc(file_account, 39);
 
 /**
  * Client sends AV (request regional version)
@@ -1517,7 +1541,7 @@ export type AccountRequestRegionalVersion = Message<"dofus.AccountRequestRegiona
  * Use `create(AccountRequestRegionalVersionSchema)` to create a new message.
  */
 export const AccountRequestRegionalVersionSchema: GenMessage<AccountRequestRegionalVersion> = /*@__PURE__*/
-  messageDesc(file_account, 39);
+  messageDesc(file_account, 40);
 
 /**
  * Client sends Ap<port>
@@ -1536,7 +1560,7 @@ export type AccountSendPort = Message<"dofus.AccountSendPort"> & {
  * Use `create(AccountSendPortSchema)` to create a new message.
  */
 export const AccountSendPortSchema: GenMessage<AccountSendPort> = /*@__PURE__*/
-  messageDesc(file_account, 40);
+  messageDesc(file_account, 41);
 
 /**
  * Client sends Ac<communityId>
@@ -1555,7 +1579,7 @@ export type AccountSetCommunity = Message<"dofus.AccountSetCommunity"> & {
  * Use `create(AccountSetCommunitySchema)` to create a new message.
  */
 export const AccountSetCommunitySchema: GenMessage<AccountSetCommunity> = /*@__PURE__*/
-  messageDesc(file_account, 41);
+  messageDesc(file_account, 42);
 
 /**
  * Client sends Ad<pseudo>
@@ -1574,7 +1598,7 @@ export type AccountSetDofusPseudo = Message<"dofus.AccountSetDofusPseudo"> & {
  * Use `create(AccountSetDofusPseudoSchema)` to create a new message.
  */
 export const AccountSetDofusPseudoSchema: GenMessage<AccountSetDofusPseudo> = /*@__PURE__*/
-  messageDesc(file_account, 42);
+  messageDesc(file_account, 43);
 
 /**
  * Client sends AL or ALf
@@ -1595,7 +1619,7 @@ export type AccountGetCharactersList = Message<"dofus.AccountGetCharactersList">
  * Use `create(AccountGetCharactersListSchema)` to create a new message.
  */
 export const AccountGetCharactersListSchema: GenMessage<AccountGetCharactersList> = /*@__PURE__*/
-  messageDesc(file_account, 43);
+  messageDesc(file_account, 44);
 
 /**
  * Client sends Ax
@@ -1610,7 +1634,7 @@ export type AccountGetServersList = Message<"dofus.AccountGetServersList"> & {
  * Use `create(AccountGetServersListSchema)` to create a new message.
  */
 export const AccountGetServersListSchema: GenMessage<AccountGetServersList> = /*@__PURE__*/
-  messageDesc(file_account, 44);
+  messageDesc(file_account, 45);
 
 /**
  * Client sends AX<serverId>
@@ -1629,7 +1653,7 @@ export type AccountSelectServerRequest = Message<"dofus.AccountSelectServerReque
  * Use `create(AccountSelectServerRequestSchema)` to create a new message.
  */
 export const AccountSelectServerRequestSchema: GenMessage<AccountSelectServerRequest> = /*@__PURE__*/
-  messageDesc(file_account, 45);
+  messageDesc(file_account, 46);
 
 /**
  * Client sends AS<charId>
@@ -1648,7 +1672,39 @@ export type AccountSelectCharacter = Message<"dofus.AccountSelectCharacter"> & {
  * Use `create(AccountSelectCharacterSchema)` to create a new message.
  */
 export const AccountSelectCharacterSchema: GenMessage<AccountSelectCharacter> = /*@__PURE__*/
-  messageDesc(file_account, 46);
+  messageDesc(file_account, 47);
+
+/**
+ * Client sends a self-service signup: username + password (both stretched
+ * client-side exactly like AccountSendIdentity) + optional nickname.
+ *
+ * @generated from message dofus.AccountCreateAccount
+ */
+export type AccountCreateAccount = Message<"dofus.AccountCreateAccount"> & {
+  /**
+   * @generated from field: string username = 1;
+   */
+  username: string;
+
+  /**
+   * @generated from field: string encrypted_password = 2;
+   */
+  encryptedPassword: string;
+
+  /**
+   * display nickname; falls back to username when empty
+   *
+   * @generated from field: string pseudo = 3;
+   */
+  pseudo: string;
+};
+
+/**
+ * Describes the message dofus.AccountCreateAccount.
+ * Use `create(AccountCreateAccountSchema)` to create a new message.
+ */
+export const AccountCreateAccountSchema: GenMessage<AccountCreateAccount> = /*@__PURE__*/
+  messageDesc(file_account, 48);
 
 /**
  * Client sends AA<name>|<class>|<sex>|<c1>|<c2>|<c3>
@@ -1694,7 +1750,7 @@ export type AccountCreateCharacter = Message<"dofus.AccountCreateCharacter"> & {
  * Use `create(AccountCreateCharacterSchema)` to create a new message.
  */
 export const AccountCreateCharacterSchema: GenMessage<AccountCreateCharacter> = /*@__PURE__*/
-  messageDesc(file_account, 47);
+  messageDesc(file_account, 49);
 
 /**
  * Client sends AD<charId>|<secretAnswer>
@@ -1718,7 +1774,7 @@ export type AccountDeleteCharacter = Message<"dofus.AccountDeleteCharacter"> & {
  * Use `create(AccountDeleteCharacterSchema)` to create a new message.
  */
 export const AccountDeleteCharacterSchema: GenMessage<AccountDeleteCharacter> = /*@__PURE__*/
-  messageDesc(file_account, 48);
+  messageDesc(file_account, 50);
 
 /**
  * Client sends AR<charId>
@@ -1737,7 +1793,7 @@ export type AccountResetCharacter = Message<"dofus.AccountResetCharacter"> & {
  * Use `create(AccountResetCharacterSchema)` to create a new message.
  */
 export const AccountResetCharacterSchema: GenMessage<AccountResetCharacter> = /*@__PURE__*/
-  messageDesc(file_account, 49);
+  messageDesc(file_account, 51);
 
 /**
  * Client sends AB<bonusId>|<quantity>
@@ -1761,7 +1817,7 @@ export type AccountUseBoost = Message<"dofus.AccountUseBoost"> & {
  * Use `create(AccountUseBoostSchema)` to create a new message.
  */
 export const AccountUseBoostSchema: GenMessage<AccountUseBoost> = /*@__PURE__*/
-  messageDesc(file_account, 50);
+  messageDesc(file_account, 52);
 
 /**
  * Client sends Ar<ticket> or Ar<ticket>|<fightStatus>
@@ -1785,7 +1841,7 @@ export type AccountRescueRequest = Message<"dofus.AccountRescueRequest"> & {
  * Use `create(AccountRescueRequestSchema)` to create a new message.
  */
 export const AccountRescueRequestSchema: GenMessage<AccountRescueRequest> = /*@__PURE__*/
-  messageDesc(file_account, 51);
+  messageDesc(file_account, 53);
 
 /**
  * Client sends Ag<language>
@@ -1804,7 +1860,7 @@ export type AccountGetGifts = Message<"dofus.AccountGetGifts"> & {
  * Use `create(AccountGetGiftsSchema)` to create a new message.
  */
 export const AccountGetGiftsSchema: GenMessage<AccountGetGifts> = /*@__PURE__*/
-  messageDesc(file_account, 52);
+  messageDesc(file_account, 54);
 
 /**
  * Client sends AG<giftId>|<charId>
@@ -1828,7 +1884,7 @@ export type AccountAttributeGift = Message<"dofus.AccountAttributeGift"> & {
  * Use `create(AccountAttributeGiftSchema)` to create a new message.
  */
 export const AccountAttributeGiftSchema: GenMessage<AccountAttributeGift> = /*@__PURE__*/
-  messageDesc(file_account, 53);
+  messageDesc(file_account, 55);
 
 /**
  * Client sends Af
@@ -1843,7 +1899,7 @@ export type AccountGetQueuePosition = Message<"dofus.AccountGetQueuePosition"> &
  * Use `create(AccountGetQueuePositionSchema)` to create a new message.
  */
 export const AccountGetQueuePositionSchema: GenMessage<AccountGetQueuePosition> = /*@__PURE__*/
-  messageDesc(file_account, 54);
+  messageDesc(file_account, 56);
 
 /**
  * Client sends AP
@@ -1858,7 +1914,7 @@ export type AccountGetRandomName = Message<"dofus.AccountGetRandomName"> & {
  * Use `create(AccountGetRandomNameSchema)` to create a new message.
  */
 export const AccountGetRandomNameSchema: GenMessage<AccountGetRandomName> = /*@__PURE__*/
-  messageDesc(file_account, 55);
+  messageDesc(file_account, 57);
 
 /**
  * Client sends Ak<keyId>
@@ -1877,7 +1933,7 @@ export type AccountUseKey = Message<"dofus.AccountUseKey"> & {
  * Use `create(AccountUseKeySchema)` to create a new message.
  */
 export const AccountUseKeySchema: GenMessage<AccountUseKey> = /*@__PURE__*/
-  messageDesc(file_account, 56);
+  messageDesc(file_account, 58);
 
 /**
  * Client sends AEn<name>
@@ -1896,7 +1952,7 @@ export type AccountEditName = Message<"dofus.AccountEditName"> & {
  * Use `create(AccountEditNameSchema)` to create a new message.
  */
 export const AccountEditNameSchema: GenMessage<AccountEditName> = /*@__PURE__*/
-  messageDesc(file_account, 57);
+  messageDesc(file_account, 59);
 
 /**
  * Client sends AEc<c1>|<c2>|<c3>
@@ -1925,7 +1981,7 @@ export type AccountEditColors = Message<"dofus.AccountEditColors"> & {
  * Use `create(AccountEditColorsSchema)` to create a new message.
  */
 export const AccountEditColorsSchema: GenMessage<AccountEditColors> = /*@__PURE__*/
-  messageDesc(file_account, 58);
+  messageDesc(file_account, 60);
 
 /**
  * Client sends AF<nickname>
@@ -1944,7 +2000,7 @@ export type AccountSearchFriend = Message<"dofus.AccountSearchFriend"> & {
  * Use `create(AccountSearchFriendSchema)` to create a new message.
  */
 export const AccountSearchFriendSchema: GenMessage<AccountSearchFriend> = /*@__PURE__*/
-  messageDesc(file_account, 59);
+  messageDesc(file_account, 61);
 
 /**
  * Client sends AM?<charId>;<name> or AM<charId>;<name> or AM-<charId>
@@ -1973,7 +2029,7 @@ export type AccountMigrationRequest = Message<"dofus.AccountMigrationRequest"> &
  * Use `create(AccountMigrationRequestSchema)` to create a new message.
  */
 export const AccountMigrationRequestSchema: GenMessage<AccountMigrationRequest> = /*@__PURE__*/
-  messageDesc(file_account, 60);
+  messageDesc(file_account, 62);
 
 /**
  * Login failure reasons. Mirrors the legacy Dofus 1.29 single-char codes
@@ -2053,6 +2109,54 @@ export const LoginErrorSchema: GenEnum<LoginError> = /*@__PURE__*/
   enumDesc(file_account, 0);
 
 /**
+ * Account self-registration failure reasons. Unlike the legacy 1.29 protocol
+ * (which had no self-service signup), this project exposes an in-client
+ * registration flow, so the error enum is explicit instead of a single char.
+ *
+ * @generated from enum dofus.RegisterError
+ */
+export enum RegisterError {
+  /**
+   * @generated from enum value: REGISTER_ERROR_UNSPECIFIED = 0;
+   */
+  UNSPECIFIED = 0,
+
+  /**
+   * too short / bad characters / already taken
+   *
+   * @generated from enum value: REGISTER_ERROR_INVALID_USERNAME = 1;
+   */
+  INVALID_USERNAME = 1,
+
+  /**
+   * too short
+   *
+   * @generated from enum value: REGISTER_ERROR_WEAK_PASSWORD = 2;
+   */
+  WEAK_PASSWORD = 2,
+
+  /**
+   * nickname malformed
+   *
+   * @generated from enum value: REGISTER_ERROR_INVALID_PSEUDO = 3;
+   */
+  INVALID_PSEUDO = 3,
+
+  /**
+   * unexpected DB/server error
+   *
+   * @generated from enum value: REGISTER_ERROR_BACKEND = 4;
+   */
+  BACKEND = 4,
+}
+
+/**
+ * Describes the enum dofus.RegisterError.
+ */
+export const RegisterErrorSchema: GenEnum<RegisterError> = /*@__PURE__*/
+  enumDesc(file_account, 1);
+
+/**
  * Select-server failure reasons. Canonical enum; legacy single-char codes
  * documented inline match apps/gameserver/pkg/auth/application/servers.go.
  *
@@ -2118,5 +2222,5 @@ export enum SelectServerError {
  * Describes the enum dofus.SelectServerError.
  */
 export const SelectServerErrorSchema: GenEnum<SelectServerError> = /*@__PURE__*/
-  enumDesc(file_account, 1);
+  enumDesc(file_account, 2);
 

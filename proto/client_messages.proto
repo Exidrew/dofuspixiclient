@@ -48,6 +48,7 @@ message ClientMessage {
     AccountEditColors              account_edit_colors             = 31;  // AEc
     AccountSearchFriend            account_search_friend           = 32;  // AF
     AccountMigrationRequest        account_migration               = 33;  // AM
+    AccountCreateAccount           account_create_account          = 34;  // self-service signup
 
     // --- Game (G) ---
     GameCreateRequest              game_create                     = 100; // GC

@@ -168,6 +168,28 @@ export class MapMonsterService {
     return this.maps.get(mapId)?.walkable ?? [];
   }
 
+  /** Every map currently holding a live monster state (players present). */
+  activeMapIds(): number[] {
+    return [...this.maps.keys()];
+  }
+
+  /**
+   * Commit an authoritative position update for a live group after the
+   * movement loop moved it. `walkable` is refreshed so a subsequent
+   * `findGroupAtCell` / PvM trigger sees the new position, and the
+   * direction is snapped to the path's last step.
+   */
+  moveGroup(groupId: number, cellId: number, direction: number): void {
+    for (const state of this.maps.values()) {
+      const group = state.groups.get(groupId);
+      if (group) {
+        group.cellId = cellId;
+        group.direction = direction;
+        return;
+      }
+    }
+  }
+
   clearMap(mapId: number): void {
     this.maps.delete(mapId);
   }

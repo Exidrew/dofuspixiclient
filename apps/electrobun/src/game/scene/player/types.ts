@@ -118,6 +118,14 @@ export interface ActivePlayer {
   speedModerator: number;
   moving: boolean;
   moveResolve?: () => void;
+  /**
+   * Optional pixel offset applied on top of the cell position so
+   * decorative monster-group siblings spread around their leader. The
+   * offset is re-applied on every cell landing (teleport / crossCell /
+   * finishPath) so the cluster keeps its shape while the group wanders,
+   * instead of collapsing onto the leader's cell after a move.
+   */
+  pixelOffset: { x: number; y: number } | null;
   spriteLoading: boolean;
   /** Queued animation request while spriteLoading is true. */
   pendingAnim: { baseAnim: string; direction: number } | null;

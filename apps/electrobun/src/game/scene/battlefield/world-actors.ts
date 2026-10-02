@@ -172,11 +172,7 @@ export class BattlefieldWorldActors {
     // for). Each sibling registers with the same group roster + bonus
     // so hovering or clicking any one of them surfaces the same panel
     // and routes to the same fight-trigger cell.
-    if (
-      data.monsterGroup &&
-      data.monsterGroup.length > 1 &&
-      this.renderer
-    ) {
+    if (data.monsterGroup && data.monsterGroup.length > 1 && this.renderer) {
       await this.spawnGroupSiblings(data, team, groupSpriteIds);
     }
 
@@ -307,6 +303,17 @@ export class BattlefieldWorldActors {
 
   async move(id: number, path: number[]): Promise<void> {
     await this.renderer?.movePlayer(id, path);
+
+    // Decorative monster-group siblings are independent actors with a
+    // fixed pixelOffset around the leader; the server only addresses the
+    // leader's spriteId. Drag them along the same path so a wandering
+    // group keeps its cluster shape instead of leaving ghosts behind.
+    const siblings = this.groupSiblings.get(id);
+    if (siblings && siblings.length > 0) {
+      await Promise.all(
+        siblings.map((sid) => this.renderer?.movePlayer(sid, path))
+      );
+    }
   }
 
   clear(): void {
@@ -369,7 +376,7 @@ export class BattlefieldWorldActors {
     // out of sync (was the user's "HP bar goes to 0 after any damage"
     // bug — onDamage's local delta computation was racing with the
     // store update fired right after).
-    let lastHpKey = new Map<string, string>();
+    const lastHpKey = new Map<string, string>();
     this.fightStoreUnsub = fightStore.subscribe(() => {
       const renderer = this.renderer;
       if (!renderer) return;

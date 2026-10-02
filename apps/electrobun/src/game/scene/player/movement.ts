@@ -103,7 +103,7 @@ export class PlayerMovement {
 
   teleport(player: ActivePlayer, cellId: number): void {
     player.cellId = cellId;
-    const pos = this.cellPos(cellId);
+    const pos = this.cellPos(cellId, player.pixelOffset);
     player.container.x = pos.x;
     player.container.y = pos.y;
     player.container.zIndex = this.deps.calculateZIndex(cellId);
@@ -258,7 +258,7 @@ export class PlayerMovement {
 
   private crossCell(player: ActivePlayer, nextCell: number): void {
     const prevCellId = player.cellId;
-    const toPos = this.cellPos(nextCell);
+    const toPos = this.cellPos(nextCell, player.pixelOffset);
     player.container.x = toPos.x;
     player.container.y = toPos.y;
     player.cellId = nextCell;
@@ -284,7 +284,7 @@ export class PlayerMovement {
     if (player.path.length > 0) {
       const finalCell = player.path[player.path.length - 1];
       if (typeof finalCell === "number") {
-        const finalPos = this.cellPos(finalCell);
+        const finalPos = this.cellPos(finalCell, player.pixelOffset);
         player.cellId = finalCell;
         player.container.x = finalPos.x;
         player.container.y = finalPos.y;
@@ -323,12 +323,22 @@ export class PlayerMovement {
     };
   }
 
-  private cellPos(cellId: number): { x: number; y: number } {
-    return getCellPositionWithSlope(
+  private cellPos(
+    cellId: number,
+    offset?: { x: number; y: number } | null
+  ): {
+    x: number;
+    y: number;
+  } {
+    const pos = getCellPositionWithSlope(
       cellId,
       this.deps.mapWidth(),
       this.deps.groundLevel(),
       this.deps.cellDataMap()
     );
+    if (offset) {
+      return { x: pos.x + offset.x, y: pos.y + offset.y };
+    }
+    return pos;
   }
 }

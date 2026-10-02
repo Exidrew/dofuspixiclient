@@ -1,6 +1,6 @@
 import type { DofusPathfinding } from "@dofus/grid";
-import { clampFightDirection } from "@dofus/grid";
 import type { Sprite } from "pixi.js";
+import { clampFightDirection } from "@dofus/grid";
 import { ColorMatrixFilter, Container, Graphics, Ticker } from "pixi.js";
 
 import type { CellData } from "@/game/datacenter/cell";
@@ -33,11 +33,6 @@ import {
 } from "@/game/scene/player/graphics";
 import { PlayerMovement } from "@/game/scene/player/movement";
 import { PlayerPerfMonitor } from "@/game/scene/player/perf";
-import {
-  clearPlayerNameplates,
-  hidePlayerNameplate,
-  setPlayerNameplate,
-} from "@/hud/world/player-nameplate-store";
 import { PlayerSpriteController } from "@/game/scene/player/sprite-controller";
 import {
   type ActivePlayer,
@@ -45,6 +40,11 @@ import {
   type PlayerSpriteData,
   parseGfxId,
 } from "@/game/scene/player/types";
+import {
+  clearPlayerNameplates,
+  hidePlayerNameplate,
+  setPlayerNameplate,
+} from "@/hud/world/player-nameplate-store";
 import { createLogger } from "@/utils/logger";
 
 const log = createLogger("PlayerRenderer");
@@ -567,9 +567,10 @@ export class PlayerRenderer {
     hidePlayerNameplate(id);
   }
 
-  private computeNameplateAnchor(
-    player: ActivePlayer
-  ): { x: number; y: number } {
+  private computeNameplateAnchor(player: ActivePlayer): {
+    x: number;
+    y: number;
+  } {
     // `getGlobalPosition` walks every parent transform (zoom + pan
     // included), returning the canvas-stage position in CSS pixels —
     // exactly the coord space `HudOverlay`'s wrapper uses.
@@ -709,6 +710,7 @@ export class PlayerRenderer {
       isCharacter: data.isCharacter ?? data.isPlayer,
       speedModerator: move.speedModerator,
       moving: move.moving,
+      pixelOffset: data.pixelOffset ? { ...data.pixelOffset } : null,
       spriteLoading: false,
       pendingAnim: null,
       revertTo: null,

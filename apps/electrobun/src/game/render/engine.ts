@@ -119,6 +119,10 @@ export class Engine {
 
     await this.app.init(initOptions as Parameters<Application["init"]>[0]);
     clampBatchTextures(this.app.renderer);
+    console.info(
+      `[Engine] Pixi ${this.app.renderer.name} maxBatchableTextures=` +
+        `${(this.app.renderer.limits as { maxBatchableTextures: number }).maxBatchableTextures}`
+    );
 
     // Guard against a silent WebGL fallback. The render pipeline hands
     // Vello-owned GPUTextures to Pixi via `ExternalSource`, which only works

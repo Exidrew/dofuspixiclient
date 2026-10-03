@@ -40,6 +40,7 @@ import {
   ItemDropRequestSchema,
   ItemMoveRequestSchema,
   ItemUseRequestSchema,
+  SpellMoveRequestSchema,
 } from "@/game/network/protocol";
 import { HighlightType } from "@/game/scene/overlays/cell-highlighter";
 import { PlayerAnimation } from "@/game/scene/player/animation";
@@ -1139,6 +1140,20 @@ export class GameClient {
           position,
           quantity,
         })
+      )
+    );
+  }
+
+  /**
+   * Drop a known spell into a hotbar slot (Dofus `SM`). The server swaps
+   * it with whatever already occupies the slot and re-emits the spell
+   * list, so `spellsStore` picks up the new positions automatically.
+   */
+  moveSpell(spellId: number, newSlot: number): void {
+    this.connection.send(
+      encodeClient(
+        "spellMove",
+        create(SpellMoveRequestSchema, { spellId, newSlot })
       )
     );
   }

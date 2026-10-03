@@ -36,11 +36,18 @@ export class FightLeaveHandler {
       return;
     }
 
-    // In Active state: end their turn
+    // In Active state: forfeit. The player concedes, so they are counted
+    // as dead for the fight-end check — if their team has no survivors
+    // left, the fight concludes right away (GameEnd). A plain turn
+    // hand-off (the old `runner.requestEnd`) never ended the fight, so
+    // the opponent was left waiting forever.
     if (fight.state.name === StateName.Active) {
       const runner = this.fightRegistry.getRunner(fight.id);
       if (runner) {
-        runner.requestEnd(fighter.id);
+        runner.forfeit(fighter.id);
+      } else {
+        // No runner (e.g. fight torn down): nothing more to do.
+        return;
       }
     }
 

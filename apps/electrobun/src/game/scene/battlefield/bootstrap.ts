@@ -45,6 +45,15 @@ export interface BattlefieldBootstrapContext {
   mapTransition: MapTransition | null;
   pickingSystem: PickingSystem | null;
   atlasLoader: AtlasLoader | null;
+  /**
+   * Which `.dofasset` rasterizer backend `initEngineAndVello` ended up
+   * selecting — "gpu" (default, Vello WASM) or "cpu" (`vello_cpu`
+   * fallback, set when WebGPU/Vello init fails). Read by
+   * `initPickingAndAtlas` (which backend `AtlasLoader` renders tiles with)
+   * and `wireVelloLoaders` (whether to wire the GPU-only
+   * character/spell/UI renderers at all).
+   */
+  rendererBackend: "gpu" | "cpu";
   adjacentMapCache: AdjacentMapCache | null;
   interactionHandler: InteractionHandler | null;
   debugOverlay: DebugOverlay | null;
@@ -64,57 +73,76 @@ export interface BattlefieldBootstrapContext {
 }
 
 /**
- * Init Pixi engine + shared Vello GPU device. Must complete before anything
- * renders — Vello needs the GPUDevice attached before `engine.init()` so the
- * WebGPU pipeline uses the shared device (enables zero-copy texture sharing).
+ * Init Pixi engine + the `.dofasset` rasterizer backend. Must complete
+ * before anything renders.
+ *
+ * Tries Vello WASM + WebGPU first (zero-copy GPU texture sharing — the
+ * fastest path, and the only one covering characters/spells/UI panels for
+ * now). If `navigator.gpu` is missing or Vello fails to acquire a GPU
+ * device, falls back to the CPU rasterizer (`vello_cpu`, no WebGPU
+ * anywhere) instead of failing outright — tiles still render (plain Pixi
+ * buffer textures), fixing the "HUD/menus OK, map is a black canvas" failure
+ * mode for devices without usable WebGPU. Characters/spells/UI panels stay
+ * blank on this path until their renderers get the same CPU treatment
+ * (see `wireVelloLoaders` below).
  */
 export async function initEngineAndVello(
   ctx: BattlefieldBootstrapContext
 ): Promise<void> {
-  // The whole renderer pipeline is WebGPU-only: Vello allocates GPUTextures
-  // that Pixi consumes through `ExternalSource`. If `navigator.gpu` is
-  // missing (or no adapter can be acquired), Pixi would silently fall back
-  // to WebGL and every tile/sprite draw would resolve to nothing — the
-  // player sees the HUD over a black canvas with no error. Detect it up
-  // front and fail loudly instead, so MapRenderer's error overlay shows
-  // the real cause.
-  if (typeof navigator === "undefined" || !("gpu" in navigator)) {
-    // Probe the whole stack so the error message carries the exact failing
-    // link instead of a generic "WebGPU unavailable".
-    const report = await diagnoseWebGPU();
-    throw new Error(
-      "WebGPU is not available in this environment. The game renderer " +
-        "(Vello WASM + PixiJS) requires WebGPU. Use a WebGPU-capable browser " +
-        "(Chrome/Edge 113+) or enable it via chrome://flags/#enable-unsafe-webgpu. " +
-        "In the desktop (Electrobun/CEF) build, the GPU/WebGPU flags in " +
-        "electrobun.config.ts must be active.\n\n" +
-        "WebGPU diagnostics:\n" +
-        formatWebGPUDiagnostic(report)
+  const hasNavigatorGpu =
+    typeof navigator !== "undefined" && "gpu" in navigator;
+
+  let gpuReady = false;
+
+  if (hasNavigatorGpu) {
+    try {
+      const { initVello } = await import("@/game/render/vello-loader");
+      const { gpu } = await initVello();
+      ctx.engine.setGpu(gpu);
+      gpuReady = true;
+      log.info("Vello WASM renderer initialized (zero-copy GPU sharing)");
+    } catch (e) {
+      log.error(
+        "Vello WASM failed to initialize — falling back to the CPU rasterizer (tiles only):",
+        e
+      );
+    }
+  } else {
+    log.warn(
+      "navigator.gpu is unavailable — falling back to the CPU rasterizer (tiles only)."
     );
   }
 
-  try {
-    const { initVello } = await import("@/game/render/vello-loader");
-    const { gpu } = await initVello();
-    ctx.engine.setGpu(gpu);
-    log.info("Vello WASM renderer initialized (zero-copy GPU sharing)");
-  } catch (e) {
-    log.error("Vello WASM failed to initialize — rendering will not work:", e);
-    // Rethrow: continuing here produces a black canvas with a working HUD,
-    // which is indistinguishable from a dozen other bugs. Surface it, and
-    // append the raw WebGPU probe so a WASM-level failure (e.g. "Couldn't
-    // find suitable device") can be told apart from a missing adapter.
-    let probe = "";
+  if (!gpuReady) {
+    ctx.rendererBackend = "cpu";
+    // Tell Pixi to use its WebGL renderer instead of attempting WebGPU on
+    // its own (it has no `gpu` device to share either way since Vello never
+    // created one on this path).
+    ctx.engine.setPreferWebGPU(false);
+
     try {
-      probe = `\n\nWebGPU diagnostics:\n${formatWebGPUDiagnostic(await diagnoseWebGPU())}`;
-    } catch {
-      // diagnostics are best-effort; never mask the original error.
+      const { initCpuRenderer } = await import("@/game/render/cpu-loader");
+      await initCpuRenderer();
+      log.info(
+        "CPU .dofasset rasterizer initialized (no WebGPU) — tiles only; " +
+          "characters/spells/UI panels require WebGPU for now."
+      );
+    } catch (e) {
+      // Both backends failed — this is the one case still worth failing
+      // loudly, same reasoning as the old WebGPU-only gate: continuing
+      // would produce a black canvas with a working HUD and no clear cause.
+      let probe = "";
+      try {
+        probe = `\n\nWebGPU diagnostics:\n${formatWebGPUDiagnostic(await diagnoseWebGPU())}`;
+      } catch {
+        // diagnostics are best-effort; never mask the original error.
+      }
+      throw new Error(
+        `Both the WebGPU (Vello) and CPU .dofasset renderers failed to initialize: ${
+          e instanceof Error ? e.message : String(e)
+        }. The map cannot be drawn.${probe}`
+      );
     }
-    throw new Error(
-      `Vello/WASM renderer failed to initialize: ${
-        e instanceof Error ? e.message : String(e)
-      }. The map and characters cannot be drawn without it.${probe}`
-    );
   }
 
   await ctx.engine.init();
@@ -155,7 +183,11 @@ export function initPickingAndAtlas(ctx: BattlefieldBootstrapContext): void {
     ctx.app.screen.width,
     ctx.app.screen.height
   );
-  ctx.atlasLoader = new AtlasLoader(ctx.app.renderer, "/assets/spritesheets");
+  ctx.atlasLoader = new AtlasLoader(
+    ctx.app.renderer,
+    "/assets/spritesheets",
+    ctx.rendererBackend
+  );
   ctx.spellVelloRenderer = new SpellVelloRenderer(
     ctx.app.renderer,
     "/assets/spritesheets"
@@ -163,12 +195,27 @@ export function initPickingAndAtlas(ctx: BattlefieldBootstrapContext): void {
 }
 
 /**
- * Hand the shared Vello renderer to both tile + character sprite loaders and
- * wire up the debug overlay line. No-op if Vello is unavailable.
+ * Hand the active rasterizer backend to the tile + character sprite loaders
+ * and wire up the debug overlay line.
+ *
+ * On the "cpu" backend (see `initEngineAndVello`), only the tile loader
+ * gets wired — characters, spells, fighter portraits and UI panels still
+ * go through `VelloRenderer`/WebGPU exclusively, so they simply stay blank
+ * until those renderers get a CPU counterpart too.
  */
 export async function wireVelloLoaders(
   ctx: BattlefieldBootstrapContext
 ): Promise<void> {
+  if (ctx.rendererBackend === "cpu") {
+    const { getCpuRenderer } = await import("@/game/render/cpu-loader");
+    const cpu = getCpuRenderer();
+    if (cpu && ctx.atlasLoader) {
+      ctx.atlasLoader.setCpuRenderer(cpu);
+      ctx.adjacentMapCache = new AdjacentMapCache(ctx.atlasLoader);
+    }
+    return;
+  }
+
   const { getVelloRenderer, getMaxTextureSize } = await import(
     "@/game/render/vello-loader"
   );

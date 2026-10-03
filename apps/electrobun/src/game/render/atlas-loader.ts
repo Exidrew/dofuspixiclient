@@ -1,10 +1,11 @@
-import { readTileExtras, type TileExtras } from "@dofus/dofasset-format";
 import type { Renderer, Texture } from "pixi.js";
-import type { VelloRenderer } from "vello-wasm";
+import type { CpuRenderer, VelloRenderer } from "vello-wasm";
+import { readTileExtras, type TileExtras } from "@dofus/dofasset-format";
 
 import type { TileManifest } from "@/game/types";
 import { createLogger } from "@/utils/logger";
 
+import type { VelloAnimationMeta } from "./vello-loader";
 import {
   AtlasCache,
   type AtlasManifest,
@@ -12,8 +13,29 @@ import {
   type SpritesheetManifest,
 } from "./atlas-cache";
 import { getLoadProgress } from "./load-progress";
+import { TileCpuRenderer } from "./tile-cpu-renderer";
 import { convertToTileManifest } from "./tile-manifest-converter";
 import { TileVelloRenderer } from "./tile-vello-renderer";
+
+/**
+ * Common surface both tile backends satisfy structurally — lets
+ * `AtlasLoader` stay agnostic to which one is actually rendering.
+ * `TileVelloRenderer` (GPU, `ExternalSource`/zero-copy) and
+ * `TileCpuRenderer` (CPU, `vello_cpu` + plain buffer upload) both implement
+ * this shape without declaring it explicitly.
+ */
+interface TileRasterizer {
+  hasAsset(tileKey: string): boolean;
+  getAssetBytes(tileKey: string): Uint8Array | undefined;
+  getAnimationMeta(tileKey: string): VelloAnimationMeta | null;
+  loadAsset(tileKey: string): Promise<boolean>;
+  renderFrame(
+    tileKey: string,
+    frameIndex: number,
+    zoom: number,
+    cacheKey: string
+  ): Texture | null;
+}
 
 const log = createLogger("AtlasLoader");
 
@@ -24,18 +46,40 @@ export class AtlasLoader {
     Promise<CachedTileData | null>
   >();
   private currentZoom = 1;
-  private readonly velloRenderer: TileVelloRenderer;
+  private readonly tileRasterizer: TileRasterizer;
 
-  constructor(renderer: Renderer, basePath = "/assets/spritesheets") {
-    this.velloRenderer = new TileVelloRenderer(renderer, basePath);
+  /**
+   * `backend` picks which `.dofasset` rasterizer tiles go through:
+   * "gpu" (default) = Vello WASM + WebGPU zero-copy `ExternalSource`;
+   * "cpu" = `vello_cpu`, no WebGPU anywhere — the fallback for devices
+   * `diagnoseWebGPU()` flags as unusable (see battlefield/bootstrap.ts).
+   */
+  constructor(
+    renderer: Renderer,
+    basePath = "/assets/spritesheets",
+    backend: "gpu" | "cpu" = "gpu"
+  ) {
+    this.tileRasterizer =
+      backend === "cpu"
+        ? new TileCpuRenderer(basePath)
+        : new TileVelloRenderer(renderer, basePath);
   }
 
-  /** Set the Vello renderer (call after vello init, before prefetch). */
+  /** Set the Vello renderer (call after vello init, before prefetch). No-op on the CPU backend. */
   setVelloRenderer(vello: VelloRenderer): void {
-    this.velloRenderer.setVelloRenderer(vello);
+    if (this.tileRasterizer instanceof TileVelloRenderer) {
+      this.tileRasterizer.setVelloRenderer(vello);
+    }
   }
 
-  /** Current zoom determines Vello render resolution. */
+  /** Set the CPU renderer (call after cpu-loader init, before prefetch). No-op on the GPU backend. */
+  setCpuRenderer(cpu: CpuRenderer): void {
+    if (this.tileRasterizer instanceof TileCpuRenderer) {
+      this.tileRasterizer.setCpuRenderer(cpu);
+    }
+  }
+
+  /** Current zoom determines render resolution. */
   setZoom(zoom: number): void {
     this.currentZoom = zoom;
   }
@@ -76,8 +120,8 @@ export class AtlasLoader {
   ): Promise<CachedTileData | null> {
     // Ensure the .dofasset is in Vello (triggers the single fetch that also
     // gives us the Extras section — no more sidecar manifest.json fetch).
-    await this.velloRenderer.loadAsset(tileKey);
-    const bytes = this.velloRenderer.getAssetBytes(tileKey);
+    await this.tileRasterizer.loadAsset(tileKey);
+    const bytes = this.tileRasterizer.getAssetBytes(tileKey);
     if (!bytes) {
       return null;
     }
@@ -97,7 +141,7 @@ export class AtlasLoader {
 
     // Single Vello path-walk per tile, cached forever. Anchor + canvas scale
     // linearly with zoom, so no re-query on zoom changes.
-    const meta = this.velloRenderer.getAnimationMeta(tileKey);
+    const meta = this.tileRasterizer.getAnimationMeta(tileKey);
     if (!meta) {
       log.warn(`Tile ${tileKey} Vello animation meta unavailable`);
       return null;
@@ -162,11 +206,11 @@ export class AtlasLoader {
       return cachedTexture;
     }
 
-    if (!this.velloRenderer.hasAsset(tileKey)) {
-      await this.velloRenderer.loadAsset(tileKey);
+    if (!this.tileRasterizer.hasAsset(tileKey)) {
+      await this.tileRasterizer.loadAsset(tileKey);
     }
 
-    const texture = this.velloRenderer.renderFrame(
+    const texture = this.tileRasterizer.renderFrame(
       tileKey,
       frameIndex,
       this.currentZoom,
@@ -241,11 +285,11 @@ export class AtlasLoader {
       return cached;
     }
 
-    if (!this.velloRenderer.hasAsset(tileKey)) {
+    if (!this.tileRasterizer.hasAsset(tileKey)) {
       return null;
     }
 
-    const texture = this.velloRenderer.renderFrame(
+    const texture = this.tileRasterizer.renderFrame(
       tileKey,
       frameIndex,
       this.currentZoom,
@@ -295,7 +339,7 @@ export class AtlasLoader {
       tileKeys.map(async (key) => {
         await this.loadTileData(key);
         this.getTileManifestSync(key);
-        await this.velloRenderer.loadAsset(key);
+        await this.tileRasterizer.loadAsset(key);
 
         loaded++;
         progress.report("map-tiles", loaded, total);

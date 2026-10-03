@@ -302,6 +302,18 @@ export class Engine {
     this.config.gpu = gpu;
   }
 
+  /**
+   * Override the WebGPU/WebGL preference (call before init). Used by the
+   * CPU-rasterizer fallback path (battlefield/bootstrap.ts) when
+   * `diagnoseWebGPU()`/Vello init fails — tiles render through
+   * `vello_cpu` + plain buffer textures, which work identically on Pixi's
+   * WebGL renderer, so there's no reason to force a WebGPU context Pixi
+   * would otherwise create (and that CEF/the browser may not even support).
+   */
+  setPreferWebGPU(preferWebGPU: boolean): void {
+    this.config.preferWebGPU = preferWebGPU;
+  }
+
   getApp(): Application {
     if (!this.app) {
       throw new Error("Engine not initialized");

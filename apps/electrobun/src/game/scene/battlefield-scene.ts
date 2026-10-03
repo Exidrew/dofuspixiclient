@@ -95,6 +95,14 @@ export class Battlefield {
   private mapContainer: Container | null = null;
   private atlasLoader: AtlasLoader | null = null;
   /**
+   * Which `.dofasset` rasterizer backend is active for this session — "gpu"
+   * (Vello WASM + WebGPU, default) or "cpu" (`vello_cpu`, no WebGPU) when
+   * `initEngineAndVello` falls back after a failed WebGPU/Vello init. Only
+   * tiles render on "cpu" for now; characters/spells/UI panels still
+   * require "gpu" (see `wireVelloLoaders`).
+   */
+  private rendererBackend: "gpu" | "cpu" = "gpu";
+  /**
    * Shared Vello renderer for spell .dofasset binaries. Populated by
    * `initPickingAndAtlas` via the bootstrap context; FightUI pulls it
    * out of the battlefield to hand to its SpellRenderer.
@@ -823,6 +831,15 @@ export class Battlefield {
 
   getApp(): Application | null {
     return this.app;
+  }
+
+  /**
+   * Which `.dofasset` rasterizer backend this session ended up using —
+   * "cpu" means `initEngineAndVello` fell back after WebGPU/Vello failed
+   * (see battlefield/bootstrap.ts). Exposed for debug overlays/diagnostics.
+   */
+  getRendererBackend(): "gpu" | "cpu" {
+    return this.rendererBackend;
   }
 
   getBaseZoom(): number {

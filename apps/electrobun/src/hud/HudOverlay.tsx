@@ -153,6 +153,8 @@ export function HudOverlay({
             ? {
                 onSelectSpell: (spellId) =>
                   gameClient.fightSelectSpell(spellId),
+                onMoveSpell: (spellId, slot) =>
+                  gameClient.moveSpell(spellId, slot),
               }
             : {})}
         />

@@ -23,6 +23,46 @@ export enum ChromaSampling {
     Cs400 = 3,
 }
 
+/**
+ * CPU-only `.dofasset` rasterizer — no `wgpu`/WebGPU/`GPUDevice` anywhere in
+ * this struct. Exists as the fallback path for devices where WebGPU is
+ * unavailable or unreliable (see `webgpu-diagnostics.ts` on the client).
+ * Deliberately independent from `VelloRenderer` (no shared state) so this
+ * increment doesn't risk the existing GPU pipeline. Scope matches
+ * `scene_builder_cpu`: body-part frames + base/delta z-order, no
+ * accessories yet.
+ */
+export class CpuRenderer {
+    free(): void;
+    [Symbol.dispose](): void;
+    /**
+     * Mirrors `VelloRenderer::free_asset`.
+     */
+    freeAsset(id: number): void;
+    /**
+     * Mirrors `VelloRenderer::get_animation_meta` (no accessories — out of
+     * scope for the CPU path for now). Returns `{ width, height, anchorX,
+     * anchorY }`, or `null` if the asset/animation isn't found.
+     */
+    getAnimationMeta(asset_id: number, animation: string, resolution: number): any;
+    getAnimationNames(asset_id: number): string[];
+    /**
+     * Decode a `.dofasset` into `id`. Mirrors `VelloRenderer::load_asset`
+     * (caller-assigned id, magic-byte validation) so the two renderers can
+     * share the same asset-id bookkeeping on the TS side.
+     */
+    loadAsset(id: number, bytes: Uint8Array): boolean;
+    constructor();
+    /**
+     * Rasterize one frame entirely on the CPU. `colors` is an optional
+     * 3-element `[r, g, b]` (packed 0xRRGGBB) player-color array, or an
+     * empty array for "no replacement". Returns `{ rgba, width, height }`
+     * (straight-alpha RGBA8, row-major) — upload directly via
+     * `Texture.fromBuffer` on the JS side, no `ExternalSource` involved.
+     */
+    renderFrame(asset_id: number, animation: string, frame_index: number, resolution: number, colors: Uint32Array): any;
+}
+
 export class VelloRenderer {
     private constructor();
     free(): void;
@@ -217,7 +257,14 @@ export type InitInput = RequestInfo | URL | Response | BufferSource | WebAssembl
 
 export interface InitOutput {
     readonly memory: WebAssembly.Memory;
+    readonly __wbg_cpurenderer_free: (a: number, b: number) => void;
     readonly __wbg_vellorenderer_free: (a: number, b: number) => void;
+    readonly cpurenderer_freeAsset: (a: number, b: number) => void;
+    readonly cpurenderer_getAnimationMeta: (a: number, b: number, c: number, d: number, e: number) => any;
+    readonly cpurenderer_getAnimationNames: (a: number, b: number) => [number, number];
+    readonly cpurenderer_loadAsset: (a: number, b: number, c: number, d: number) => number;
+    readonly cpurenderer_new: () => number;
+    readonly cpurenderer_renderFrame: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number) => any;
     readonly vellorenderer_batchCopy: (a: number, b: number, c: number, d: number) => number;
     readonly vellorenderer_createAtlas: (a: number, b: number, c: number) => any;
     readonly vellorenderer_flushFrames: (a: number, b: number) => void;
@@ -242,9 +289,9 @@ export interface InitOutput {
     readonly vellorenderer_swfAnimFrameCount: (a: number, b: number, c: number, d: number, e: number) => number;
     readonly vellorenderer_swfBundleFrameRate: (a: number, b: number, c: number) => number;
     readonly vellorenderer_swfTileAnimKind: (a: number, b: number, c: number, d: number, e: number) => [number, number];
-    readonly wasm_bindgen_a17927fb6ff7db9f___convert__closures_____invoke___js_sys_1c259585af17ca9b___Function_fn_wasm_bindgen_a17927fb6ff7db9f___JsValue_____wasm_bindgen_a17927fb6ff7db9f___sys__Undefined___js_sys_1c259585af17ca9b___Function_fn_wasm_bindgen_a17927fb6ff7db9f___JsValue_____wasm_bindgen_a17927fb6ff7db9f___sys__Undefined_______true_: (a: number, b: number, c: any, d: any) => void;
-    readonly wasm_bindgen_a17927fb6ff7db9f___convert__closures_____invoke___wasm_bindgen_a17927fb6ff7db9f___JsValue__core_ed718c3d60ebd546___result__Result_____wasm_bindgen_a17927fb6ff7db9f___JsError___true_: (a: number, b: number, c: any) => [number, number];
-    readonly wasm_bindgen_a17927fb6ff7db9f___convert__closures_____invoke___wasm_bindgen_a17927fb6ff7db9f___JsValue______true_: (a: number, b: number, c: any) => void;
+    readonly wasm_bindgen_f1f22d1002885764___convert__closures_____invoke___js_sys_f0cfdae76522e648___Function_fn_wasm_bindgen_f1f22d1002885764___JsValue_____wasm_bindgen_f1f22d1002885764___sys__Undefined___js_sys_f0cfdae76522e648___Function_fn_wasm_bindgen_f1f22d1002885764___JsValue_____wasm_bindgen_f1f22d1002885764___sys__Undefined_______true_: (a: number, b: number, c: any, d: any) => void;
+    readonly wasm_bindgen_f1f22d1002885764___convert__closures_____invoke___wasm_bindgen_f1f22d1002885764___JsValue__core_ed718c3d60ebd546___result__Result_____wasm_bindgen_f1f22d1002885764___JsError___true_: (a: number, b: number, c: any) => [number, number];
+    readonly wasm_bindgen_f1f22d1002885764___convert__closures_____invoke___wasm_bindgen_f1f22d1002885764___JsValue______true_: (a: number, b: number, c: any) => void;
     readonly __wbindgen_malloc: (a: number, b: number) => number;
     readonly __wbindgen_realloc: (a: number, b: number, c: number, d: number) => number;
     readonly __wbindgen_exn_store: (a: number) => void;

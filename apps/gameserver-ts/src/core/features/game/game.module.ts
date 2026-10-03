@@ -17,6 +17,7 @@ import { MoveModule } from "@features/game/move/move.module";
 import { MoveAckModule } from "@features/game/move-ack/move-ack.module";
 import { SelectCharacterModule } from "@features/game/select-character/select-character.module";
 import { SessionLeaveModule } from "@features/game/session-leave/session-leave.module";
+import { SpellMoveModule } from "@features/game/spell-move/spell-move.module";
 import { StatBoostModule } from "@features/game/stat-boost/stat-boost.module";
 import { WaypointUseModule } from "@features/game/waypoint-use/waypoint-use.module";
 import { FightModule } from "@modules/fight/fight.module";
@@ -48,6 +49,7 @@ import { GameRuntimeConfigModule } from "@shared/config/game-runtime";
     FightChallengeModule,
     SessionLeaveModule,
     WaypointUseModule,
+    SpellMoveModule,
   ],
 })
 export class GameModule {}

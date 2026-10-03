@@ -85,6 +85,38 @@ export class Runner {
     }
   }
 
+  /**
+   * A fighter leaves the fight by forfeit (abandon). Unlike a plain turn
+   * pass, this marks the fighter as dead (so `checkFightEnd` counts their
+   * team short one member) and ends the fight immediately if their side
+   * has no survivors left. Without this, `gameLeave` during the Active
+   * state only called `requestEnd` (a turn hand-off) and the fight never
+   * concluded — the opponent was left waiting forever.
+   *
+   * Returns true when the forfeit ended the fight.
+   */
+  forfeit(fighterId: number): boolean {
+    const fighter = this.fight.fighters().find((f) => f.id === fighterId);
+    if (fighter) {
+      fighter.setLp(0);
+      fighter.markLeftFight();
+    }
+    this.active.turnList.remove(fighterId);
+
+    const endCheck = this.fight.checkFightEnd();
+    if (endCheck.ended) {
+      this.sink.broadcast(this.fight, "GE", null);
+      this.stop();
+      return true;
+    }
+
+    // Fight continues: if the forfeiter was mid-turn, hand the turn over.
+    if (this.turn && this.turn.fighter.id === fighterId) {
+      this.endTurn(this.turn);
+    }
+    return false;
+  }
+
   private advanceTurn(): void {
     if (this.stopped) {
       return;

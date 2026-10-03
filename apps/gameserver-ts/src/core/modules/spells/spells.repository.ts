@@ -88,4 +88,28 @@ export class SpellsRepository {
       .executeTakeFirst();
     return row !== undefined;
   }
+
+  /** Set the hotbar slot (position) of a spell the player knows. */
+  async setSpellPosition(
+    playerId: string,
+    spellId: number,
+    position: number
+  ): Promise<void> {
+    await this.txHost.tx
+      .updateTable("playerSpells")
+      .set({ position })
+      .where("playerId", "=", playerId)
+      .where("spellId", "=", spellId)
+      .execute();
+  }
+
+  /** Find the spell the player currently has in a given hotbar slot. */
+  findSpellAtPosition(playerId: string, position: number) {
+    return this.txHost.tx
+      .selectFrom("playerSpells")
+      .select(["spellId", "position"])
+      .where("playerId", "=", playerId)
+      .where("position", "=", position)
+      .executeTakeFirst();
+  }
 }

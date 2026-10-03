@@ -23,6 +23,102 @@ export const ChromaSampling = Object.freeze({
     Cs400: 3, "3": "Cs400",
 });
 
+/**
+ * CPU-only `.dofasset` rasterizer — no `wgpu`/WebGPU/`GPUDevice` anywhere in
+ * this struct. Exists as the fallback path for devices where WebGPU is
+ * unavailable or unreliable (see `webgpu-diagnostics.ts` on the client).
+ * Deliberately independent from `VelloRenderer` (no shared state) so this
+ * increment doesn't risk the existing GPU pipeline. Scope matches
+ * `scene_builder_cpu`: body-part frames + base/delta z-order, no
+ * accessories yet.
+ */
+export class CpuRenderer {
+    __destroy_into_raw() {
+        const ptr = this.__wbg_ptr;
+        this.__wbg_ptr = 0;
+        CpuRendererFinalization.unregister(this);
+        return ptr;
+    }
+    free() {
+        const ptr = this.__destroy_into_raw();
+        wasm.__wbg_cpurenderer_free(ptr, 0);
+    }
+    /**
+     * Mirrors `VelloRenderer::free_asset`.
+     * @param {number} id
+     */
+    freeAsset(id) {
+        wasm.cpurenderer_freeAsset(this.__wbg_ptr, id);
+    }
+    /**
+     * Mirrors `VelloRenderer::get_animation_meta` (no accessories — out of
+     * scope for the CPU path for now). Returns `{ width, height, anchorX,
+     * anchorY }`, or `null` if the asset/animation isn't found.
+     * @param {number} asset_id
+     * @param {string} animation
+     * @param {number} resolution
+     * @returns {any}
+     */
+    getAnimationMeta(asset_id, animation, resolution) {
+        const ptr0 = passStringToWasm0(animation, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len0 = WASM_VECTOR_LEN;
+        const ret = wasm.cpurenderer_getAnimationMeta(this.__wbg_ptr, asset_id, ptr0, len0, resolution);
+        return ret;
+    }
+    /**
+     * @param {number} asset_id
+     * @returns {string[]}
+     */
+    getAnimationNames(asset_id) {
+        const ret = wasm.cpurenderer_getAnimationNames(this.__wbg_ptr, asset_id);
+        var v1 = getArrayJsValueFromWasm0(ret[0], ret[1]);
+        wasm.__wbindgen_free(ret[0], ret[1] * 4, 4);
+        return v1;
+    }
+    /**
+     * Decode a `.dofasset` into `id`. Mirrors `VelloRenderer::load_asset`
+     * (caller-assigned id, magic-byte validation) so the two renderers can
+     * share the same asset-id bookkeeping on the TS side.
+     * @param {number} id
+     * @param {Uint8Array} bytes
+     * @returns {boolean}
+     */
+    loadAsset(id, bytes) {
+        const ptr0 = passArray8ToWasm0(bytes, wasm.__wbindgen_malloc);
+        const len0 = WASM_VECTOR_LEN;
+        const ret = wasm.cpurenderer_loadAsset(this.__wbg_ptr, id, ptr0, len0);
+        return ret !== 0;
+    }
+    constructor() {
+        const ret = wasm.cpurenderer_new();
+        this.__wbg_ptr = ret;
+        CpuRendererFinalization.register(this, this.__wbg_ptr, this);
+        return this;
+    }
+    /**
+     * Rasterize one frame entirely on the CPU. `colors` is an optional
+     * 3-element `[r, g, b]` (packed 0xRRGGBB) player-color array, or an
+     * empty array for "no replacement". Returns `{ rgba, width, height }`
+     * (straight-alpha RGBA8, row-major) — upload directly via
+     * `Texture.fromBuffer` on the JS side, no `ExternalSource` involved.
+     * @param {number} asset_id
+     * @param {string} animation
+     * @param {number} frame_index
+     * @param {number} resolution
+     * @param {Uint32Array} colors
+     * @returns {any}
+     */
+    renderFrame(asset_id, animation, frame_index, resolution, colors) {
+        const ptr0 = passStringToWasm0(animation, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len0 = WASM_VECTOR_LEN;
+        const ptr1 = passArray32ToWasm0(colors, wasm.__wbindgen_malloc);
+        const len1 = WASM_VECTOR_LEN;
+        const ret = wasm.cpurenderer_renderFrame(this.__wbg_ptr, asset_id, ptr0, len0, frame_index, resolution, ptr1, len1);
+        return ret;
+    }
+}
+if (Symbol.dispose) CpuRenderer.prototype[Symbol.dispose] = CpuRenderer.prototype.free;
+
 export class VelloRenderer {
     static __wrap(ptr) {
         const obj = Object.create(VelloRenderer.prototype);
@@ -773,7 +869,7 @@ function __wbg_get_imports() {
                     const a = state0.a;
                     state0.a = 0;
                     try {
-                        return wasm_bindgen_a17927fb6ff7db9f___convert__closures_____invoke___js_sys_1c259585af17ca9b___Function_fn_wasm_bindgen_a17927fb6ff7db9f___JsValue_____wasm_bindgen_a17927fb6ff7db9f___sys__Undefined___js_sys_1c259585af17ca9b___Function_fn_wasm_bindgen_a17927fb6ff7db9f___JsValue_____wasm_bindgen_a17927fb6ff7db9f___sys__Undefined_______true_(a, state0.b, arg0, arg1);
+                        return wasm_bindgen_f1f22d1002885764___convert__closures_____invoke___js_sys_f0cfdae76522e648___Function_fn_wasm_bindgen_f1f22d1002885764___JsValue_____wasm_bindgen_f1f22d1002885764___sys__Undefined___js_sys_f0cfdae76522e648___Function_fn_wasm_bindgen_f1f22d1002885764___JsValue_____wasm_bindgen_f1f22d1002885764___sys__Undefined_______true_(a, state0.b, arg0, arg1);
                     } finally {
                         state0.a = a;
                     }
@@ -1139,13 +1235,13 @@ function __wbg_get_imports() {
             arg0.writeTexture(arg1, arg2, arg3, arg4);
         }, arguments); },
         __wbindgen_generic_0000000000000001: function(arg0, arg1) {
-            // Cast intrinsic for `Closure(Closure { owned: true, function: Function { arguments: [Externref], shim_idx: 193, ret: Result(Unit), inner_ret: Some(Result(Unit)) }, mutable: true }) -> Externref`.
-            const ret = makeMutClosure(arg0, arg1, wasm_bindgen_a17927fb6ff7db9f___convert__closures_____invoke___wasm_bindgen_a17927fb6ff7db9f___JsValue__core_ed718c3d60ebd546___result__Result_____wasm_bindgen_a17927fb6ff7db9f___JsError___true_);
+            // Cast intrinsic for `Closure(Closure { owned: true, function: Function { arguments: [Externref], shim_idx: 198, ret: Result(Unit), inner_ret: Some(Result(Unit)) }, mutable: true }) -> Externref`.
+            const ret = makeMutClosure(arg0, arg1, wasm_bindgen_f1f22d1002885764___convert__closures_____invoke___wasm_bindgen_f1f22d1002885764___JsValue__core_ed718c3d60ebd546___result__Result_____wasm_bindgen_f1f22d1002885764___JsError___true_);
             return ret;
         },
         __wbindgen_generic_0000000000000002: function(arg0, arg1) {
-            // Cast intrinsic for `Closure(Closure { owned: true, function: Function { arguments: [Externref], shim_idx: 255, ret: Unit, inner_ret: Some(Unit) }, mutable: true }) -> Externref`.
-            const ret = makeMutClosure(arg0, arg1, wasm_bindgen_a17927fb6ff7db9f___convert__closures_____invoke___wasm_bindgen_a17927fb6ff7db9f___JsValue______true_);
+            // Cast intrinsic for `Closure(Closure { owned: true, function: Function { arguments: [Externref], shim_idx: 396, ret: Unit, inner_ret: Some(Unit) }, mutable: true }) -> Externref`.
+            const ret = makeMutClosure(arg0, arg1, wasm_bindgen_f1f22d1002885764___convert__closures_____invoke___wasm_bindgen_f1f22d1002885764___JsValue______true_);
             return ret;
         },
         __wbindgen_generic_0000000000000003: function(arg0) {
@@ -1179,19 +1275,19 @@ function __wbg_get_imports() {
     };
 }
 
-function wasm_bindgen_a17927fb6ff7db9f___convert__closures_____invoke___wasm_bindgen_a17927fb6ff7db9f___JsValue______true_(arg0, arg1, arg2) {
-    wasm.wasm_bindgen_a17927fb6ff7db9f___convert__closures_____invoke___wasm_bindgen_a17927fb6ff7db9f___JsValue______true_(arg0, arg1, arg2);
+function wasm_bindgen_f1f22d1002885764___convert__closures_____invoke___wasm_bindgen_f1f22d1002885764___JsValue______true_(arg0, arg1, arg2) {
+    wasm.wasm_bindgen_f1f22d1002885764___convert__closures_____invoke___wasm_bindgen_f1f22d1002885764___JsValue______true_(arg0, arg1, arg2);
 }
 
-function wasm_bindgen_a17927fb6ff7db9f___convert__closures_____invoke___wasm_bindgen_a17927fb6ff7db9f___JsValue__core_ed718c3d60ebd546___result__Result_____wasm_bindgen_a17927fb6ff7db9f___JsError___true_(arg0, arg1, arg2) {
-    const ret = wasm.wasm_bindgen_a17927fb6ff7db9f___convert__closures_____invoke___wasm_bindgen_a17927fb6ff7db9f___JsValue__core_ed718c3d60ebd546___result__Result_____wasm_bindgen_a17927fb6ff7db9f___JsError___true_(arg0, arg1, arg2);
+function wasm_bindgen_f1f22d1002885764___convert__closures_____invoke___wasm_bindgen_f1f22d1002885764___JsValue__core_ed718c3d60ebd546___result__Result_____wasm_bindgen_f1f22d1002885764___JsError___true_(arg0, arg1, arg2) {
+    const ret = wasm.wasm_bindgen_f1f22d1002885764___convert__closures_____invoke___wasm_bindgen_f1f22d1002885764___JsValue__core_ed718c3d60ebd546___result__Result_____wasm_bindgen_f1f22d1002885764___JsError___true_(arg0, arg1, arg2);
     if (ret[1]) {
         throw takeFromExternrefTable0(ret[0]);
     }
 }
 
-function wasm_bindgen_a17927fb6ff7db9f___convert__closures_____invoke___js_sys_1c259585af17ca9b___Function_fn_wasm_bindgen_a17927fb6ff7db9f___JsValue_____wasm_bindgen_a17927fb6ff7db9f___sys__Undefined___js_sys_1c259585af17ca9b___Function_fn_wasm_bindgen_a17927fb6ff7db9f___JsValue_____wasm_bindgen_a17927fb6ff7db9f___sys__Undefined_______true_(arg0, arg1, arg2, arg3) {
-    wasm.wasm_bindgen_a17927fb6ff7db9f___convert__closures_____invoke___js_sys_1c259585af17ca9b___Function_fn_wasm_bindgen_a17927fb6ff7db9f___JsValue_____wasm_bindgen_a17927fb6ff7db9f___sys__Undefined___js_sys_1c259585af17ca9b___Function_fn_wasm_bindgen_a17927fb6ff7db9f___JsValue_____wasm_bindgen_a17927fb6ff7db9f___sys__Undefined_______true_(arg0, arg1, arg2, arg3);
+function wasm_bindgen_f1f22d1002885764___convert__closures_____invoke___js_sys_f0cfdae76522e648___Function_fn_wasm_bindgen_f1f22d1002885764___JsValue_____wasm_bindgen_f1f22d1002885764___sys__Undefined___js_sys_f0cfdae76522e648___Function_fn_wasm_bindgen_f1f22d1002885764___JsValue_____wasm_bindgen_f1f22d1002885764___sys__Undefined_______true_(arg0, arg1, arg2, arg3) {
+    wasm.wasm_bindgen_f1f22d1002885764___convert__closures_____invoke___js_sys_f0cfdae76522e648___Function_fn_wasm_bindgen_f1f22d1002885764___JsValue_____wasm_bindgen_f1f22d1002885764___sys__Undefined___js_sys_f0cfdae76522e648___Function_fn_wasm_bindgen_f1f22d1002885764___JsValue_____wasm_bindgen_f1f22d1002885764___sys__Undefined_______true_(arg0, arg1, arg2, arg3);
 }
 
 
@@ -1220,6 +1316,9 @@ const __wbindgen_enum_GpuTextureSampleType = ["float", "unfilterable-float", "de
 
 
 const __wbindgen_enum_GpuTextureViewDimension = ["1d", "2d", "2d-array", "cube", "cube-array", "3d"];
+const CpuRendererFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_cpurenderer_free(ptr, 1));
 const VelloRendererFinalization = (typeof FinalizationRegistry === 'undefined')
     ? { register: () => {}, unregister: () => {} }
     : new FinalizationRegistry(ptr => wasm.__wbg_vellorenderer_free(ptr, 1));

@@ -101,6 +101,43 @@ describe("Runner", () => {
     expect(true).toBe(true);
   });
 
+  test("forfeit marks the fighter dead and ends the fight when their team is wiped", () => {
+    const { fight, playerFighter } = makeFight();
+    const active = new ActiveState();
+    active.enter(fight);
+    const { sink, broadcasts } = stubSink();
+    const runner = new Runner(fight, active, sink, 30_000);
+
+    const ended = runner.forfeit(playerFighter.id);
+
+    // The player was the only one on team 0 → forfeiting ends the fight.
+    expect(ended).toBe(true);
+    expect(playerFighter.dead).toBe(true);
+    expect(
+      active.turnList.fighters().find((f) => f.id === playerFighter.id)
+    ).toBeUndefined();
+    expect(broadcasts.some((b) => b.messageId === "GE")).toBe(true);
+  });
+
+  test("forfeit keeps the fight alive when the team still has survivors", () => {
+    const { fight, playerFighter } = makeFight();
+    // Add a second player to team 0 so the team survives the forfeit.
+    const ally = new Fighter(3, FighterKind.Player, "ally", 100, 6, 3, 3);
+    ally.cell = 101;
+    fight.teams[0].add(ally);
+    const active = new ActiveState();
+    active.enter(fight);
+    const { sink, broadcasts } = stubSink();
+    const runner = new Runner(fight, active, sink, 30_000);
+
+    const ended = runner.forfeit(playerFighter.id);
+
+    expect(ended).toBe(false);
+    expect(playerFighter.dead).toBe(true);
+    expect(ally.dead).toBe(false);
+    expect(broadcasts.some((b) => b.messageId === "GE")).toBe(false);
+  });
+
   test("setObserver stores observer reference", () => {
     const { fight } = makeFight();
     const active = new ActiveState();

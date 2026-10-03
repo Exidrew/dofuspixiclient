@@ -1,4 +1,6 @@
-import { useState } from "react";
+import { useState, useSyncExternalStore } from "react";
+
+import { spellsStore } from "@/game/stores/spells-store";
 
 import { Panel } from "../components/Panel";
 
@@ -9,10 +11,20 @@ interface SpellsPanelProps {
 
 /**
  * Spells panel: 250x390
- * Filter buttons + spell list + boost points footer
+ * Filter buttons + spell list + boost points footer.
+ *
+ * The spell list is now live: it renders every spell the player knows
+ * (from `spellsStore`, hydrated by the SpellList frame on world entry),
+ * shows the current hotbar slot, and each row is draggable. Dropping a
+ * row on the action bar (BannerReact) sends an `SM` (spell move) which
+ * the server swaps into place.
  */
 export function SpellsPanel({ onClose, zoom = 1 }: SpellsPanelProps) {
   const [activeFilter, setActiveFilter] = useState(0);
+  const { spells } = useSyncExternalStore(
+    spellsStore.subscribe,
+    spellsStore.getSnapshot
+  );
 
   const p = (n: number) => Math.round(n * zoom);
 
@@ -26,10 +38,20 @@ export function SpellsPanel({ onClose, zoom = 1 }: SpellsPanelProps) {
     "#ffcc00",
   ];
 
+  // Sort by hotbar slot so the panel mirrors the action bar, then by id
+  // for the unslotted spells (position = -1).
+  const sorted = [...spells].sort((a, b) => {
+    const ap = a.position >= 1 ? a.position : Number.POSITIVE_INFINITY;
+    const bp = b.position >= 1 ? b.position : Number.POSITIVE_INFINITY;
+    if (ap !== bp) {
+      return ap - bp;
+    }
+    return a.spellId - b.spellId;
+  });
+
   const contentHeight = 390 - 22; // excluding title bar
-  const colHeaderY = p(6 + 14 + 14 + 4); // label(6) + filters(18+4) + section header(14) + spacing(4)
-  const listY = colHeaderY + p(14);
-  const rowH = p(18);
+  const listY = p(6 + 14 + 18 + 4 + 14 + 14); // filters + section + column headers
+  const rowH = p(20);
   const footerY = contentHeight - p(16);
 
   return (
@@ -113,7 +135,7 @@ export function SpellsPanel({ onClose, zoom = 1 }: SpellsPanelProps) {
           style={{
             position: "absolute",
             left: 0,
-            top: colHeaderY,
+            top: p(58),
             width: "100%",
             height: p(14),
             background: "var(--dofus-header-bg, #514a3c)",
@@ -141,9 +163,26 @@ export function SpellsPanel({ onClose, zoom = 1 }: SpellsPanelProps) {
             overflow: "auto",
           }}
         >
-          {[...Array(12)].map((_, i) => (
+          {sorted.length === 0 && (
             <div
-              key={`spell-${i}`}
+              style={{
+                padding: `${p(6)}px ${p(8)}px`,
+                fontSize: p(10),
+                color: "var(--dofus-text-dark, #514a3c)",
+              }}
+            >
+              Aucun sort connu.
+            </div>
+          )}
+          {sorted.map((spell, i) => (
+            <button
+              type="button"
+              key={spell.spellId}
+              draggable
+              onDragStart={(e) => {
+                e.dataTransfer.setData("text/spell-id", String(spell.spellId));
+                e.dataTransfer.effectAllowed = "move";
+              }}
               style={{
                 position: "relative",
                 height: rowH,
@@ -155,16 +194,51 @@ export function SpellsPanel({ onClose, zoom = 1 }: SpellsPanelProps) {
                     : "var(--dofus-bg, #d5cfaa)",
                 fontSize: p(10),
                 display: "flex",
+                alignItems: "center",
                 justifyContent: "space-between",
+                cursor: "grab",
+                boxSizing: "border-box",
+                gap: p(4),
               }}
+              title="Glissez ce sort sur la barre d'action"
             >
               <img
                 src="/themes/classic/assets/panels/spells/spell-slot-background.svg"
-                alt="spell"
-                style={{ width: p(20), height: p(20) }}
+                alt=""
+                style={{ width: p(18), height: p(18), flexShrink: 0 }}
               />
-              <div />
-            </div>
+              <span
+                style={{
+                  flex: 1,
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                  whiteSpace: "nowrap",
+                  color: "var(--dofus-text-dark, #514a3c)",
+                }}
+              >
+                {spell.name}
+              </span>
+              {spell.position >= 1 && (
+                <span
+                  style={{
+                    fontSize: p(9),
+                    fontWeight: "bold",
+                    color: "#e87a0d",
+                    flexShrink: 0,
+                  }}
+                >
+                  {spell.position}
+                </span>
+              )}
+              <span
+                style={{
+                  flexShrink: 0,
+                  color: "var(--dofus-text-dark, #514a3c)",
+                }}
+              >
+                {spell.level}
+              </span>
+            </button>
           ))}
         </div>
 

@@ -20,6 +20,7 @@ import {
   MainBannerMorePanel,
   MainBannerRightPanel,
 } from "@/components/ui/main-banner";
+import { ResourceGauge } from "@/components/ui/resource-gauge";
 import { useSpellCast } from "@/game/machines/spell-cast-selectors";
 import { getSpellIconRenderer } from "@/game/render/spell-icon-renderer";
 import { togglePanel, toggleWorldMap } from "@/game/stores";
@@ -48,6 +49,14 @@ interface SpellHotbarCellProps {
   fight: FightSlotState;
   /** Click handler for fight casts. No-op when fight === "idle". */
   onCast?: ((spellId: number) => void) | undefined;
+  /**
+   * Called when a spell is dragged from the spellbook onto this slot.
+   * `slot` is the 1-based hotbar slot (as stored server-side). Enables
+   * the "drag a spell into the action bar" flow.
+   */
+  onDropSpell?: ((spellId: number, slot: number) => void) | undefined;
+  /** 0-based hotbar index of this cell — passed through to onDropSpell. */
+  slotIndex?: number;
 }
 
 /**
@@ -190,9 +199,36 @@ const FIGHT_SLOT_OVERLAY: Record<FightSlotState, string> = {
  * treatment reflects the spell-cast machine + per-spell affordability.
  * Outside a fight the cell is purely informational (hover tooltip).
  */
-function SpellHotbarCell({ spell, fight, onCast }: SpellHotbarCellProps) {
+function SpellHotbarCell({
+  spell,
+  fight,
+  onCast,
+  onDropSpell,
+  slotIndex,
+}: SpellHotbarCellProps) {
+  const dropProps =
+    onDropSpell !== undefined && slotIndex !== undefined
+      ? {
+          onDragOver: (e: React.DragEvent) => {
+            if (e.dataTransfer.types.includes("text/spell-id")) {
+              e.preventDefault();
+              e.dataTransfer.dropEffect = "move";
+            }
+          },
+          onDrop: (e: React.DragEvent) => {
+            const raw = e.dataTransfer.getData("text/spell-id");
+            const spellId = Number(raw);
+            if (Number.isFinite(spellId) && spellId > 0) {
+              e.preventDefault();
+              // slotIndex is 0-based; the wire/DB slot is 1-based.
+              onDropSpell(spellId, slotIndex + 1);
+            }
+          },
+        }
+      : {};
+
   if (!spell) {
-    return <MainBannerGridSlot />;
+    return <MainBannerGridSlot {...dropProps} />;
   }
   const overlay = FIGHT_SLOT_OVERLAY[fight];
   const clickable =
@@ -200,7 +236,8 @@ function SpellHotbarCell({ spell, fight, onCast }: SpellHotbarCellProps) {
     fight !== "disabled" &&
     fight !== "cooldown" &&
     fight !== "pending";
-  const handleClick = clickable && onCast ? () => onCast(spell.spellId) : undefined;
+  const handleClick =
+    clickable && onCast ? () => onCast(spell.spellId) : undefined;
   const cooldownBadge =
     fight === "cooldown" && spell.cooldownRemaining > 0 ? (
       <span className="absolute inset-0 z-20 flex items-center justify-center font-[Verdana,sans-serif] text-[calc(14px*var(--resolution-factor))] font-bold text-white drop-shadow-[0_0_2px_#000] pointer-events-none">
@@ -220,6 +257,7 @@ function SpellHotbarCell({ spell, fight, onCast }: SpellHotbarCellProps) {
           <MainBannerGridSlot
             className={overlay}
             {...(handleClick ? { onClick: handleClick } : {})}
+            {...dropProps}
           >
             <SpellIconMount spellId={spell.spellId} label={spell.name} />
             {apBadge}
@@ -229,11 +267,11 @@ function SpellHotbarCell({ spell, fight, onCast }: SpellHotbarCellProps) {
       />
       <Tooltip.Portal>
         {/* Positioner is the floating-UI fixed container; the z-index
-          * has to live here, not on Popup, or the entire tooltip stacks
-          * under any HUD panel with higher z-index than the Positioner's
-          * default. 999999 matches the app's custom tooltip layer
-          * (`hud/components/Tooltip.tsx`) so spell tooltips float above
-          * world-map / fight / conquest panels. */}
+         * has to live here, not on Popup, or the entire tooltip stacks
+         * under any HUD panel with higher z-index than the Positioner's
+         * default. 999999 matches the app's custom tooltip layer
+         * (`hud/components/Tooltip.tsx`) so spell tooltips float above
+         * world-map / fight / conquest panels. */}
         <Tooltip.Positioner sideOffset={6} style={{ zIndex: 999999 }}>
           {/*
             Canonical Dofus 1.29 spell tooltip styling — sourced from
@@ -304,16 +342,21 @@ const ICON_BUTTONS = [
 interface BannerReactProps {
   /** Callback when a spell slot is clicked during a fight (cast/select). */
   onSelectSpell?: (spellId: number) => void;
+  /** Callback when a spell is dropped onto a hotbar slot (0-based slot). */
+  onMoveSpell?: (spellId: number, slot: number) => void;
 }
 
-export function BannerReact({ onSelectSpell }: BannerReactProps = {}) {
+export function BannerReact({
+  onSelectSpell,
+  onMoveSpell,
+}: BannerReactProps = {}) {
   const { stats } = useSyncExternalStore(
     characterStore.subscribe,
-    characterStore.getSnapshot,
+    characterStore.getSnapshot
   );
   const { spells } = useSyncExternalStore(
     spellsStore.subscribe,
-    spellsStore.getSnapshot,
+    spellsStore.getSnapshot
   );
 
   const fight = useFightMode();
@@ -335,17 +378,19 @@ export function BannerReact({ onSelectSpell }: BannerReactProps = {}) {
   const maxHp = myFighter?.maxHp ?? stats?.maxHp ?? 100;
 
   /**
-   * Project the SpellEntry list into fixed HOTBAR_SLOTS cells, keyed by
-   * `position` (0-based). Positions outside the bar are dropped; duplicate
+   * Project the SpellEntry list into fixed HOTBAR_SLOTS cells. The server
+   * stores positions 1-based (`class_starter_spells` seeds 1..N, and the
+   * Dofus `SM` wire slot is 1..N), so we subtract 1 to index the 0-based
+   * slots array. Positions outside the bar are dropped; duplicate
    * positions collide — the last one wins, matching Dofus 1.29's drag-and-
-   * drop semantics. Out-of-bar spells (no position assigned) can live in
-   * the Sorts panel later; for now they just don't show in the hotbar.
+   * drop semantics. Out-of-bar spells (position = -1) don't show here.
    */
   const hotbar = useMemo<(SpellEntry | null)[]>(() => {
     const slots: (SpellEntry | null)[] = Array(HOTBAR_SLOTS).fill(null);
     for (const s of spells) {
-      if (s.position < 0 || s.position >= HOTBAR_SLOTS) continue;
-      slots[s.position] = s;
+      const slot = s.position - 1;
+      if (slot < 0 || slot >= HOTBAR_SLOTS) continue;
+      slots[slot] = s;
     }
     return slots;
   }, [spells]);
@@ -370,7 +415,14 @@ export function BannerReact({ onSelectSpell }: BannerReactProps = {}) {
       if (spell.apCost > fight.ap) return "unaffordable";
       return "ready";
     });
-  }, [hotbar, fight.isCombat, fight.isMyTurn, fight.ap, cast.selectedSpellId, cast.isPending]);
+  }, [
+    hotbar,
+    fight.isCombat,
+    fight.isMyTurn,
+    fight.ap,
+    cast.selectedSpellId,
+    cast.isPending,
+  ]);
 
   const handleIconClick = (panel: string) => {
     if (panel === "map") {
@@ -391,6 +443,33 @@ export function BannerReact({ onSelectSpell }: BannerReactProps = {}) {
         </MainBannerCircle>
 
         <MainBannerHeart hp={hp} max={maxHp} />
+
+        {/* In-fight AP/MP readout — pinned right next to the HP heart so
+            the player can always see how many action / movement points
+            are left without looking at the top-right overlay. Hidden
+            outside combat (roleplay has no AP/MP). */}
+        {fight.isCombat && (
+          <div
+            className="absolute z-10 flex flex-col gap-[calc(2px*var(--resolution-factor))]"
+            style={{
+              left: "calc(352px * var(--resolution-factor))",
+              top: "calc(6px * var(--resolution-factor))",
+            }}
+          >
+            <ResourceGauge
+              variant="ap"
+              value={fight.ap}
+              max={fight.maxAp}
+              className="h-[calc(22px*var(--resolution-factor))] px-[calc(6px*var(--resolution-factor))] text-[calc(12px*var(--resolution-factor))]"
+            />
+            <ResourceGauge
+              variant="mp"
+              value={fight.mp}
+              max={fight.maxMp}
+              className="h-[calc(22px*var(--resolution-factor))] px-[calc(6px*var(--resolution-factor))] text-[calc(12px*var(--resolution-factor))]"
+            />
+          </div>
+        )}
 
         <MainBannerButtons>
           {ICON_BUTTONS.map(({ icon, panel }) => (
@@ -427,6 +506,8 @@ export function BannerReact({ onSelectSpell }: BannerReactProps = {}) {
                 spell={spell}
                 fight={fightStates[i] ?? "idle"}
                 onCast={onSelectSpell}
+                onDropSpell={onMoveSpell}
+                slotIndex={i}
               />
             ))}
           </Tooltip.Provider>

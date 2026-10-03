@@ -45,6 +45,55 @@ export class SpellsService implements SpellPort {
   }
 
   /**
+   * Move a known spell into a hotbar slot, swapping with whatever spell
+   * already occupies it (canonical Dofus 1.29 `SM` semantics). Both the
+   * moved spell and the displaced spell end up with a valid position, so
+   * the client can re-render the bar without losing either.
+   *
+   * Returns the resulting positions as `{ spellId, position }` pairs, or
+   * an empty array when the move is invalid (unknown spell / out-of-range
+   * slot).
+   */
+  async moveSpell(
+    playerId: string,
+    spellId: number,
+    newSlot: number
+  ): Promise<{ spellId: number; position: number }[]> {
+    if (newSlot < 1) {
+      return [];
+    }
+    if (!(await this.repo.playerHasSpell(playerId, spellId))) {
+      return [];
+    }
+
+    const current = await this.repo.findByPlayer(playerId);
+    const moving = current.find((s) => s.spellId === spellId);
+    if (!moving) {
+      return [];
+    }
+    const oldSlot = moving.position;
+    if (oldSlot === newSlot) {
+      return [{ spellId, position: newSlot }];
+    }
+
+    const displaced = current.find((s) => s.position === newSlot);
+    const updates: { spellId: number; position: number }[] = [
+      { spellId, position: newSlot },
+    ];
+    if (displaced) {
+      // Swap: the displaced spell takes the mover's old slot. If the
+      // mover had no slot (-1), the displaced one simply becomes
+      // unslotted (-1) like a normal Dofus swap with an empty slot.
+      updates.push({ spellId: displaced.spellId, position: oldSlot });
+    }
+
+    for (const u of updates) {
+      await this.repo.setSpellPosition(playerId, u.spellId, u.position);
+    }
+    return updates;
+  }
+
+  /**
    * Build the full SpellList payload for a player — one SpellData per
    * known spell, hydrated with the level row so the client has
    * everything needed to render + gate the spell-cast UI locally

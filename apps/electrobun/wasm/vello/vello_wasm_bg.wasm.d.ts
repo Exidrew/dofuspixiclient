@@ -1,7 +1,14 @@
 /* tslint:disable */
 /* eslint-disable */
 export const memory: WebAssembly.Memory;
+export const __wbg_cpurenderer_free: (a: number, b: number) => void;
 export const __wbg_vellorenderer_free: (a: number, b: number) => void;
+export const cpurenderer_freeAsset: (a: number, b: number) => void;
+export const cpurenderer_getAnimationMeta: (a: number, b: number, c: number, d: number, e: number) => any;
+export const cpurenderer_getAnimationNames: (a: number, b: number) => [number, number];
+export const cpurenderer_loadAsset: (a: number, b: number, c: number, d: number) => number;
+export const cpurenderer_new: () => number;
+export const cpurenderer_renderFrame: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number) => any;
 export const vellorenderer_batchCopy: (a: number, b: number, c: number, d: number) => number;
 export const vellorenderer_createAtlas: (a: number, b: number, c: number) => any;
 export const vellorenderer_flushFrames: (a: number, b: number) => void;
@@ -26,9 +33,9 @@ export const vellorenderer_setSwfPlayerColors: (a: number, b: number, c: number,
 export const vellorenderer_swfAnimFrameCount: (a: number, b: number, c: number, d: number, e: number) => number;
 export const vellorenderer_swfBundleFrameRate: (a: number, b: number, c: number) => number;
 export const vellorenderer_swfTileAnimKind: (a: number, b: number, c: number, d: number, e: number) => [number, number];
-export const wasm_bindgen_a17927fb6ff7db9f___convert__closures_____invoke___js_sys_1c259585af17ca9b___Function_fn_wasm_bindgen_a17927fb6ff7db9f___JsValue_____wasm_bindgen_a17927fb6ff7db9f___sys__Undefined___js_sys_1c259585af17ca9b___Function_fn_wasm_bindgen_a17927fb6ff7db9f___JsValue_____wasm_bindgen_a17927fb6ff7db9f___sys__Undefined_______true_: (a: number, b: number, c: any, d: any) => void;
-export const wasm_bindgen_a17927fb6ff7db9f___convert__closures_____invoke___wasm_bindgen_a17927fb6ff7db9f___JsValue__core_ed718c3d60ebd546___result__Result_____wasm_bindgen_a17927fb6ff7db9f___JsError___true_: (a: number, b: number, c: any) => [number, number];
-export const wasm_bindgen_a17927fb6ff7db9f___convert__closures_____invoke___wasm_bindgen_a17927fb6ff7db9f___JsValue______true_: (a: number, b: number, c: any) => void;
+export const wasm_bindgen_f1f22d1002885764___convert__closures_____invoke___js_sys_f0cfdae76522e648___Function_fn_wasm_bindgen_f1f22d1002885764___JsValue_____wasm_bindgen_f1f22d1002885764___sys__Undefined___js_sys_f0cfdae76522e648___Function_fn_wasm_bindgen_f1f22d1002885764___JsValue_____wasm_bindgen_f1f22d1002885764___sys__Undefined_______true_: (a: number, b: number, c: any, d: any) => void;
+export const wasm_bindgen_f1f22d1002885764___convert__closures_____invoke___wasm_bindgen_f1f22d1002885764___JsValue__core_ed718c3d60ebd546___result__Result_____wasm_bindgen_f1f22d1002885764___JsError___true_: (a: number, b: number, c: any) => [number, number];
+export const wasm_bindgen_f1f22d1002885764___convert__closures_____invoke___wasm_bindgen_f1f22d1002885764___JsValue______true_: (a: number, b: number, c: any) => void;
 export const __wbindgen_malloc: (a: number, b: number) => number;
 export const __wbindgen_realloc: (a: number, b: number, c: number, d: number) => number;
 export const __wbindgen_exn_store: (a: number) => void;

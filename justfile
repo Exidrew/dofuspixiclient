@@ -49,9 +49,12 @@ default:
 # Setup & Development
 # =============================================================================
 
-# Full setup: install deps, create DB, run migrations, build WASM
-setup: install db wasm
-    @echo "Setup complete."
+# Full setup: install deps, create DB, run migrations.
+# The Vello WASM renderer is VENDORED at apps/electrobun/wasm/vello (prebuilt
+# .wasm committed) so NO Rust toolchain / wasm-pack / sibling repo is needed.
+# Rebuilding it from source is a maintainer-only, optional step: `just wasm`.
+setup: install db
+    @echo "Setup complete. Start the server with 'just server', then the client with 'just client-hmr'."
 
 # Install all JS/TS dependencies
 install:
@@ -117,10 +120,19 @@ server:
     cd {{root}}/apps/gameserver-ts && \
     DATABASE_URL="{{db_url}}" REDIS_URL="{{redis_url}}" GATEWAY_PORT={{gateway_port}} bun run dev:gateway
 
-# Build the Vello WASM renderer (shared dofus-vello-custom-format sibling repo)
+# Rebuild the Vello WASM renderer from source (MAINTAINERS ONLY, optional).
+#
+# The prebuilt `.wasm` is VENDORED at apps/electrobun/wasm/vello and committed
+# to the repo, so normal users never need this target — `just setup` works with
+# zero Rust. Only run it to upgrade the shared renderer; then commit the updated
+# files under apps/electrobun/wasm/vello.
+#
+# Requires the sibling `vello-dofasset-format` repo, wasm-pack, cargo, a C
+# linker and the wasm32-unknown-unknown target.
 wasm:
     @if ! command -v wasm-pack >/dev/null 2>&1; then \
         echo "error: wasm-pack not found on PATH."; \
+        echo "       This target is OPTIONAL (maintainers only) — the WASM is vendored."; \
         echo "       Install it: https://rustwasm.github.io/wasm-pack/installer/"; \
         exit 1; \
     fi
@@ -130,7 +142,7 @@ wasm:
     @bash "{{root}}/tools/setup/check-vello-build-deps.sh"
     @if [ ! -f "{{vello_wasm}}/Cargo.toml" ]; then \
         echo "error: Vello WASM crate not found at {{vello_wasm}}"; \
-        echo "       The shared renderer lives in its own repo and is not vendored here."; \
+        echo "       The shared renderer lives in its own repo (maintainer build only)."; \
         echo "       Clone it next to this project (any folder name works — it is"; \
         echo "       auto-detected as ../dofus-vello-custom-format or ../vello-dofasset-format):"; \
         echo "         git clone https://github.com/HetwanDofus/vello-dofasset-format.git \\"; \
@@ -139,6 +151,14 @@ wasm:
         exit 1; \
     fi
     cd "{{vello_wasm}}" && wasm-pack build --target web --release
+    @# Re-vendor the freshly built artifacts so the client picks them up
+    @# without any sibling repo. Run this after a successful build, then commit.
+    @echo "Re-vendoring WASM into apps/electrobun/wasm/vello ..."
+    cp "{{vello_wasm}}/pkg/vello_wasm_bg.wasm" "{{root}}/apps/electrobun/wasm/vello/vello_wasm_bg.wasm"
+    cp "{{vello_wasm}}/pkg/vello_wasm.js" "{{root}}/apps/electrobun/wasm/vello/vello_wasm.js"
+    cp "{{vello_wasm}}/pkg/vello_wasm.d.ts" "{{root}}/apps/electrobun/wasm/vello/vello_wasm.d.ts"
+    cp "{{vello_wasm}}/pkg/vello_wasm_bg.wasm.d.ts" "{{root}}/apps/electrobun/wasm/vello/vello_wasm_bg.wasm.d.ts"
+    @echo "Done. Commit apps/electrobun/wasm/vello/* to ship the new renderer."
 
 # Start the client (Electrobun dev mode)
 client:

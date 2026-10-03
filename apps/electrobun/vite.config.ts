@@ -492,7 +492,11 @@ export default defineConfig({
   resolve: {
     alias: {
       "@": resolve(__dirname, "./src"),
-      "vello-wasm": resolve(__dirname, "../../../vello-dofasset-format/packages/vello-wasm/pkg"),
+      // Vello WASM renderer — VENDORED under apps/electrobun/wasm/vello so the
+      // client builds with NO Rust toolchain and NO sibling repo checkout.
+      // The prebuilt `.wasm` (a static, portable artifact) is committed here.
+      // To rebuild it from source, see `just wasm` (optional, maintainers only).
+      "vello-wasm": resolve(__dirname, "./wasm/vello"),
     },
   },
   build: {
@@ -511,15 +515,12 @@ export default defineConfig({
       ignored: ["**/public/**"],
     },
     fs: {
-      // Allow serving files from the vello-wasm pkg directory (outside project root).
-      // NOTE: Vite compares REAL paths (realpath), so we must list the real
-      // directory `vello-dofasset-format` — NOT the `dofus-vello-custom-format`
-      // symlink, whose realpath resolves to `vello-dofasset-format` and would
-      // otherwise be rejected ("outside of Vite serving allow list") which
-      // makes the WASM fetch fail and leaves the game canvas black.
+      // Allow serving files from the vendored Vello WASM directory. It lives
+      // inside the project (`apps/electrobun/wasm/vello`), so the default
+      // serving root already covers it — listed explicitly for clarity.
       allow: [
         resolve(__dirname, "../.."),
-        resolve(__dirname, "../../../vello-dofasset-format/packages/vello-wasm/pkg"),
+        resolve(__dirname, "./wasm/vello"),
       ],
     },
   },

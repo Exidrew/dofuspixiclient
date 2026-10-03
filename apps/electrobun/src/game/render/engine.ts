@@ -15,6 +15,7 @@ import {
   ZOOM_LEVELS,
 } from "@/game/constants/battlefield";
 import { clampBatchTextures } from "@/game/render/pixi-batch-limits";
+import "@/game/render/pixi-canvas-format";
 
 extensions.add(LayoutSystem);
 TextureSource.defaultOptions.scaleMode = "nearest";

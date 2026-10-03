@@ -88,4 +88,47 @@ export class SpellsRepository {
       .executeTakeFirst();
     return row !== undefined;
   }
+
+  /**
+   * Moves a spell to a hotbar slot. Whatever occupied the slot takes the
+   * mover's previous position (swap); `newSlot = -1` unslots the spell.
+   * Returns false when the player does not own the spell.
+   */
+  moveSpell(
+    playerId: string,
+    spellId: number,
+    newSlot: number
+  ): Promise<boolean> {
+    return this.txHost.withTransaction(async () => {
+      const mover = await this.txHost.tx
+        .selectFrom("playerSpells")
+        .select("position")
+        .where("playerId", "=", playerId)
+        .where("spellId", "=", spellId)
+        .executeTakeFirst();
+
+      if (!mover) {
+        return false;
+      }
+
+      if (newSlot > 0) {
+        await this.txHost.tx
+          .updateTable("playerSpells")
+          .set({ position: mover.position > 0 ? mover.position : -1 })
+          .where("playerId", "=", playerId)
+          .where("position", "=", newSlot)
+          .where("spellId", "!=", spellId)
+          .execute();
+      }
+
+      await this.txHost.tx
+        .updateTable("playerSpells")
+        .set({ position: newSlot > 0 ? newSlot : -1 })
+        .where("playerId", "=", playerId)
+        .where("spellId", "=", spellId)
+        .execute();
+
+      return true;
+    });
+  }
 }

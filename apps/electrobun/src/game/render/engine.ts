@@ -14,6 +14,7 @@ import {
   GAME_WIDTH,
   ZOOM_LEVELS,
 } from "@/game/constants/battlefield";
+import { clampBatchTextures } from "@/game/render/pixi-batch-limits";
 
 extensions.add(LayoutSystem);
 TextureSource.defaultOptions.scaleMode = "nearest";
@@ -117,6 +118,7 @@ export class Engine {
     }
 
     await this.app.init(initOptions as Parameters<Application["init"]>[0]);
+    clampBatchTextures(this.app.renderer);
 
     // Guard against a silent WebGL fallback. The render pipeline hands
     // Vello-owned GPUTextures to Pixi via `ExternalSource`, which only works

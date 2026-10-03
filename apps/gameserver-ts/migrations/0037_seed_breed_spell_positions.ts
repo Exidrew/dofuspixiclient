@@ -17,19 +17,23 @@ import { type Kysely, sql } from "kysely";
  */
 
 // Dofus 1.29 class -> starting spell id range. Inclusive bounds.
+// The 12 breed spell sets are laid out CONSECUTIVELY in blocks of 20
+// (Feca 1-20, Osamodas 21-40, ...). The previous speculative ranges
+// (Feca 401-411, ...) pointed at ids that do not exist in
+// `spell_templates`, so no player ever got a slotted spell.
 const BREED_RANGES: ReadonlyArray<{ cls: number; lo: number; hi: number }> = [
-  { cls: 1, lo: 401, hi: 411 }, // Feca
-  { cls: 2, lo: 201, hi: 211 }, // Osamodas
-  { cls: 3, lo: 301, hi: 311 }, // Enutrof
-  { cls: 4, lo: 501, hi: 511 }, // Sram
-  { cls: 5, lo: 701, hi: 711 }, // Xelor
-  { cls: 6, lo: 601, hi: 611 }, // Ecaflip
-  { cls: 7, lo: 901, hi: 911 }, // Eniripsa
-  { cls: 8, lo: 101, hi: 111 }, // Iop
-  { cls: 9, lo: 1001, hi: 1011 }, // Cra
-  { cls: 10, lo: 1101, hi: 1111 }, // Sadida
-  { cls: 11, lo: 1201, hi: 1211 }, // Sacrieur
-  { cls: 12, lo: 2001, hi: 2011 }, // Pandawa
+  { cls: 1, lo: 1, hi: 20 }, // Feca
+  { cls: 2, lo: 21, hi: 40 }, // Osamodas
+  { cls: 3, lo: 41, hi: 60 }, // Enutrof
+  { cls: 4, lo: 61, hi: 80 }, // Sram
+  { cls: 5, lo: 81, hi: 100 }, // Xelor
+  { cls: 6, lo: 101, hi: 120 }, // Ecaflip
+  { cls: 7, lo: 121, hi: 140 }, // Eniripsa
+  { cls: 8, lo: 141, hi: 160 }, // Iop
+  { cls: 9, lo: 161, hi: 180 }, // Cra
+  { cls: 10, lo: 181, hi: 200 }, // Sadida
+  { cls: 11, lo: 201, hi: 220 }, // Sacrieur
+  { cls: 12, lo: 221, hi: 240 }, // Pandawa
 ];
 
 export async function up(db: Kysely<never>): Promise<void> {

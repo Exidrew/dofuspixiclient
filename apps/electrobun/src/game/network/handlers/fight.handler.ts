@@ -92,6 +92,18 @@ export interface FightEventHandlers {
   onMovement?: (payload: GameMovement) => void;
   onZoneAdd?: (payload: ZonePayload) => void;
   onZoneRemove?: (payload: ZonePayload) => void;
+  /** Duel invitation addressed to the local player (GA 900). */
+  onChallengeProposed?: (payload: { challengerCharacterId: string }) => void;
+  /** Our duel invitation was accepted (GA 901). */
+  onChallengeAccepted?: (payload: {
+    challengerCharacterId: string;
+    targetCharacterId: string;
+  }) => void;
+  /** A duel invitation was refused / expired (GA 902). */
+  onChallengeCancelled?: (payload: {
+    cancelerCharacterId: string;
+    otherCharacterId: string;
+  }) => void;
 }
 
 /**
@@ -305,9 +317,7 @@ export class FightHandler {
               color1: c1,
               color2: c2,
               color3: c3,
-              ...(entry.isSummoned
-                ? { summonedBy: entry.spriteId }
-                : {}),
+              ...(entry.isSummoned ? { summonedBy: entry.spriteId } : {}),
             },
           });
         }
@@ -338,6 +348,40 @@ export class FightHandler {
 
   private routeAction(action: GameAction): void {
     const data = action.actionData;
+
+    // ── PvP challenge (duel) lifecycle ──────────────────────────────────
+    // These GA frames carry NO action_data oneof — only `actionType` +
+    // `spriteId` (the initiator) + `rawParams` (the other party's char id).
+    // Handle them BEFORE the action_data switch, which would otherwise drop
+    // them into `default: break`.
+    //
+    //   900 PROPOSAL : challenger=spriteId, target=rawParams
+    //   901 ACCEPT   : challenger=spriteId, target=rawParams
+    //   902 REFUSE   : canceler=spriteId, other=rawParams
+    if (action.actionType === 900) {
+      const targetId = action.rawParams;
+      const my = this.getMySpriteId();
+      if (my && targetId === my) {
+        this.handlers.onChallengeProposed?.({
+          challengerCharacterId: action.spriteId,
+        });
+      }
+      return;
+    }
+    if (action.actionType === 901) {
+      this.handlers.onChallengeAccepted?.({
+        challengerCharacterId: action.spriteId,
+        targetCharacterId: action.rawParams,
+      });
+      return;
+    }
+    if (action.actionType === 902) {
+      this.handlers.onChallengeCancelled?.({
+        cancelerCharacterId: action.spriteId,
+        otherCharacterId: action.rawParams,
+      });
+      return;
+    }
 
     switch (data.case) {
       case "spellLaunch":
@@ -479,10 +523,7 @@ export class FightHandler {
    * Compute a HP patch from a current fighter snapshot: the wire delta
    * is applied to the latest known HP, floored at 0 and capped at maxHp.
    */
-  private hpPatch(
-    spriteId: string,
-    delta: number
-  ): { hp: number } {
+  private hpPatch(spriteId: string, delta: number): { hp: number } {
     const existing = fightActor.getSnapshot().context.fighters.get(spriteId);
     const current = existing?.hp ?? 0;
     const max = existing?.maxHp ?? Number.POSITIVE_INFINITY;
@@ -491,22 +532,50 @@ export class FightHandler {
 
   // ── Outbound commands (client → server) ───────────────────────────
 
-  /** Accept an incoming fight challenge. */
-  acceptChallenge(): void {
+  /**
+   * Send a PvP challenge (duel) to another player. Server verb 900; the
+   * `params` field carries the TARGET CHARACTER ID (the server resolves it
+   * against the presence registry on the same map). Server echoes a 900
+   * broadcast on the map and, on accept (901), starts a Challenge fight.
+   */
+  challenge(targetCharacterId: string): void {
     this.connection.send(
       encodeClient(
         "gameAction",
-        create(GameActionRequestSchema, { actionType: 901, params: "" })
+        create(GameActionRequestSchema, {
+          actionType: 900,
+          params: String(targetCharacterId),
+        })
       )
     );
   }
 
-  /** Refuse an incoming fight challenge. */
-  refuseChallenge(): void {
+  /**
+   * Accept an incoming fight challenge. Server verb 901; `params` must
+   * carry the CHALLENGER's character id (the server keys its pending
+   * map as `<accepter>:<challenger>`), so pass the challenger id through.
+   */
+  acceptChallenge(challengerCharacterId: string): void {
     this.connection.send(
       encodeClient(
         "gameAction",
-        create(GameActionRequestSchema, { actionType: 902, params: "" })
+        create(GameActionRequestSchema, {
+          actionType: 901,
+          params: String(challengerCharacterId),
+        })
+      )
+    );
+  }
+
+  /** Refuse an incoming fight challenge. Server verb 902; `params` = the other party's character id. */
+  refuseChallenge(otherCharacterId: string): void {
+    this.connection.send(
+      encodeClient(
+        "gameAction",
+        create(GameActionRequestSchema, {
+          actionType: 902,
+          params: String(otherCharacterId),
+        })
       )
     );
   }
@@ -575,7 +644,9 @@ export class FightHandler {
   }
 
   destroy(): void {
-    for (const u of this.unsubscribers) u();
+    for (const u of this.unsubscribers) {
+      u();
+    }
     this.unsubscribers = [];
     this.handlers = {};
   }

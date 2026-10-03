@@ -194,8 +194,13 @@ async function upsertCharacter(db, accountId, serverId) {
   }
 
   // player_stats : INNER JOIN dans SelectCharacterRepository.load → OBLIGATOIRE.
+  // Stats de départ minimales (6 partout) pour que les sorts infligent des
+  // dégâts dès le niveau 1 ; les PA (6) / PM (3) de base sont hardcodés côté
+  // serveur (Fighter.fromPlayer / Runner.refreshFighter), pas en base.
   await db.query(
-    `INSERT INTO player_stats (player_id) VALUES ($1)
+    `INSERT INTO player_stats
+       (player_id, strength, vitality, wisdom, intelligence, chance, agility)
+     VALUES ($1, 6, 6, 6, 6, 6, 6)
      ON CONFLICT (player_id) DO NOTHING`,
     [playerId]
   );

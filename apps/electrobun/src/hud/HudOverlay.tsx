@@ -1,13 +1,14 @@
 import { useSyncExternalStore } from "react";
 
 import type { GameClient } from "@/game/game-client";
-import { fightActor } from "@/game/stores/fight-store";
 import { DISPLAY_HEIGHT, FULL_HEIGHT } from "@/game/constants/battlefield";
 import { characterStore, closeAllPanels, hudStore } from "@/game/stores";
+import { fightActor } from "@/game/stores/fight-store";
 
 import { BannerReact } from "./banner/BannerReact";
 import { TooltipProvider } from "./components/Tooltip";
 import { ConquestPanel } from "./conquest/ConquestPanel";
+import { ChallengePrompt } from "./fight/ChallengePrompt";
 import { DamagePoints } from "./fight/DamagePoints";
 import { FightEndDialog } from "./fight/FightEndDialog";
 import { FightOverlay } from "./fight/FightOverlay";
@@ -19,9 +20,9 @@ import { MountPanel } from "./mount/MountPanel";
 import { QuestsPanel } from "./quests/QuestsPanel";
 import { SpellsPanel } from "./spells/SpellsPanel";
 import { StatsPanel } from "./stats/StatsPanel";
-import { WorldMapPanel } from "./worldmap/WorldMapPanel";
 import { MonsterGroupTooltip } from "./world/MonsterGroupTooltip";
 import { PlayerNameplate } from "./world/PlayerNameplate";
+import { WorldMapPanel } from "./worldmap/WorldMapPanel";
 
 interface HudOverlayProps {
   baseZoom: number;
@@ -149,7 +150,10 @@ export function HudOverlay({
 
         <BannerReact
           {...(gameClient
-            ? { onSelectSpell: (spellId) => gameClient.fightSelectSpell(spellId) }
+            ? {
+                onSelectSpell: (spellId) =>
+                  gameClient.fightSelectSpell(spellId),
+              }
             : {})}
         />
 
@@ -184,6 +188,12 @@ export function HudOverlay({
 
       <MonsterGroupTooltip />
       <GameContextMenu />
+      {gameClient && (
+        <ChallengePrompt
+          onAccept={() => gameClient.acceptChallenge()}
+          onRefuse={() => gameClient.refuseChallenge()}
+        />
+      )}
     </TooltipProvider>
   );
 }

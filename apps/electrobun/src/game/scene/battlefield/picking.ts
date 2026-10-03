@@ -31,6 +31,12 @@ export interface BattlefieldPickingDeps {
    * PvM auto-trigger on cell arrival.
    */
   onCellPickThrough?: (cellId: number) => void;
+  /**
+   * Fired when the user picks "Défier" (challenge) on another player's
+   * context menu. The game client sends the PvP challenge (server verb 900)
+   * with the target's character id.
+   */
+  onChallengePlayer?: (targetCharacterId: string) => void;
 }
 
 interface InteractiveCallbacks {
@@ -434,7 +440,7 @@ export class BattlefieldPicking {
       }
       const name =
         this.deps.worldActorRenderer()?.getPlayerName(playerId) ?? "Player";
-      this.showPlayerContextMenu(name, result.x, result.y);
+      this.showPlayerContextMenu(playerId, name, result.x, result.y);
       return;
     }
 
@@ -504,6 +510,7 @@ export class BattlefieldPicking {
   }
 
   private showPlayerContextMenu(
+    playerId: number,
     name: string,
     screenX: number,
     screenY: number
@@ -512,6 +519,10 @@ export class BattlefieldPicking {
     showContextMenu(
       name,
       [
+        {
+          label: "Défier",
+          onClick: () => this.deps.onChallengePlayer?.(String(playerId)),
+        },
         { label: "Slap", onClick: () => log.debug(`Slap: ${name}`) },
         {
           label: "Organize my shop",

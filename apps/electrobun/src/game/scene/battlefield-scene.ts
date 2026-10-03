@@ -135,6 +135,7 @@ export class Battlefield {
 
   private onCellClickCallback?: (cellId: number) => void;
   private onCellHoverCallback?: (cellId: number | null) => void;
+  private onChallengePlayerCallback?: (targetCharacterId: string) => void;
   private lastHoveredCellId: number | null = null;
   private onResizeStartCallback?: () => void;
   private onResizeEndCallback?: () => void;
@@ -145,6 +146,8 @@ export class Battlefield {
     worldActorRenderer: () => this.worldActors.getRenderer(),
     app: () => this.app,
     onCellPickThrough: (cellId) => this.onCellClickCallback?.(cellId),
+    onChallengePlayer: (targetCharacterId) =>
+      this.onChallengePlayerCallback?.(targetCharacterId),
   });
 
   private readonly worldActors = new BattlefieldWorldActors({
@@ -797,6 +800,15 @@ export class Battlefield {
 
   setOnCellHover(callback: (cellId: number | null) => void): void {
     this.onCellHoverCallback = callback;
+  }
+
+  /**
+   * Subscribe to the "Défier" (challenge) action chosen from another player's
+   * context menu. The callback receives the target's character id (as a
+   * string) and should send the PvP challenge request.
+   */
+  setOnChallengePlayer(callback: (targetCharacterId: string) => void): void {
+    this.onChallengePlayerCallback = callback;
   }
 
   /**

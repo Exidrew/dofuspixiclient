@@ -59,27 +59,59 @@ export function gfxForClass(classId: number): number {
 }
 
 /**
- * Class → spell-id range (inclusive), the same convention used by migration
- * 0037 (see BREED_RANGES). Used to grant a new character its starting kit
- * when `class_starter_spells` has no row for the class.
+ * Class → spell-id range (inclusive). Dofus 1.29 lays out the 12 breed spell
+ * sets CONSECUTIVELY in blocks of 20: Feca 1-20, Osamodas 21-40, Enutrof 41-60,
+ * Sram 61-80, Xelor 81-100, Ecaflip 101-120, Eniripsa 121-140, Iop 141-160,
+ * Cra 161-180, Sadida 181-200, Sacrieur 201-220, Pandawa 221-240. (Verified
+ * against the canonical lang bundle: every id in 1..240 resolves to a spell
+ * whose `l1[9]` classId matches the block.)
+ *
+ * NOTE: earlier revisions of this table used speculative ranges (Feca 401-411
+ * etc.) whose ids do NOT exist in `spell_templates`, so new characters were
+ * granted ZERO spells. This is the corrected source of truth, mirrored by
+ * migrations 0037 + 0042.
  */
 export const BREED_SPELL_RANGES: ReadonlyArray<{
   cls: number;
   lo: number;
   hi: number;
 }> = [
-  { cls: 1, lo: 401, hi: 411 }, // Feca
-  { cls: 2, lo: 201, hi: 211 }, // Osamodas
-  { cls: 3, lo: 301, hi: 311 }, // Enutrof
-  { cls: 4, lo: 501, hi: 511 }, // Sram
-  { cls: 5, lo: 701, hi: 711 }, // Xelor
-  { cls: 6, lo: 601, hi: 611 }, // Ecaflip
-  { cls: 7, lo: 901, hi: 911 }, // Eniripsa
-  { cls: 8, lo: 101, hi: 111 }, // Iop
-  { cls: 9, lo: 1001, hi: 1011 }, // Cra
-  { cls: 10, lo: 1101, hi: 1111 }, // Sadida
-  { cls: 11, lo: 1201, hi: 1211 }, // Sacrieur
-  { cls: 12, lo: 2001, hi: 2011 }, // Pandawa
+  { cls: 1, lo: 1, hi: 20 }, // Feca
+  { cls: 2, lo: 21, hi: 40 }, // Osamodas
+  { cls: 3, lo: 41, hi: 60 }, // Enutrof
+  { cls: 4, lo: 61, hi: 80 }, // Sram
+  { cls: 5, lo: 81, hi: 100 }, // Xelor
+  { cls: 6, lo: 101, hi: 120 }, // Ecaflip
+  { cls: 7, lo: 121, hi: 140 }, // Eniripsa
+  { cls: 8, lo: 141, hi: 160 }, // Iop
+  { cls: 9, lo: 161, hi: 180 }, // Cra
+  { cls: 10, lo: 181, hi: 200 }, // Sadida
+  { cls: 11, lo: 201, hi: 220 }, // Sacrieur
+  { cls: 12, lo: 221, hi: 240 }, // Pandawa
+];
+
+/**
+ * Canonical level-1 attack spell per breed — the single spell a fresh
+ * character MUST own so it can deal damage in its first fight. These are the
+ * `l1[2] === 1` (minLevel 1) offensive spells from the canonical lang bundle
+ * (Feca → 3 "Attaque Naturelle", 5 AP, 1d5+1 neutral, range 1-6).
+ */
+export const BREED_STARTER_ATTACK: ReadonlyArray<{
+  cls: number;
+  spellId: number;
+}> = [
+  { cls: 1, spellId: 3 }, // Feca — Attaque Naturelle
+  { cls: 2, spellId: 21 }, // Osamodas — Griffe Spectrale
+  { cls: 3, spellId: 43 }, // Enutrof — Lancer de Pelle
+  { cls: 4, spellId: 61 }, // Sram — Sournoiserie
+  { cls: 5, spellId: 81 }, // Xelor — Ralentissement
+  { cls: 6, spellId: 101 }, // Ecaflip — Roulette
+  { cls: 7, spellId: 121 }, // Eniripsa — Mot Curatif
+  { cls: 8, spellId: 141 }, // Iop — Pression
+  { cls: 9, spellId: 161 }, // Cra — Flèche Magique
+  { cls: 10, spellId: 181 }, // Sadida — Tremblement
+  { cls: 11, spellId: 201 }, // Sacrieur — Béco du Tofu
+  { cls: 12, spellId: 221 }, // Pandawa — Pince
 ];
 
 export function breedSpellRange(
@@ -87,4 +119,10 @@ export function breedSpellRange(
 ): { lo: number; hi: number } | null {
   const entry = BREED_SPELL_RANGES.find((r) => r.cls === classId);
   return entry ? { lo: entry.lo, hi: entry.hi } : null;
+}
+
+/** Canonical level-1 attack spell id for a breed (see BREED_STARTER_ATTACK). */
+export function breedStarterAttack(classId: number): number | null {
+  const entry = BREED_STARTER_ATTACK.find((r) => r.cls === classId);
+  return entry ? entry.spellId : null;
 }

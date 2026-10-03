@@ -2,7 +2,10 @@ import type { TransactionalAdapterKysely } from "@nestjs-cls/transactional-adapt
 import type { DB } from "@shared/db/schema";
 import { Inject, Injectable } from "@nestjs/common";
 import { TransactionHost } from "@nestjs-cls/transactional";
-import { breedSpellRange } from "@shared/account/account-validation";
+import {
+  breedSpellRange,
+  breedStarterAttack,
+} from "@shared/account/account-validation";
 
 export interface NewCharacterInput {
   accountId: string;
@@ -17,6 +20,24 @@ export interface NewCharacterInput {
   mapId: number;
   cellId: number;
 }
+
+/**
+ * Minimal starter stats so a fresh level-1 character can actually fight.
+ * AP (6) and MP (3) are NOT stored here — they are hardcoded Dofus 1.29 base
+ * values applied by `Fighter.fromPlayer` / `Runner.refreshFighter` and shown
+ * by `StatsService.sendStats`. These six elemental characteristics give every
+ * spell a non-zero damage roll (see `calculateDamage`: stat scales the dice).
+ * A small uniform spread (all 6) keeps every breed playable regardless of its
+ * element while staying trivially re-specable with level-up points.
+ */
+const STARTER_STATS = {
+  strength: 6,
+  vitality: 6,
+  wisdom: 6,
+  intelligence: 6,
+  chance: 6,
+  agility: 6,
+} as const;
 
 @Injectable()
 export class CharacterCreateRepository {
@@ -106,12 +127,12 @@ export class CharacterCreateRepository {
         .insertInto("playerStats")
         .values({
           playerId,
-          strength: 0,
-          vitality: 0,
-          wisdom: 0,
-          intelligence: 0,
-          chance: 0,
-          agility: 0,
+          strength: STARTER_STATS.strength,
+          vitality: STARTER_STATS.vitality,
+          wisdom: STARTER_STATS.wisdom,
+          intelligence: STARTER_STATS.intelligence,
+          chance: STARTER_STATS.chance,
+          agility: STARTER_STATS.agility,
         })
         .onConflict((oc) => oc.column("playerId").doNothing())
         .execute();
@@ -184,7 +205,17 @@ export class CharacterCreateRepository {
       .orderBy("id", "asc")
       .execute();
 
-    return templates.map((t, i) => ({
+    // Pin the breed's canonical level-1 attack to position 1 so a fresh
+    // character can attack immediately even before the spell book is opened.
+    const attack = breedStarterAttack(classId);
+    const ordered = attack
+      ? [
+          ...templates.filter((t) => t.id === attack),
+          ...templates.filter((t) => t.id !== attack),
+        ]
+      : templates;
+
+    return ordered.map((t, i) => ({
       spellId: t.id,
       level: 1,
       position: i + 1,

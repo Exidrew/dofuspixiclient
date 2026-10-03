@@ -58,6 +58,8 @@ import {
   forceWalkable,
   gatewayCellsForDirection,
   oppositeEdgeCell,
+  parsePlacementCells,
+  splitFightPlaces,
 } from "./dofus-maps.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -421,6 +423,17 @@ async function main() {
     let done = 0;
     const neighborLinks = [];
 
+    // ── map_fight_places ──────────────────────────────────────────────────
+    // Aucune migration ne peuple `map_fight_places`, or c'est LA table que
+    // `MapsRepository.findFightPlaces` lit pour alimenter `createFightMap`
+    // (FightStartService.startPvM / startChallenge). Sans elle, `places0` /
+    // `places1` sont vides -> `parsePlacementCells` renvoie [] ->
+    // `createFightMap` retourne null -> AUCUN combat ne démarre (ni PvM ni
+    // PvP). Le dump figé porte ces places (`entry.places` = "places0|places1",
+    // codec HASH_CHARS : paires de caractères -> (hi<<6)|lo). On les copie
+    // telles quelles. Idempotent (ON CONFLICT (map_id) DO UPDATE).
+    let fightPlacesDone = 0;
+
     // ── Phase 1 : préparer les maps à insérer (décodage + spawn) ───────────
     // On garde les plans en mémoire pour pouvoir appliquer les portes APRÈS
     // avoir tout préparé (les portes d'une map dépendent des portes des maps
@@ -662,6 +675,43 @@ async function main() {
           `${neighborLinks.filter((l) => l.mapId <= l.neighborMapId).length} aller(s)`
       );
     }
+
+    // ── map_fight_places ──────────────────────────────────────────────────
+    // (inséré APRÈS les maps : FK map_id -> maps(id)). On ne pose une ligne
+    // que si le dump fournit des places décodables pour la map.
+    for (const [mapId, prep] of prepared) {
+      const parsed = splitFightPlaces(prep.entry?.places);
+      if (!parsed) {
+        continue;
+      }
+      // Both teams must resolve to a non-empty cell list, otherwise
+      // `createFightMap` would reject the map (needs team0 AND team1) and the
+      // row would be dead weight. A few frozen maps declare a malformed
+      // `places` (one side empty) — skip those.
+      if (
+        parsePlacementCells(parsed.places0).length === 0 ||
+        parsePlacementCells(parsed.places1).length === 0
+      ) {
+        console.warn(
+          `    · map ${mapId} : places de combat incomplètes → ignorées`
+        );
+        continue;
+      }
+      const { rowCount } = await db.query(
+        `INSERT INTO map_fight_places (map_id, places0, places1)
+           VALUES ($1, $2, $3)
+           ON CONFLICT (map_id) DO UPDATE SET
+             places0 = EXCLUDED.places0,
+             places1 = EXCLUDED.places1`,
+        [mapId, parsed.places0, parsed.places1]
+      );
+      if (rowCount > 0) {
+        fightPlacesDone++;
+      }
+    }
+    console.log(
+      `✓ ${fightPlacesDone} map(s) avec cellules de placement de combat (map_fight_places)`
+    );
 
     // ── scripted_cells (portails jaunes onMovementEnd) ────────────────────
     // Chaque entrée {cellId, toMapId, toCellId} d'une map cible seedée devient

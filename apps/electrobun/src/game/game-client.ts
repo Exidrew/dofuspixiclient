@@ -44,6 +44,12 @@ import {
 import { HighlightType } from "@/game/scene/overlays/cell-highlighter";
 import { PlayerAnimation } from "@/game/scene/player/animation";
 import { characterStore } from "@/game/stores";
+import {
+  challengeStore,
+  clearChallenge,
+  setChallengeNotice,
+  setIncomingChallenge,
+} from "@/game/stores/challenge-store";
 import { fightActor, fightStore } from "@/game/stores/fight-store";
 import { spellsStore, tickCooldowns } from "@/game/stores/spells-store";
 import { HoverPreview } from "@/hud/fight/hover-preview";
@@ -216,6 +222,11 @@ export class GameClient {
   setBattlefield(battlefield: Battlefield): void {
     this.battlefield = battlefield;
     battlefield.setOnCellClick((cellId) => this.handleCellClick(cellId));
+    // "Défier" from another player's context menu → send the PvP challenge
+    // (server verb 900 with the target character id).
+    battlefield.setOnChallengePlayer((targetCharacterId) =>
+      this.fightHandler.challenge(targetCharacterId)
+    );
     // Sole driver of the MP-reachable-range tint: roll-over our own
     // avatar shows the green pattern, roll-out clears it. Replicates
     // canonical Sprite._rollOver / _rollOut from the 1.29 client.
@@ -705,13 +716,46 @@ export class GameClient {
         const highlighter = this.battlefield
           ?.getFightUI()
           ?.getCellHighlighter();
-        if (!highlighter) return;
+        if (!highlighter) {
+          return;
+        }
         // Remove the matching zone instance — the highlighter keeps
         // the cell footprint per (centerCell, type) so we don't need
         // to recompute it from areaKind/size here. Try both types
         // since the wire only carries the centre cell.
         highlighter.removeZone(zone.cellId, HighlightType.GLYPH);
         highlighter.removeZone(zone.cellId, HighlightType.TRAP);
+      },
+      onChallengeProposed: ({ challengerCharacterId }) => {
+        // GA 900 addressed to us → surface the duel prompt. Best-effort
+        // resolve the challenger's display name from the world actors.
+        const name =
+          this.battlefield
+            ?.getWorldActorRenderer()
+            ?.getPlayerName(Number(challengerCharacterId)) ??
+          `Joueur ${challengerCharacterId}`;
+        setIncomingChallenge({ challengerCharacterId, challengerName: name });
+      },
+      onChallengeAccepted: ({ challengerCharacterId, targetCharacterId }) => {
+        // The invitation we sent was accepted → the fight starts (the
+        // server emits gameCreate/gameJoin right after), so dismiss any
+        // pending prompt either way.
+        clearChallenge();
+        setChallengeNotice("Défi accepté !");
+        void challengerCharacterId;
+        void targetCharacterId;
+      },
+      onChallengeCancelled: ({ otherCharacterId }) => {
+        // A prompt addressed to us was refused/expired (or our outgoing
+        // challenge was cancelled by the target).
+        const snap = challengeStore.getSnapshot();
+        if (
+          snap.incoming &&
+          snap.incoming.challengerCharacterId === otherCharacterId
+        ) {
+          clearChallenge();
+        }
+        setChallengeNotice("Défi annulé");
       },
     });
 
@@ -1251,6 +1295,37 @@ export class GameClient {
 
   fightForfeit(): void {
     this.fightHandler.forfeit();
+  }
+
+  /**
+   * Accept the pending duel invitation currently surfaced in the challenge
+   * store. Sends GA 901 with the CHALLENGER id (the server keys its pending
+   * map on `<accepter>:<challenger>`).
+   */
+  acceptChallenge(): void {
+    const pending = challengeStore.getSnapshot().incoming;
+    if (!pending) {
+      return;
+    }
+    this.fightHandler.acceptChallenge(pending.challengerCharacterId);
+    clearChallenge();
+    setChallengeNotice("Défi accepté");
+  }
+
+  /** Refuse the pending duel invitation (GA 902). */
+  refuseChallenge(): void {
+    const pending = challengeStore.getSnapshot().incoming;
+    if (!pending) {
+      return;
+    }
+    this.fightHandler.refuseChallenge(pending.challengerCharacterId);
+    clearChallenge();
+  }
+
+  /** Send a duel invitation to another player (GA 900). */
+  challengePlayer(targetCharacterId: string): void {
+    this.fightHandler.challenge(targetCharacterId);
+    setChallengeNotice("Défi envoyé…");
   }
 
   /**

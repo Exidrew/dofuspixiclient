@@ -525,3 +525,40 @@ export function oppositeEdgeCell(
 }
 
 export { HASH_CELL };
+
+/**
+ * Décode une chaîne de cellules de placement de combat (format StarLoco
+ * `places`), identique au codec serveur `parsePlacementCells` de
+ * `fight.map.ts` : paires de caractères `HASH_CHARS` -> `(hi << 6) | lo`.
+ *
+ * @param {string} encoded
+ * @returns {number[]} cellules, ou [] si la chaîne est vide/impaire/invalide.
+ */
+export function parsePlacementCells(encoded) {
+  const trimmed = typeof encoded === "string" ? encoded.trim() : "";
+  if (trimmed.length === 0 || trimmed.length % 2 !== 0) {
+    return [];
+  }
+  const out = [];
+  for (let i = 0; i < trimmed.length; i += 2) {
+    const hi = HASH_CELL.indexOf(trimmed.charAt(i));
+    const lo = HASH_CELL.indexOf(trimmed.charAt(i + 1));
+    if (hi === -1 || lo === -1) {
+      return [];
+    }
+    out.push((hi << 6) | lo);
+  }
+  return out;
+}
+
+/**
+ * Découpe le champ `places` figé d'une map (`"places0|places1"`) en deux listes
+ * de cellules de placement. Renvoie `null` si le format est absent/incorrect.
+ */
+export function splitFightPlaces(raw) {
+  if (typeof raw !== "string" || !raw.includes("|")) {
+    return null;
+  }
+  const [p0, p1] = raw.split("|");
+  return { places0: p0 ?? "", places1: p1 ?? "" };
+}

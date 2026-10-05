@@ -1,6 +1,7 @@
 import type { VelloRenderer } from "vello-wasm";
 import { ExternalSource, Rectangle, type Renderer, Texture } from "pixi.js";
 
+import { getMaxTextureSize } from "@/game/render/vello-loader";
 import { createLogger } from "@/utils/logger";
 
 const log = createLogger("SpellVello");
@@ -153,14 +154,38 @@ export class SpellVelloRenderer {
       return null;
     }
 
-    const strip = vello.renderAnimationStrip(
+    let stripResolution = this.fitStripResolution(
+      vello,
       assetId,
       animation,
+      animInfo.frameCount,
       resolution
+    );
+    let strip = vello.renderAnimationStrip(
+      assetId,
+      animation,
+      stripResolution
     ) as VelloStripResult | null;
+    const maxSize = getMaxTextureSize();
+    if (strip && (strip.width > maxSize || strip.height > maxSize)) {
+      // Meta bounds underestimated the real frame size — retry from the
+      // actual strip dimensions.
+      vello.freeTexture(strip.textureId);
+      const scale = Math.min(
+        maxSize / strip.width,
+        maxSize / strip.height
+      );
+      stripResolution =
+        Math.floor(stripResolution * scale * 0.95 * 1000) / 1000;
+      strip = vello.renderAnimationStrip(
+        assetId,
+        animation,
+        stripResolution
+      ) as VelloStripResult | null;
+    }
     if (!strip) {
       log.warn(
-        `spell ${spellId} anim=${animation}: renderAnimationStrip null (frameCount=${animInfo.frameCount}, resolution=${resolution}) — likely GPU texture dim limit`
+        `spell ${spellId} anim=${animation}: renderAnimationStrip null (frameCount=${animInfo.frameCount}, resolution=${stripResolution}) — likely GPU texture dim limit`
       );
       return null;
     }
@@ -175,14 +200,14 @@ export class SpellVelloRenderer {
     stripSource.alphaMode = "no-premultiply-alpha";
     stripSource.format = "rgba8unorm";
     stripSource.scaleMode = "nearest";
-    stripSource.resolution = resolution;
+    stripSource.resolution = stripResolution;
     // Lifecycle handled by us — the spell asset loader destroys these
     // textures when the spell unloads. Pixi's GC would tear the strip
     // out mid-playback otherwise.
     stripSource.autoGarbageCollect = false;
 
-    const fw = strip.frameWidth / resolution;
-    const fh = strip.frameHeight / resolution;
+    const fw = strip.frameWidth / stripResolution;
+    const fh = strip.frameHeight / stripResolution;
     const cols = strip.gridCols || strip.frameCount;
     const frames: Texture[] = [];
     for (let i = 0; i < strip.frameCount; i++) {
@@ -205,11 +230,61 @@ export class SpellVelloRenderer {
       frameWidth: fw,
       frameHeight: fh,
       // strip.anchorX/Y is in render-resolution pixels; convert to logical.
-      anchorPxX: (strip.anchorX ?? 0) / resolution,
-      anchorPxY: (strip.anchorY ?? 0) / resolution,
+      anchorPxX: (strip.anchorX ?? 0) / stripResolution,
+      anchorPxY: (strip.anchorY ?? 0) / stripResolution,
     };
     this.animationCache.set(cacheKey, animation_);
     return animation_;
+  }
+
+  /**
+   * Vello lays every frame of a strip out on a single row, so long
+   * animations (100+ frames) can exceed the GPU's maxTextureDimension2D
+   * (8192 on most devices) and produce an invalid texture. Lower the
+   * render resolution just enough for the strip to fit.
+   */
+  private fitStripResolution(
+    vello: VelloRenderer,
+    assetId: number,
+    animation: string,
+    frameCount: number,
+    resolution: number
+  ): number {
+    const meta = vello.getAnimationMeta(assetId, animation, 1.0) as {
+      width: number;
+      height: number;
+    } | null;
+    if (!meta || meta.width <= 0 || meta.height <= 0) {
+      return resolution;
+    }
+    const maxSize = getMaxTextureSize();
+    const estWidth = meta.width * resolution * frameCount;
+    const estHeight = meta.height * resolution;
+    // Meta bounds can undershoot the rasterized cells badly, so only
+    // trust the estimate when it is far below the limit.
+    if (Math.max(estWidth, estHeight) < maxSize * 0.3) {
+      return resolution;
+    }
+    // Measure the real strip size with a cheap low-res probe render.
+    const probeRes =
+      resolution * Math.min(1, (maxSize * 0.25) / Math.max(estWidth, estHeight));
+    const probe = vello.renderAnimationStrip(
+      assetId,
+      animation,
+      probeRes
+    ) as VelloStripResult | null;
+    if (!probe) {
+      return resolution;
+    }
+    vello.freeTexture(probe.textureId);
+    // Per-frame cells are rounded up, so allow 2px per frame of slack.
+    const usableWidth = Math.max(1, maxSize - 2 * frameCount);
+    const scale = Math.min(
+      1,
+      (usableWidth / Math.max(1, probe.width)) * (probeRes / resolution),
+      ((maxSize - 2) / Math.max(1, probe.height)) * (probeRes / resolution)
+    );
+    return Math.floor(resolution * scale * 0.97 * 1000) / 1000;
   }
 
   clearAnimationCache(): void {

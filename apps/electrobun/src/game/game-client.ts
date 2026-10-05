@@ -40,6 +40,7 @@ import {
   ItemDropRequestSchema,
   ItemMoveRequestSchema,
   ItemUseRequestSchema,
+  SpellMoveRequestSchema,
 } from "@/game/network/protocol";
 import { HighlightType } from "@/game/scene/overlays/cell-highlighter";
 import { PlayerAnimation } from "@/game/scene/player/animation";
@@ -1126,6 +1127,16 @@ export class GameClient {
           actionType: 2,
           params: String(mapId),
         })
+      )
+    );
+  }
+
+  /** Moves a spell to hotbar slot 1..14 (swaps with the occupant), -1 unslots. */
+  moveSpell(spellId: number, newSlot: number): void {
+    this.connection.send(
+      encodeClient(
+        "spellMove",
+        create(SpellMoveRequestSchema, { spellId, newSlot })
       )
     );
   }

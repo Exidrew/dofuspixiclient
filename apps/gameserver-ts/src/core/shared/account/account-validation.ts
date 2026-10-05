@@ -59,17 +59,17 @@ export function gfxForClass(classId: number): number {
 }
 
 /**
- * Class → spell-id range (inclusive). Dofus 1.29 lays out the 12 breed spell
- * sets CONSECUTIVELY in blocks of 20: Feca 1-20, Osamodas 21-40, Enutrof 41-60,
- * Sram 61-80, Xelor 81-100, Ecaflip 101-120, Eniripsa 121-140, Iop 141-160,
- * Cra 161-180, Sadida 181-200, Sacrieur 201-220, Pandawa 221-240. (Verified
- * against the canonical lang bundle: every id in 1..240 resolves to a spell
- * whose `l1[9]` classId matches the block.)
+ * Class → spell-id range (inclusive). The ten original breeds use consecutive
+ * blocks of 20: Feca 1-20, Osamodas 21-40, Enutrof 41-60, Sram 61-80, Xelor
+ * 81-100, Ecaflip 101-120, Eniripsa 121-140, Iop 141-160, Cra 161-180, Sadida
+ * 181-200. The later breeds live elsewhere: Sacrieur 431-450, Pandawa 686-705
+ * (201-240 are monster spells such as "Béco du Tofu"). Verified against the
+ * canonical `classes.json` lang bundle (`G[class].s`).
  *
  * NOTE: earlier revisions of this table used speculative ranges (Feca 401-411
  * etc.) whose ids do NOT exist in `spell_templates`, so new characters were
  * granted ZERO spells. This is the corrected source of truth, mirrored by
- * migrations 0037 + 0042.
+ * migrations 0037 + 0042 (Sacrieur / Pandawa repaired by 0044).
  */
 export const BREED_SPELL_RANGES: ReadonlyArray<{
   cls: number;
@@ -86,8 +86,8 @@ export const BREED_SPELL_RANGES: ReadonlyArray<{
   { cls: 8, lo: 141, hi: 160 }, // Iop
   { cls: 9, lo: 161, hi: 180 }, // Cra
   { cls: 10, lo: 181, hi: 200 }, // Sadida
-  { cls: 11, lo: 201, hi: 220 }, // Sacrieur
-  { cls: 12, lo: 221, hi: 240 }, // Pandawa
+  { cls: 11, lo: 431, hi: 450 }, // Sacrieur
+  { cls: 12, lo: 686, hi: 705 }, // Pandawa
 ];
 
 /**
@@ -110,8 +110,8 @@ export const BREED_STARTER_ATTACK: ReadonlyArray<{
   { cls: 8, spellId: 141 }, // Iop — Pression
   { cls: 9, spellId: 161 }, // Cra — Flèche Magique
   { cls: 10, spellId: 181 }, // Sadida — Tremblement
-  { cls: 11, spellId: 201 }, // Sacrieur — Béco du Tofu
-  { cls: 12, spellId: 221 }, // Pandawa — Pince
+  { cls: 11, spellId: 432 }, // Sacrieur — Pied du Sacrieur
+  { cls: 12, spellId: 687 }, // Pandawa — Poing Enflammé
 ];
 
 export function breedSpellRange(

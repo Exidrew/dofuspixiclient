@@ -1,6 +1,8 @@
 import { Application, Container } from "pixi.js";
 import { type DependencyList, type RefObject, useEffect, useRef } from "react";
 
+import { clampBatchTextures } from "@/game/render/pixi-batch-limits";
+
 /**
  * Hook that creates a standalone PIXI Application inside a DOM element.
  *
@@ -36,6 +38,7 @@ export function usePixiSlot(
         antialias: true,
       })
       .then(() => {
+        clampBatchTextures(app.renderer);
         if (destroyed) {
           app.destroy(true);
           return;

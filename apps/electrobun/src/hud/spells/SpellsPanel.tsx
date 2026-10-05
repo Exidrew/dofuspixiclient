@@ -1,18 +1,58 @@
-import { useState } from "react";
+import { useMemo, useState, useSyncExternalStore } from "react";
+
+import { type SpellEntry, spellsStore } from "@/game/stores/spells-store";
 
 import { Panel } from "../components/Panel";
+import {
+  getSpellDragData,
+  isSpellDrag,
+  SpellIconMount,
+  setSpellDragData,
+} from "./SpellIcon";
+
+/** Hotbar cells in the main banner (positions are 1-based). */
+const HOTBAR_SLOTS = 14;
 
 interface SpellsPanelProps {
   onClose: () => void;
   zoom?: number;
+  /** Move a spell to hotbar slot 1..14, or -1 to remove it from the bar. */
+  onMoveSpell?: (spellId: number, slot: number) => void;
 }
 
 /**
  * Spells panel: 250x390
- * Filter buttons + spell list + boost points footer
+ * Filter buttons + the character's spell book. Rows can be dragged onto the
+ * banner hotbar (or double-clicked to fill the first free slot); dropping a
+ * hotbar spell back on the list removes it from the bar.
  */
-export function SpellsPanel({ onClose, zoom = 1 }: SpellsPanelProps) {
+export function SpellsPanel({
+  onClose,
+  zoom = 1,
+  onMoveSpell,
+}: SpellsPanelProps) {
   const [activeFilter, setActiveFilter] = useState(0);
+  const { spells } = useSyncExternalStore(
+    spellsStore.subscribe,
+    spellsStore.getSnapshot
+  );
+  const sorted = useMemo(
+    () => [...spells].sort((a, b) => a.spellId - b.spellId),
+    [spells]
+  );
+
+  const equipInFirstFreeSlot = (spell: SpellEntry) => {
+    if (!onMoveSpell || spell.position > 0) {
+      return;
+    }
+    const used = new Set(spells.map((s) => s.position));
+    for (let slot = 1; slot <= HOTBAR_SLOTS; slot++) {
+      if (!used.has(slot)) {
+        onMoveSpell(spell.spellId, slot);
+        return;
+      }
+    }
+  };
 
   const p = (n: number) => Math.round(n * zoom);
 
@@ -131,7 +171,27 @@ export function SpellsPanel({ onClose, zoom = 1 }: SpellsPanelProps) {
         </div>
 
         {/* Spell list rows */}
-        <div
+        <ul
+          aria-label="Liste des sorts"
+          onDragOver={(e) => {
+            if (!isSpellDrag(e) || !onMoveSpell) {
+              return;
+            }
+            e.preventDefault();
+            e.dataTransfer.dropEffect = "move";
+          }}
+          onDrop={(e) => {
+            const spellId = getSpellDragData(e);
+            if (spellId === null || !onMoveSpell) {
+              return;
+            }
+            e.preventDefault();
+            if (
+              (spellsStore.getSnapshot().byId.get(spellId)?.position ?? -1) > 0
+            ) {
+              onMoveSpell(spellId, -1);
+            }
+          }}
           style={{
             position: "absolute",
             left: 0,
@@ -139,15 +199,33 @@ export function SpellsPanel({ onClose, zoom = 1 }: SpellsPanelProps) {
             width: "100%",
             height: footerY - listY,
             overflow: "auto",
+            margin: 0,
+            padding: 0,
+            listStyle: "none",
           }}
         >
-          {[...Array(12)].map((_, i) => (
-            <div
-              key={`spell-${i}`}
+          {sorted.length === 0 && (
+            <li
+              style={{
+                padding: p(8),
+                fontSize: p(10),
+                color: "var(--dofus-text-dark, #514a3c)",
+              }}
+            >
+              Aucun sort.
+            </li>
+          )}
+          {sorted.map((spell, i) => (
+            <li
+              key={spell.spellId}
+              draggable
+              title={spell.description || spell.name}
+              onDragStart={(e) => setSpellDragData(e, spell.spellId)}
+              onDoubleClick={() => equipInFirstFreeSlot(spell)}
               style={{
                 position: "relative",
                 height: rowH,
-                padding: `${p(2)}px ${p(6)}px`,
+                padding: `${p(1)}px ${p(6)}px`,
                 borderBottom: `${p(1)}px solid var(--dofus-bar-border, #514a3c)`,
                 background:
                   i % 2 === 1
@@ -155,20 +233,41 @@ export function SpellsPanel({ onClose, zoom = 1 }: SpellsPanelProps) {
                     : "var(--dofus-bg, #d5cfaa)",
                 fontSize: p(10),
                 display: "flex",
-                justifyContent: "space-between",
+                alignItems: "center",
+                gap: p(6),
+                cursor: "grab",
+                userSelect: "none",
+                boxSizing: "border-box",
               }}
             >
-              <img
-                src="/themes/classic/assets/panels/spells/spell-slot-background.svg"
-                alt="spell"
-                style={{ width: p(20), height: p(20) }}
-              />
-              <div />
-            </div>
+              <div
+                style={{
+                  position: "relative",
+                  flex: "none",
+                  width: p(16),
+                  height: p(16),
+                }}
+              >
+                <SpellIconMount spellId={spell.spellId} label={spell.name} />
+              </div>
+              <span
+                style={{
+                  flex: 1,
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                  whiteSpace: "nowrap",
+                  color: "var(--dofus-text-dark, #514a3c)",
+                  fontWeight: spell.position > 0 ? "bold" : "normal",
+                }}
+              >
+                {spell.name || `Sort ${spell.spellId}`}
+              </span>
+              <span style={{ flex: "none" }}>{spell.level}</span>
+            </li>
           ))}
-        </div>
+        </ul>
 
-        {/* Footer: boost points */}
+        {/* Footer: drag-and-drop hint */}
         <div
           style={{
             position: "absolute",
@@ -180,7 +279,7 @@ export function SpellsPanel({ onClose, zoom = 1 }: SpellsPanelProps) {
             color: "var(--dofus-text-white, #ffffff)",
             padding: `${p(4)}px`,
             textAlign: "center",
-            fontSize: p(11),
+            fontSize: p(9),
             fontWeight: "bold",
             boxSizing: "border-box",
             display: "flex",
@@ -188,7 +287,7 @@ export function SpellsPanel({ onClose, zoom = 1 }: SpellsPanelProps) {
             justifyContent: "center",
           }}
         >
-          Points de boost : 0
+          Glisse un sort dans la barre (ou double-clic)
         </div>
       </div>
     </Panel>

@@ -95,7 +95,16 @@ export function HudOverlay({
 
         {activePanel === "spells" && (
           <div style={panelWrapStyle}>
-            <SpellsPanel zoom={baseZoom} onClose={() => closeAllPanels()} />
+            <SpellsPanel
+              zoom={baseZoom}
+              onClose={() => closeAllPanels()}
+              {...(gameClient
+                ? {
+                    onMoveSpell: (spellId: number, slot: number) =>
+                      gameClient.moveSpell(spellId, slot),
+                  }
+                : {})}
+            />
           </div>
         )}
 
@@ -153,6 +162,8 @@ export function HudOverlay({
             ? {
                 onSelectSpell: (spellId) =>
                   gameClient.fightSelectSpell(spellId),
+                onMoveSpell: (spellId, slot) =>
+                  gameClient.moveSpell(spellId, slot),
               }
             : {})}
         />

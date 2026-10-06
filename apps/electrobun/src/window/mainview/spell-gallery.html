@@ -1,0 +1,9 @@
+<!DOCTYPE html>
+<html lang="fr"><head><meta charset="UTF-8"/><title>Spell VFX gallery</title>
+<style>body{margin:0;background:#222;color:#fff;font-family:sans-serif}
+#bar{position:fixed;top:0;left:0;right:0;z-index:10;background:#000c;padding:8px;display:flex;gap:8px;align-items:center}
+#gfx{font-size:28px;font-weight:bold;min-width:90px}#st{opacity:.7}button,input{font-size:16px}</style></head>
+<body><div id="bar"><button id="prev">◀</button><span id="gfx">-</span><button id="next">▶</button>
+<button id="replay">Rejouer</button><label><input type="checkbox" id="auto"/> auto</label>
+<input id="goto" placeholder="n° gfx" size="6"/><button id="go">Go</button><span id="st"></span></div>
+<div id="stage" style="position:fixed;inset:0;top:50px"></div><script type="module" src="/spell-gallery.ts"></script></body></html>
